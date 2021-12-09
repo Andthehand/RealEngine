@@ -1,5 +1,8 @@
 #include "Application.h"
 
+#include "RealEngine/Log.h"
+#include "RealEngine/Events/ApplicationEvent.h"
+
 namespace RealEngine {
 
 	Application::Application() {
@@ -9,8 +12,9 @@ namespace RealEngine {
 	}
 
 	void Application::Run() {
-		while (true) {
-
-		}
+		WindowResizeEvent e(1280, 720);
+		RE_TRACE(e);
+		
+		while (true);
 	}
 }

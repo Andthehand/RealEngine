@@ -6,6 +6,8 @@
 	#else
 		#define RealEngine_API __declspec(dllimport)
 	#endif
-#else 
+#else
 	#error RealEngine only supports Windows!
-#endif 
+#endif
+
+#define BIT(x) (1 << x)
