@@ -40,6 +40,12 @@
     <ClInclude Include="src\RealEngine\Events\MouseEvent.h">
       <Filter>RealEngine\Events</Filter>
     </ClInclude>
+    <ClInclude Include="src\RealEngine\Layer.h">
+      <Filter>RealEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RealEngine\LayerStack.h">
+      <Filter>RealEngine</Filter>
+    </ClInclude>
     <ClInclude Include="src\RealEngine\Log.h">
       <Filter>RealEngine</Filter>
     </ClInclude>
@@ -53,6 +59,12 @@
       <Filter>Platform\Windows</Filter>
     </ClCompile>
     <ClCompile Include="src\RealEngine\Application.cpp">
+      <Filter>RealEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RealEngine\Layer.cpp">
+      <Filter>RealEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RealEngine\LayerStack.cpp">
       <Filter>RealEngine</Filter>
     </ClCompile>
     <ClCompile Include="src\RealEngine\Log.cpp">
