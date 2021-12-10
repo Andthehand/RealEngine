@@ -2,8 +2,6 @@
 
 #include "Event.h"
 
-#include <sstream>
-
 namespace RealEngine {
 
 	class RealEngine_API MouseMovedEvent : public Event {

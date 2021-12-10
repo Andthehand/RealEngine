@@ -2,8 +2,6 @@
 
 #include "Event.h"
 
-#include <sstream>
-
 namespace RealEngine {
 	class RealEngine_API KeyEvent : public Event {
 	public:
