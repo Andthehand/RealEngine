@@ -6,11 +6,11 @@ public:
 	}
 
 	void OnUpdate() override {
-		RE_INFO("ExampleLayer::Update");
+		//RE_INFO("ExampleLayer::Update");
 	}
 
 	void OnEvent(RealEngine::Event& event) override {
-		RE_TRACE("{0}", event);
+		//RE_TRACE("{0}", event);
 	}
 };
 
@@ -18,6 +18,7 @@ class Sandbox : public RealEngine::Application {
 public:
 	Sandbox() {
 		PushLayer(new ExampleLayer());
+		PushOverlay(new RealEngine::ImGuiLayer());
 	}
 
 	~Sandbox() {
