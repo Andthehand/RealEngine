@@ -15,9 +15,13 @@ IncludeDir["GLFW"] = "RealEngine/vendor/GLFW/include"
 IncludeDir["Glad"] = "RealEngine/vendor/Glad/include"
 IncludeDir["ImGui"] = "RealEngine/vendor/imgui"
 
-include "RealEngine/vendor/GLFW"
-include "RealEngine/vendor/Glad"
-include "RealEngine/vendor/imgui"
+group "Dependencies"
+
+	include "RealEngine/vendor/GLFW"
+	include "RealEngine/vendor/Glad"
+	include "RealEngine/vendor/imgui"
+
+group ""
 
 project "RealEngine"
 	location "RealEngine"
@@ -62,7 +66,7 @@ project "RealEngine"
 		}
 
 		postbuildcommands {
-			("{copy} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox")
+			("{copy} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/Sandbox/\"")
 		}
 
 
