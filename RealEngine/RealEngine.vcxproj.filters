@@ -71,6 +71,8 @@
       <Filter>RealEngine</Filter>
     </ClInclude>
     <ClInclude Include="src\repch.h" />
+    <ClInclude Include="src\RealEngine\KeyCodes.h" />
+    <ClInclude Include="src\RealEngine\MouseButtonCodes.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\OpenGL\ImGuiOpengGLRenderer.cpp">

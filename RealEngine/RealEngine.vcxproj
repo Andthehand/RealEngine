@@ -76,7 +76,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>repch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RE_PLATFORM_WINDOWS;RE_BUILD_DLL;GLFW_INCLUDE_NONE;RE_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -98,7 +98,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>repch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RE_PLATFORM_WINDOWS;RE_BUILD_DLL;GLFW_INCLUDE_NONE;RE_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -124,7 +124,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>repch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RE_PLATFORM_WINDOWS;RE_BUILD_DLL;GLFW_INCLUDE_NONE;RE_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -162,9 +162,11 @@
     <ClInclude Include="src\RealEngine\Events\MouseEvent.h" />
     <ClInclude Include="src\RealEngine\ImGui\ImGuiLayer.h" />
     <ClInclude Include="src\RealEngine\Input.h" />
+    <ClInclude Include="src\RealEngine\KeyCodes.h" />
     <ClInclude Include="src\RealEngine\Layer.h" />
     <ClInclude Include="src\RealEngine\LayerStack.h" />
     <ClInclude Include="src\RealEngine\Log.h" />
+    <ClInclude Include="src\RealEngine\MouseButtonCodes.h" />
     <ClInclude Include="src\RealEngine\Window.h" />
     <ClInclude Include="src\repch.h" />
   </ItemGroup>

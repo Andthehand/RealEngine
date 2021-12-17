@@ -10,6 +10,10 @@ public:
 	}
 
 	void OnEvent(RealEngine::Event& event) override {
+		if (event.GetEventType() == RealEngine::EventType::KeyPressed) {
+			RealEngine::KeyPressedEvent& e = (RealEngine::KeyPressedEvent&)event;
+			RE_TRACE("{0}", (char)e.GetKeyCode());
+		}
 		//RE_TRACE("{0}", event);
 	}
 };
