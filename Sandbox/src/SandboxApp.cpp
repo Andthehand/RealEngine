@@ -1,28 +1,36 @@
 #include <RealEngine.h>
- 
+
+#include "imgui/imgui.h"
+
 class ExampleLayer : public RealEngine::Layer {
 public:
 	ExampleLayer() : Layer("Example") {
+	
 	}
 
 	void OnUpdate() override {
-		//RE_INFO("ExampleLayer::Update");
+
+	}
+
+	virtual void OnImGuiRender() override {
+		ImGui::Begin("Test");
+		ImGui::Text("Hello World");
+		ImGui::End();
 	}
 
 	void OnEvent(RealEngine::Event& event) override {
 		if (event.GetEventType() == RealEngine::EventType::KeyPressed) {
 			RealEngine::KeyPressedEvent& e = (RealEngine::KeyPressedEvent&)event;
-			RE_TRACE("{0}", (char)e.GetKeyCode());
+			//RE_TRACE("{0}", (char)e.GetKeyCode());
 		}
-		//RE_TRACE("{0}", event);
 	}
+
 };
 
 class Sandbox : public RealEngine::Application {
 public:
 	Sandbox() {
-		PushLayer(new ExampleLayer());
-		PushOverlay(new RealEngine::ImGuiLayer());
+
 	}
 
 	~Sandbox() {

@@ -7,6 +7,8 @@
 #include "RealEngine/Events/Event.h"
 #include "RealEngine/Events/ApplicationEvent.h"
 
+#include "RealEngine/ImGui/ImGuiLayer.h"
+
 
 namespace RealEngine {
 
@@ -29,6 +31,7 @@ namespace RealEngine {
 		bool OnWindowClose(WindowCloseEvent& e);
 
 		std::unique_ptr<Window> m_Window;
+		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
 		LayerStack m_LayerStack;
 
