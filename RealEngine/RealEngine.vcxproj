@@ -140,6 +140,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
     <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\RealEngine.h" />
@@ -157,6 +158,7 @@
     <ClInclude Include="src\RealEngine\LayerStack.h" />
     <ClInclude Include="src\RealEngine\Log.h" />
     <ClInclude Include="src\RealEngine\MouseButtonCodes.h" />
+    <ClInclude Include="src\RealEngine\Renderer\GraphicsContext.h" />
     <ClInclude Include="src\RealEngine\Window.h" />
     <ClInclude Include="src\repch.h" />
     <ClInclude Include="vendor\glm\glm\common.hpp" />
@@ -576,6 +578,7 @@
     <ClInclude Include="vendor\glm\glm\vector_relational.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="src\RealEngine\Application.cpp" />
