@@ -4,7 +4,7 @@
 #include "Layer.h"
 
 namespace RealEngine {
-	class RealEngine_API LayerStack {
+	class  LayerStack {
 	public:
 		LayerStack();
 		~LayerStack();

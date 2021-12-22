@@ -30,7 +30,7 @@ public:
 class Sandbox : public RealEngine::Application {
 public:
 	Sandbox() {
-
+		PushLayer(new ExampleLayer);
 	}
 
 	~Sandbox() {

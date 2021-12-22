@@ -3,7 +3,7 @@
 #include "RealEngine/Core.h"
 
 namespace RealEngine {
-	class RealEngine_API Input {
+	class  Input {
 	public:
 		inline static bool IsKeyPressed(int keycode) { return s_Instance->IsKeyPressedImpl(keycode); }
 		

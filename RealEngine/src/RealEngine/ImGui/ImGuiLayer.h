@@ -7,7 +7,7 @@
 #include "RealEngine/Events/ApplicationEvent.h"
 
 namespace RealEngine {
-	class RealEngine_API ImGuiLayer : public Layer {
+	class  ImGuiLayer : public Layer {
 	public:
 		ImGuiLayer();
 		~ImGuiLayer();

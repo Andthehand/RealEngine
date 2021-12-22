@@ -12,7 +12,7 @@
 
 namespace RealEngine {
 
-	class RealEngine_API Application {
+	class  Application {
 	public:
 		Application();
 		virtual ~Application();

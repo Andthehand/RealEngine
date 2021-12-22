@@ -26,9 +26,10 @@ group ""
 
 project "RealEngine"
 	location "RealEngine"
-	kind "SharedLib"
+	kind "StaticLib"
 	language "C++"
-	staticruntime "off"
+	cppdialect "C++17"
+	staticruntime "on"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -41,6 +42,10 @@ project "RealEngine"
 		"%{prj.name}/src/**.cpp",
 		"%{prj.name}/vendor/glm/glm/**.hpp",
 		"%{prj.name}/vendor/glm/glm/**.inl"
+	}
+
+	defines {
+		"_CRT_SECURE_NO_WARNINGS"
 	}
 
 	includedirs {
@@ -60,7 +65,6 @@ project "RealEngine"
 	}
 
 	filter "system:windows"
-		cppdialect "C++17"
 		systemversion "latest"
 		
 		defines {
@@ -69,31 +73,28 @@ project "RealEngine"
 			"GLFW_INCLUDE_NONE"
 		}
 
-		postbuildcommands {
-			("{copy} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/Sandbox/\"")
-		}
-
 
 		filter "configurations:Debug"
 			defines "RE_DEBUG"
 			runtime "Debug"
-			symbols "On"
+			symbols "on"
 
 		filter "configurations:Release"
 			defines "RE_RELEASE"
 			runtime "Release"
-			optimize"On"
+			optimize"on"
 
 		filter "configurations:DIST"
 			defines "RE_DIST"
 			runtime "Release"
-			optimize"On"
+			optimize"on"
 
 project "Sandbox"
 	location "Sandbox"
 	kind "ConsoleAPP"
 	language "C++"
-	staticruntime "off"
+	cppdialect "C++17"
+	staticruntime "on"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -115,7 +116,6 @@ project "Sandbox"
 	}
 
 	filter "system:windows"
-		cppdialect "C++17"
 		systemversion "latest"
 		
 		defines {
@@ -125,14 +125,14 @@ project "Sandbox"
 		filter "configurations:Debug"
 			defines "RE_DEBUG"
 			runtime "Debug"
-			symbols "On"
+			symbols "on"
 
 		filter "configurations:Release"
 			defines "RE_RELEASE"
 			runtime "Release"
-			optimize"On"
+			optimize"on"
 
 		filter "configurations:DIST"
 			defines "RE_DIST"
 			runtime "Release"
-			optimize"On"
+			optimize"on"

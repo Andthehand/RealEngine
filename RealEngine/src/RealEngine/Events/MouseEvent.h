@@ -4,7 +4,7 @@
 
 namespace RealEngine {
 
-	class RealEngine_API MouseMovedEvent : public Event {
+	class  MouseMovedEvent : public Event {
 	public:
 		MouseMovedEvent(float x, float y) : m_MouseX(x), m_MouseY(y) {}
 
@@ -23,7 +23,7 @@ namespace RealEngine {
 		float m_MouseX, m_MouseY;
 	};
 
-	class RealEngine_API MouseScrolledEvent : public Event {
+	class  MouseScrolledEvent : public Event {
 	public:
 		MouseScrolledEvent(float xOffset, float yOffset) : m_XOffset(xOffset), m_YOffset(yOffset) {}
 
@@ -42,7 +42,7 @@ namespace RealEngine {
 		float m_XOffset, m_YOffset;
 	};
 
-	class RealEngine_API MouseButtonEvent : public Event {
+	class  MouseButtonEvent : public Event {
 	public:
 		inline int GetMouseButton() const { return m_Button; }
 
@@ -53,7 +53,7 @@ namespace RealEngine {
 		int m_Button;
 	};
 
-	class RealEngine_API MouseButtonPressedEvent : public MouseButtonEvent {
+	class  MouseButtonPressedEvent : public MouseButtonEvent {
 	public:
 		MouseButtonPressedEvent(int button) : MouseButtonEvent(button) {}
 
@@ -66,7 +66,7 @@ namespace RealEngine {
 		EVENT_CLASS_TYPE(MouseButtonPressed)
 	};
 
-	class RealEngine_API MouseButtonReleasedEvent : public MouseButtonEvent {
+	class  MouseButtonReleasedEvent : public MouseButtonEvent {
 	public:
 		MouseButtonReleasedEvent(int button) : MouseButtonEvent(button) {}
 

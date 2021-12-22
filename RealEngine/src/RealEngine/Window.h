@@ -17,7 +17,7 @@ namespace RealEngine {
 			:Title(title), Width(width), Height(height) {}
 	};
 
-	class RealEngine_API Window {
+	class  Window {
 	public:
 		using EventCallbackFn = std::function<void(Event&)>;
 

@@ -1,15 +1,5 @@
 #pragma once
 
-#ifdef RE_PLATFORM_WINDOWS
-	#ifdef RE_BUILD_DLL
-		#define RealEngine_API __declspec(dllexport)
-	#else
-		#define RealEngine_API __declspec(dllimport)
-	#endif
-#else
-	#error RealEngine only supports Windows!
-#endif
-
 #ifdef RE_DEBUG
 	#define RE_ENABLE_ASSERTS
 #endif
