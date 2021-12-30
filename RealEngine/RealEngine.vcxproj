@@ -142,6 +142,7 @@
   <ItemGroup>
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h" />
     <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\RealEngine.h" />
@@ -163,6 +164,7 @@
     <ClInclude Include="src\RealEngine\Renderer\GraphicsContext.h" />
     <ClInclude Include="src\RealEngine\Renderer\Renderer.h" />
     <ClInclude Include="src\RealEngine\Renderer\Shader.h" />
+    <ClInclude Include="src\RealEngine\Renderer\VertexArray.h" />
     <ClInclude Include="src\RealEngine\Window.h" />
     <ClInclude Include="src\repch.h" />
     <ClInclude Include="vendor\glm\glm\common.hpp" />
@@ -584,6 +586,7 @@
   <ItemGroup>
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLVertexArray.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="src\RealEngine\Application.cpp" />
@@ -595,6 +598,7 @@
     <ClCompile Include="src\RealEngine\Renderer\Buffer.cpp" />
     <ClCompile Include="src\RealEngine\Renderer\Renderer.cpp" />
     <ClCompile Include="src\RealEngine\Renderer\Shader.cpp" />
+    <ClCompile Include="src\RealEngine\Renderer\VertexArray.cpp" />
     <ClCompile Include="src\repch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
