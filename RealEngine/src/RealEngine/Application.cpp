@@ -13,6 +13,7 @@ namespace RealEngine {
 
 	Application* Application::s_Instance = nullptr;
 
+	//TODO: Remove this
 	static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type) {
 		switch (type) {
 			case RealEngine::ShaderDataType::None:    return GL_FLOAT;
@@ -38,11 +39,19 @@ namespace RealEngine {
 		s_Instance = this;
 
 		m_Window = std::unique_ptr<Window>(Window::Create());
+		//Sets the event callback of the window to the applictation.cpp OnEvent function
+		//i.e. resize event, mouse input, and keyboard input
 		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
 
+		//Pushes the ImGuiLayer to the layer stack so that it's easier to deal with
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
 
+		//-------------------//
+		#pragma region TempCode
+		//-------------------//
+
+		//Creates and binds the VAO so that the VBO binds to it
 		glGenVertexArrays(1, &m_VertexArray);
 		glBindVertexArray(m_VertexArray);
 
@@ -52,17 +61,21 @@ namespace RealEngine {
 			 0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
 		};
 
+		//Makes sure that m_VertexBuffer is deleted before storing another VertexBuffer
+		//Also binds VBO to VAO
 		m_VertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
 
+		//The brackets make it so that layout is created stored then deleted right away
 		{
 			BufferLayout layout = {
-				{ ShaderDataType::Float3, "a_Posistion"},
+				{ ShaderDataType::Float3, "a_Position"},
 				{ ShaderDataType::Float4, "a_Color"}
 			};
 
 			m_VertexBuffer->SetLayout(layout);
 		}
 
+		//Loops through the elements to add to the VBO such as a_Position and a_Color
 		uint32_t index = 0;
 		const auto& layout = m_VertexBuffer->GetLayout();
 		for (const auto& element : layout) {
@@ -77,6 +90,7 @@ namespace RealEngine {
 			index++;
 		}
 
+		//I think it's needed for the ImGUI
 		uint32_t indices[3] = { 0, 1, 2 };
 		m_IndexBuffer.reset(IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
 
@@ -108,6 +122,7 @@ namespace RealEngine {
 			})";
 
 		m_Shader.reset(new Shader(vertexSrc, fragmentSrc));
+		#pragma endregion
 	}
 
 	Application::~Application() {
@@ -137,13 +152,16 @@ namespace RealEngine {
 	void Application::Run() {
 		
 		while (m_Running) {
+			//Clear screen to color
 			glClearColor(0.1, 0.1, 0.1, 1);
 			glClear(GL_COLOR_BUFFER_BIT);
 
+			//Bind current shader and buffer
 			m_Shader->Bind();
 			glBindVertexArray(m_VertexArray);
 			glDrawElements(GL_TRIANGLES, m_IndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
 
+			//Update all layers/Overlays
 			for (Layer* layer : m_LayerStack)
 				layer->OnUpdate();
 

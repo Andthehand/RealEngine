@@ -69,6 +69,7 @@ namespace RealEngine {
 		std::vector<BufferElement>::const_iterator begin() const { return m_Elements.begin(); }
 		std::vector<BufferElement>::const_iterator end() const { return m_Elements.end(); }
 	private:
+		//Loops through all of the elemets that are passed into this class and calculates the offset and stride automatically
 		void CalculateOffsetsAndStride() {
 			uint32_t offset = 0;
 			m_Stride = 0;
