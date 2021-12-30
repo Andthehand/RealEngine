@@ -9,6 +9,7 @@
 
 #include "RealEngine/ImGui/ImGuiLayer.h"
 
+#include "RealEngine/Renderer/OrthographicCamera.h"
 #include "RealEngine/Renderer/Shader.h"
 #include "RealEngine/Renderer/VertexArray.h"
 #include "RealEngine/Renderer/Buffer.h"
@@ -16,7 +17,7 @@
 
 namespace RealEngine {
 
-	class  Application {
+	class Application {
 	public:
 		Application();
 		virtual ~Application();
@@ -44,6 +45,8 @@ namespace RealEngine {
 
 		std::shared_ptr<Shader> m_SquareShader;
 		std::shared_ptr<VertexArray> m_SquareVA;
+
+		OrthographicCamera m_Camera;
 
 		static Application* s_Instance;
 	};

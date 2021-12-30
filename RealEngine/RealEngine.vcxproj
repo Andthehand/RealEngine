@@ -163,6 +163,7 @@
     <ClInclude Include="src\RealEngine\MouseButtonCodes.h" />
     <ClInclude Include="src\RealEngine\Renderer\Buffer.h" />
     <ClInclude Include="src\RealEngine\Renderer\GraphicsContext.h" />
+    <ClInclude Include="src\RealEngine\Renderer\OrthographicCamera.h" />
     <ClInclude Include="src\RealEngine\Renderer\RenderCommand.h" />
     <ClInclude Include="src\RealEngine\Renderer\Renderer.h" />
     <ClInclude Include="src\RealEngine\Renderer\RendererAPI.h" />
@@ -600,6 +601,7 @@
     <ClCompile Include="src\RealEngine\LayerStack.cpp" />
     <ClCompile Include="src\RealEngine\Log.cpp" />
     <ClCompile Include="src\RealEngine\Renderer\Buffer.cpp" />
+    <ClCompile Include="src\RealEngine\Renderer\OrthographicCamera.cpp" />
     <ClCompile Include="src\RealEngine\Renderer\RenderCommand.cpp" />
     <ClCompile Include="src\RealEngine\Renderer\Renderer.cpp" />
     <ClCompile Include="src\RealEngine\Renderer\RendererAPI.cpp" />

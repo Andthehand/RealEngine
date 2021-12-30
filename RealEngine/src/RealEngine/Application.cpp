@@ -1,8 +1,9 @@
 #include "repch.h"
 #include "Application.h"
 
+#include "RealEngine/Renderer/Renderer.h"
+
 #include "RealEngine/Log.h"
-#include "Renderer/Renderer.h"
 
 #include "Input.h"
 
@@ -12,7 +13,7 @@ namespace RealEngine {
 
 	Application* Application::s_Instance = nullptr;
 
-	Application::Application() {
+	Application::Application() : m_Camera(-1.0, 1.0f, -1.0f, 1.0f) {
 		RE_CORE_ASSERT(!s_Instance, "Application already exists!")
 		s_Instance = this;
 
@@ -85,12 +86,14 @@ namespace RealEngine {
 			layout(location = 0) in vec3 a_Position;
 			layout(location = 1) in vec4 a_Color;
 
+			uniform mat4 u_ViewProjection;
+
 			out vec3 v_Position;
 			out vec4 v_Color;
 
 			void main() {
 				v_Position = a_Position;
-				gl_Position = vec4(a_Position, 1.0);	
+				gl_Position = u_ViewProjection * vec4(a_Position, 1.0);	
 				v_Color = a_Color;
 			})";
 
@@ -113,11 +116,13 @@ namespace RealEngine {
 			
 			layout(location = 0) in vec3 a_Position;
 
+			uniform mat4 u_ViewProjection;
+
 			out vec3 v_Position;
 
 			void main() {
 				v_Position = a_Position;
-				gl_Position = vec4(a_Position, 1.0);	
+				gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
 			})";
 
 		std::string squareFragmentSrc = R"(
@@ -165,13 +170,11 @@ namespace RealEngine {
 			RenderCommand::SetClearColor({ 0.1, 0.1, 0.1, 1 });
 			RenderCommand::Clear();
 
-			Renderer::BeginScene();
+			Renderer::BeginScene(m_Camera);
 			
-			m_SquareShader->Bind();
-			Renderer::Submit(m_SquareVA);
+			Renderer::Submit(m_SquareShader, m_SquareVA);
 
-			m_Shader->Bind();
-			Renderer::Submit(m_VertexArray);
+			Renderer::Submit(m_Shader, m_VertexArray);
 			
 			Renderer::EndScene();
 

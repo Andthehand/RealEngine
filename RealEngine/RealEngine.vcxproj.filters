@@ -117,6 +117,9 @@
     <ClInclude Include="src\RealEngine\Renderer\GraphicsContext.h">
       <Filter>src\RealEngine\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\RealEngine\Renderer\OrthographicCamera.h">
+      <Filter>src\RealEngine\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\RealEngine\Renderer\RenderCommand.h">
       <Filter>src\RealEngine\Renderer</Filter>
     </ClInclude>
@@ -1422,6 +1425,9 @@
       <Filter>src\RealEngine</Filter>
     </ClCompile>
     <ClCompile Include="src\RealEngine\Renderer\Buffer.cpp">
+      <Filter>src\RealEngine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RealEngine\Renderer\OrthographicCamera.cpp">
       <Filter>src\RealEngine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\RealEngine\Renderer\RenderCommand.cpp">
