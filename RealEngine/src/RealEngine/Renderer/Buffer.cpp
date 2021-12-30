@@ -7,8 +7,8 @@
 namespace RealEngine {
 	VertexBuffer* VertexBuffer::Create(float* verticies, uint32_t size) {
 		switch (Renderer::GetAPI()) {
-			case RendererAPI::None:    RE_CORE_ASSERT(false, "RenderAPI::None is currently not supported!"); return nullptr;
-			case RendererAPI::OpenGL:  return new OpenGLVertexBuffer(verticies, size);
+			case RendererAPI::API::None:    RE_CORE_ASSERT(false, "RenderAPI::None is currently not supported!"); return nullptr;
+			case RendererAPI::API::OpenGL:  return new OpenGLVertexBuffer(verticies, size);
 		}
 
 		RE_CORE_ASSERT(false, "Unkown RendererAPI!");
@@ -17,8 +17,8 @@ namespace RealEngine {
 
 	IndexBuffer* IndexBuffer::Create(uint32_t* indices, uint32_t size) {
 		switch (Renderer::GetAPI()) {
-			case RendererAPI::None:    RE_CORE_ASSERT(false, "RenderAPI::None is currently not supported!"); return nullptr;
-			case RendererAPI::OpenGL:  return new OpenGLIndexBuffer(indices, size);
+			case RendererAPI::API::None:    RE_CORE_ASSERT(false, "RenderAPI::None is currently not supported!"); return nullptr;
+			case RendererAPI::API::OpenGL:  return new OpenGLIndexBuffer(indices, size);
 		}
 
 		RE_CORE_ASSERT(false, "Unkown RendererAPI!");

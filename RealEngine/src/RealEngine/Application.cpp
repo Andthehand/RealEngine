@@ -2,8 +2,7 @@
 #include "Application.h"
 
 #include "RealEngine/Log.h"
-
-#include <Glad/glad.h>
+#include "Renderer/Renderer.h"
 
 #include "Input.h"
 
@@ -163,18 +162,18 @@ namespace RealEngine {
 	void Application::Run() {
 		
 		while (m_Running) {
-			//Clear screen to color
-			glClearColor(0.1, 0.1, 0.1, 1);
-			glClear(GL_COLOR_BUFFER_BIT);
+			RenderCommand::SetClearColor({ 0.1, 0.1, 0.1, 1 });
+			RenderCommand::Clear();
 
+			Renderer::BeginScene();
+			
 			m_SquareShader->Bind();
-			m_SquareVA->Bind();
-			glDrawElements(GL_TRIANGLES, m_SquareVA->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+			Renderer::Submit(m_SquareVA);
 
-			//Bind current shader and buffer
 			m_Shader->Bind();
-			m_VertexArray->Bind();
-			glDrawElements(GL_TRIANGLES, m_VertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+			Renderer::Submit(m_VertexArray);
+			
+			Renderer::EndScene();
 
 			//Update all layers/Overlays
 			for (Layer* layer : m_LayerStack)
