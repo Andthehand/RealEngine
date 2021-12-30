@@ -140,7 +140,6 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\RealEngine\Renderer\Renderer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
     <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
@@ -162,6 +161,7 @@
     <ClInclude Include="src\RealEngine\MouseButtonCodes.h" />
     <ClInclude Include="src\RealEngine\Renderer\Buffer.h" />
     <ClInclude Include="src\RealEngine\Renderer\GraphicsContext.h" />
+    <ClInclude Include="src\RealEngine\Renderer\Renderer.h" />
     <ClInclude Include="src\RealEngine\Renderer\Shader.h" />
     <ClInclude Include="src\RealEngine\Window.h" />
     <ClInclude Include="src\repch.h" />
@@ -582,7 +582,6 @@
     <ClInclude Include="vendor\glm\glm\vector_relational.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\RealEngine\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />
@@ -594,6 +593,7 @@
     <ClCompile Include="src\RealEngine\LayerStack.cpp" />
     <ClCompile Include="src\RealEngine\Log.cpp" />
     <ClCompile Include="src\RealEngine\Renderer\Buffer.cpp" />
+    <ClCompile Include="src\RealEngine\Renderer\Renderer.cpp" />
     <ClCompile Include="src\RealEngine\Renderer\Shader.cpp" />
     <ClCompile Include="src\repch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
