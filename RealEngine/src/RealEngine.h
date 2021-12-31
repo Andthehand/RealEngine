@@ -4,6 +4,8 @@
 #include "RealEngine/Layer.h"
 #include "RealEngine/Log.h"
 
+#include "RealEngine/Core/TimeStep.h"
+
 #include "RealEngine/Input.h"
 #include "RealEngine/KeyCodes.h"
 #include "RealEngine/MouseButtonCodes.h"

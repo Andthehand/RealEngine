@@ -149,6 +149,7 @@
     <ClInclude Include="src\RealEngine.h" />
     <ClInclude Include="src\RealEngine\Application.h" />
     <ClInclude Include="src\RealEngine\Core.h" />
+    <ClInclude Include="src\RealEngine\Core\TimeStep.h" />
     <ClInclude Include="src\RealEngine\EntryPoint.h" />
     <ClInclude Include="src\RealEngine\Events\ApplicationEvent.h" />
     <ClInclude Include="src\RealEngine\Events\Event.h" />

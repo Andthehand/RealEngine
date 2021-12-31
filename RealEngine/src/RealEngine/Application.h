@@ -7,13 +7,9 @@
 #include "RealEngine/Events/Event.h"
 #include "RealEngine/Events/ApplicationEvent.h"
 
+#include "RealEngine/Core/TimeStep.h"
+
 #include "RealEngine/ImGui/ImGuiLayer.h"
-
-#include "RealEngine/Renderer/OrthographicCamera.h"
-#include "RealEngine/Renderer/Shader.h"
-#include "RealEngine/Renderer/VertexArray.h"
-#include "RealEngine/Renderer/Buffer.h"
-
 
 namespace RealEngine {
 
@@ -39,6 +35,7 @@ namespace RealEngine {
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
 		LayerStack m_LayerStack;
+		float m_LastFrameTime;
 
 		static Application* s_Instance;
 	};

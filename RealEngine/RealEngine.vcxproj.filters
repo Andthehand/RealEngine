@@ -16,6 +16,9 @@
     <Filter Include="src\RealEngine">
       <UniqueIdentifier>{B69BA754-A269-9B5A-8BFD-0B81776A77BF}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\RealEngine\Core">
+      <UniqueIdentifier>{CE81A490-3AE3-819E-C350-C8502FB1B85D}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\RealEngine\Events">
       <UniqueIdentifier>{DA3EEE50-46AB-A94B-0F9F-41A97BCACBB3}</UniqueIdentifier>
     </Filter>
@@ -74,6 +77,9 @@
     </ClInclude>
     <ClInclude Include="src\RealEngine\Core.h">
       <Filter>src\RealEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RealEngine\Core\TimeStep.h">
+      <Filter>src\RealEngine\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\RealEngine\EntryPoint.h">
       <Filter>src\RealEngine</Filter>

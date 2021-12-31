@@ -114,18 +114,18 @@ public:
 		m_SquareShader.reset(new RealEngine::Shader(squareVertexSrc, squareFragmentSrc));
 	}
 
-	void OnUpdate() override {
+	void OnUpdate(RealEngine::Timestep ts) override {
 		if (RealEngine::Input::IsKeyPressed(RE_KEY_W)) {
-			m_CameraPosition.y += m_CameraSpeed;
+			m_CameraPosition.y += m_CameraSpeed * ts;
 		}
 		if (RealEngine::Input::IsKeyPressed(RE_KEY_A)) {
-			m_CameraPosition.x -= m_CameraSpeed;
+			m_CameraPosition.x -= m_CameraSpeed * ts;
 		}
 		if (RealEngine::Input::IsKeyPressed(RE_KEY_S)) {
-			m_CameraPosition.y -= m_CameraSpeed;
+			m_CameraPosition.y -= m_CameraSpeed * ts;
 		}
 		if (RealEngine::Input::IsKeyPressed(RE_KEY_D)) {
-			m_CameraPosition.x += m_CameraSpeed;
+			m_CameraPosition.x += m_CameraSpeed * ts;
 		}
 
 		RealEngine::RenderCommand::SetClearColor({ 0.1, 0.1, 0.1, 1 });
@@ -155,7 +155,7 @@ private:
 
 	RealEngine::OrthographicCamera m_Camera;
 	glm::vec3 m_CameraPosition;
-	const float m_CameraSpeed = 0.1f;
+	const float m_CameraSpeed = 2.5f;
 };
 
 class Sandbox : public RealEngine::Application {
