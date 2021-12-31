@@ -1,10 +1,12 @@
 #include <RealEngine.h>
 
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "imgui/imgui.h"
 
 class ExampleLayer : public RealEngine::Layer {
 public:
-	ExampleLayer() : Layer("Example"), m_Camera(-1.0, 1.0f, -1.0f, 1.0f), m_CameraPosition(0.0f) {
+	ExampleLayer() : Layer("Example"), m_Camera(-1.6f, 1.6f, -0.9f, 0.9f), m_CameraPosition(0.0f) {
 		float vertices[3 * 7] = {
 		-0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
 		 0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.8f, 1.0f,
@@ -39,10 +41,10 @@ public:
 		m_SquareVA.reset(RealEngine::VertexArray::Create());
 
 		float squareVertices[3 * 4] = {
-			 -0.75f,  -0.75f,  0.0f,
-			  0.75f,  -0.75f,  0.0f,
-			  0.75f,   0.75f,  0.0f,
-			 -0.75f,   0.75f,  0.0f
+			 -0.5f,  -0.5f,  0.0f,
+			  0.5f,  -0.5f,  0.0f,
+			  0.5f,   0.5f,  0.0f,
+			 -0.5f,   0.5f,  0.0f
 		};
 
 		std::shared_ptr<RealEngine::VertexBuffer> squareVB;
@@ -62,13 +64,14 @@ public:
 			layout(location = 1) in vec4 a_Color;
 
 			uniform mat4 u_ViewProjection;
+			uniform mat4 u_Transform;
 
 			out vec3 v_Position;
 			out vec4 v_Color;
 
 			void main() {
 				v_Position = a_Position;
-				gl_Position = u_ViewProjection * vec4(a_Position, 1.0);	
+				gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);	
 				v_Color = a_Color;
 			})";
 
@@ -91,13 +94,14 @@ public:
 			
 			layout(location = 0) in vec3 a_Position;
 
+			uniform mat4 u_Transform;
 			uniform mat4 u_ViewProjection;
 
 			out vec3 v_Position;
 
 			void main() {
 				v_Position = a_Position;
-				gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
+				gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
 			})";
 
 		std::string squareFragmentSrc = R"(
@@ -108,7 +112,7 @@ public:
 			in vec3 v_Position;
 
 			void main() {
-				color = vec4(v_Position * 0.5 + 0.5, 1.0);
+				color = vec4(0.2, 0.3, 0.8, 1.0);
 			})";
 
 		m_SquareShader.reset(new RealEngine::Shader(squareVertexSrc, squareFragmentSrc));
@@ -135,8 +139,18 @@ public:
 
 		RealEngine::Renderer::BeginScene(m_Camera);
 
-		RealEngine::Renderer::Submit(m_SquareShader, m_SquareVA);
-		RealEngine::Renderer::Submit(m_Shader, m_VertexArray);
+		//static makes it not recalculated every update
+		static glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
+		for (int x = 0; x < 20; x++) {
+			for (int y = 0; y < 20; y++)
+			{
+				glm::vec3 pos(x * 0.11f, y * 0.11f, 0.0f);
+				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
+				RealEngine::Renderer::Submit(m_SquareShader, m_SquareVA, transform);
+			}
+		}
+
+		//RealEngine::Renderer::Submit(m_Shader, m_VertexArray);
 
 		RealEngine::Renderer::EndScene();
 	}

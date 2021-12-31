@@ -19,6 +19,9 @@ namespace RealEngine {
 			case RealEngine::ShaderDataType::Int4:	  return 4 * 4;
 			case RealEngine::ShaderDataType::Bool:	  return 1;
 		}
+		RE_ASSERT(false, "No ShaderDataType of type{0}", type);
+
+		return 0;
 	}
 
 	struct BufferElement {
