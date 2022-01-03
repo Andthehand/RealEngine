@@ -1,8 +1,11 @@
 #include <RealEngine.h>
 
-#include <glm/gtc/matrix_transform.hpp>
-
 #include "imgui/imgui.h"
+
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include "Platform/OpenGL/OpenGLShader.h"
 
 class ExampleLayer : public RealEngine::Layer {
 public:
@@ -87,7 +90,7 @@ public:
 				color = v_Color;
 			})";
 
-		m_Shader.reset(new RealEngine::Shader(vertexSrc, fragmentSrc));
+		m_Shader.reset(RealEngine::Shader::Create(vertexSrc, fragmentSrc));
 
 		std::string squareVertexSrc = R"(
 			#version 330 core
@@ -109,13 +112,15 @@ public:
 			
 			layout(location = 0) out vec4 color;
 
+			uniform vec3 u_Color;
+
 			in vec3 v_Position;
 
 			void main() {
-				color = vec4(0.2, 0.3, 0.8, 1.0);
+				color = vec4(u_Color, 1.0f);
 			})";
 
-		m_SquareShader.reset(new RealEngine::Shader(squareVertexSrc, squareFragmentSrc));
+		m_SquareShader.reset(RealEngine::Shader::Create(squareVertexSrc, squareFragmentSrc));
 	}
 
 	void OnUpdate(RealEngine::Timestep ts) override {
@@ -141,6 +146,10 @@ public:
 
 		//static makes it not recalculated every update
 		static glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
+
+		std::dynamic_pointer_cast<RealEngine::OpenGLShader>(m_SquareShader)->Bind();
+		std::dynamic_pointer_cast<RealEngine::OpenGLShader>(m_SquareShader)->UploadUniformFloat3("u_Color", m_SquareColor);
+
 		for (int x = 0; x < 20; x++) {
 			for (int y = 0; y < 20; y++)
 			{
@@ -156,6 +165,9 @@ public:
 	}
 
 	virtual void OnImGuiRender() override {
+		ImGui::Begin("Settings");
+		ImGui::ColorEdit3("Square Color", glm::value_ptr(m_SquareColor));
+		ImGui::End();
 	}
 
 	void OnEvent(RealEngine::Event& event) override {
@@ -170,6 +182,8 @@ private:
 	RealEngine::OrthographicCamera m_Camera;
 	glm::vec3 m_CameraPosition;
 	const float m_CameraSpeed = 2.5f;
+
+	glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f };
 };
 
 class Sandbox : public RealEngine::Application {
