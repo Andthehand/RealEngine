@@ -20,7 +20,7 @@ public:
 
 		//Makes sure that m_VertexBuffer is deleted before storing another VertexBuffer
 		//Also binds VBO to VAO
-		std::shared_ptr<RealEngine::VertexBuffer> vertexBuffer;
+		RealEngine::Ref<RealEngine::VertexBuffer> vertexBuffer;
 		vertexBuffer.reset(RealEngine::VertexBuffer::Create(vertices, sizeof(vertices)));
 
 		RealEngine::BufferLayout layout = {
@@ -33,7 +33,7 @@ public:
 
 		//Needed for glDrawElements in the game loop
 		uint32_t indices[3] = { 0, 1, 2 };
-		std::shared_ptr<RealEngine::IndexBuffer> indexBuffer;
+		RealEngine::Ref<RealEngine::IndexBuffer> indexBuffer;
 		indexBuffer.reset(RealEngine::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
 		m_VertexArray->SetIndexBuffer(indexBuffer);
 
@@ -50,13 +50,13 @@ public:
 			 -0.5f,   0.5f,  0.0f
 		};
 
-		std::shared_ptr<RealEngine::VertexBuffer> squareVB;
+		RealEngine::Ref<RealEngine::VertexBuffer> squareVB;
 		squareVB.reset(RealEngine::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
 		squareVB->SetLayout({ { RealEngine::ShaderDataType::Float3, "a_Position" } });
 		m_SquareVA->AddVertexBuffer(squareVB);
 
 		uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
-		std::shared_ptr<RealEngine::IndexBuffer> squareIB;
+		RealEngine::Ref<RealEngine::IndexBuffer> squareIB;
 		squareIB.reset(RealEngine::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
 		m_SquareVA->SetIndexBuffer(squareIB);
 
@@ -173,11 +173,11 @@ public:
 	void OnEvent(RealEngine::Event& event) override {
 	}
 private:
-	std::shared_ptr<RealEngine::Shader> m_Shader;
-	std::shared_ptr<RealEngine::VertexArray> m_VertexArray;
+	RealEngine::Ref<RealEngine::Shader> m_Shader;
+	RealEngine::Ref<RealEngine::VertexArray> m_VertexArray;
 
-	std::shared_ptr<RealEngine::Shader> m_SquareShader;
-	std::shared_ptr<RealEngine::VertexArray> m_SquareVA;
+	RealEngine::Ref<RealEngine::Shader> m_SquareShader;
+	RealEngine::Ref<RealEngine::VertexArray> m_SquareVA;
 
 	RealEngine::OrthographicCamera m_Camera;
 	glm::vec3 m_CameraPosition;
