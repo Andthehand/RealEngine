@@ -23,6 +23,8 @@ namespace RealEngine {
 		//i.e. resize event, mouse input, and keyboard input
 		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
 
+		Renderer::Init();
+
 		//Pushes the ImGuiLayer to the layer stack so that it's easier to deal with
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);

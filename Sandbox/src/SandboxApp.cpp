@@ -11,9 +11,9 @@ class ExampleLayer : public RealEngine::Layer {
 public:
 	ExampleLayer() : Layer("Example"), m_Camera(-1.6f, 1.6f, -0.9f, 0.9f), m_CameraPosition(0.0f) {
 		float vertices[3 * 7] = {
-		-0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
-		 0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.8f, 1.0f,
-		 0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
+			-0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
+			 0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.8f, 1.0f,
+			 0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
 		};
 
 		m_VertexArray.reset(RealEngine::VertexArray::Create());
@@ -43,16 +43,19 @@ public:
 
 		m_SquareVA.reset(RealEngine::VertexArray::Create());
 
-		float squareVertices[3 * 4] = {
-			 -0.5f,  -0.5f,  0.0f,
-			  0.5f,  -0.5f,  0.0f,
-			  0.5f,   0.5f,  0.0f,
-			 -0.5f,   0.5f,  0.0f
+		float squareVertices[5 * 4] = {
+			 -0.5f,  -0.5f,  0.0f,  0.0f, 0.0f,
+			  0.5f,  -0.5f,  0.0f,  1.0f, 0.0f,
+			  0.5f,   0.5f,  0.0f,  1.0f, 1.0f,
+			 -0.5f,   0.5f,  0.0f,  0.0f, 1.0f,
 		};
 
 		RealEngine::Ref<RealEngine::VertexBuffer> squareVB;
 		squareVB.reset(RealEngine::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
-		squareVB->SetLayout({ { RealEngine::ShaderDataType::Float3, "a_Position" } });
+		squareVB->SetLayout({ 
+			{ RealEngine::ShaderDataType::Float3, "a_Position" },
+			{ RealEngine::ShaderDataType::Float2, "a_TexCoord" }
+		});
 		m_SquareVA->AddVertexBuffer(squareVB);
 
 		uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
@@ -121,6 +124,43 @@ public:
 			})";
 
 		m_SquareShader.reset(RealEngine::Shader::Create(squareVertexSrc, squareFragmentSrc));
+
+		std::string textureVertexSrc = R"(
+			#version 330 core
+			
+			layout(location = 0) in vec3 a_Position;
+			layout(location = 1) in vec2 a_TexCoord;
+
+			uniform mat4 u_Transform;
+			uniform mat4 u_ViewProjection;
+
+			out vec2 v_TexCoord;
+
+			void main() {
+				v_TexCoord = a_TexCoord;
+				gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
+			})";
+
+		std::string textureFragmentSrc = R"(
+			#version 330 core
+			
+			layout(location = 0) out vec4 color;
+
+			in vec2 v_TexCoord;
+
+			uniform sampler2D u_Texture;
+
+			void main() {
+				color = texture(u_Texture, v_TexCoord);
+			})";
+
+		m_TextureShader.reset(RealEngine::Shader::Create(textureVertexSrc, textureFragmentSrc));
+	
+		m_Texture = RealEngine::Texture2D::Create("assets/textures/Checkerboard.png");
+		m_LogoTexture = RealEngine::Texture2D::Create("assets/textures/RealEngine.png");
+
+		std::dynamic_pointer_cast<RealEngine::OpenGLShader>(m_TextureShader)->Bind();
+		std::dynamic_pointer_cast<RealEngine::OpenGLShader>(m_TextureShader)->UploadUniformInt("u_Texture", 0);
 	}
 
 	void OnUpdate(RealEngine::Timestep ts) override {
@@ -150,6 +190,7 @@ public:
 		std::dynamic_pointer_cast<RealEngine::OpenGLShader>(m_SquareShader)->Bind();
 		std::dynamic_pointer_cast<RealEngine::OpenGLShader>(m_SquareShader)->UploadUniformFloat3("u_Color", m_SquareColor);
 
+		//Render flat color
 		for (int x = 0; x < 20; x++) {
 			for (int y = 0; y < 20; y++)
 			{
@@ -158,6 +199,13 @@ public:
 				RealEngine::Renderer::Submit(m_SquareShader, m_SquareVA, transform);
 			}
 		}
+
+		//Render with texture
+		m_Texture->Bind();
+		RealEngine::Renderer::Submit(m_TextureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+
+		m_LogoTexture->Bind();
+		RealEngine::Renderer::Submit(m_TextureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
 		//RealEngine::Renderer::Submit(m_Shader, m_VertexArray);
 
@@ -176,8 +224,11 @@ private:
 	RealEngine::Ref<RealEngine::Shader> m_Shader;
 	RealEngine::Ref<RealEngine::VertexArray> m_VertexArray;
 
-	RealEngine::Ref<RealEngine::Shader> m_SquareShader;
+	RealEngine::Ref<RealEngine::Shader> m_SquareShader, m_TextureShader;
 	RealEngine::Ref<RealEngine::VertexArray> m_SquareVA;
+
+	RealEngine::Ref<RealEngine::Texture2D> m_Texture;
+	RealEngine::Ref<RealEngine::Texture2D> m_LogoTexture;
 
 	RealEngine::OrthographicCamera m_Camera;
 	glm::vec3 m_CameraPosition;
