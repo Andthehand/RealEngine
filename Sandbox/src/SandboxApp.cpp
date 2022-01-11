@@ -93,18 +93,16 @@ public:
 				color = v_Color;
 			})";
 
+		//Triangle Shader
 		m_Shader.reset(RealEngine::Shader::Create(vertexSrc, fragmentSrc));
 
 		std::string squareVertexSrc = R"(
 			#version 330 core
 			
 			layout(location = 0) in vec3 a_Position;
-
 			uniform mat4 u_Transform;
 			uniform mat4 u_ViewProjection;
-
 			out vec3 v_Position;
-
 			void main() {
 				v_Position = a_Position;
 				gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
@@ -114,47 +112,17 @@ public:
 			#version 330 core
 			
 			layout(location = 0) out vec4 color;
-
 			uniform vec3 u_Color;
-
 			in vec3 v_Position;
-
 			void main() {
 				color = vec4(u_Color, 1.0f);
 			})";
 
+		//Square Color Shader
 		m_SquareShader.reset(RealEngine::Shader::Create(squareVertexSrc, squareFragmentSrc));
 
-		std::string textureVertexSrc = R"(
-			#version 330 core
-			
-			layout(location = 0) in vec3 a_Position;
-			layout(location = 1) in vec2 a_TexCoord;
-
-			uniform mat4 u_Transform;
-			uniform mat4 u_ViewProjection;
-
-			out vec2 v_TexCoord;
-
-			void main() {
-				v_TexCoord = a_TexCoord;
-				gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
-			})";
-
-		std::string textureFragmentSrc = R"(
-			#version 330 core
-			
-			layout(location = 0) out vec4 color;
-
-			in vec2 v_TexCoord;
-
-			uniform sampler2D u_Texture;
-
-			void main() {
-				color = texture(u_Texture, v_TexCoord);
-			})";
-
-		m_TextureShader.reset(RealEngine::Shader::Create(textureVertexSrc, textureFragmentSrc));
+		//Texture Shader
+		m_TextureShader.reset(RealEngine::Shader::Create("assets/shaders/Texture.glsl"));
 	
 		m_Texture = RealEngine::Texture2D::Create("assets/textures/Checkerboard.png");
 		m_LogoTexture = RealEngine::Texture2D::Create("assets/textures/RealEngine.png");
