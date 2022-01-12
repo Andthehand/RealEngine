@@ -10,37 +10,6 @@
 class ExampleLayer : public RealEngine::Layer {
 public:
 	ExampleLayer() : Layer("Example"), m_Camera(-1.6f, 1.6f, -0.9f, 0.9f), m_CameraPosition(0.0f) {
-		float vertices[3 * 7] = {
-			-0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
-			 0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.8f, 1.0f,
-			 0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
-		};
-
-		m_VertexArray.reset(RealEngine::VertexArray::Create());
-
-		//Makes sure that m_VertexBuffer is deleted before storing another VertexBuffer
-		//Also binds VBO to VAO
-		RealEngine::Ref<RealEngine::VertexBuffer> vertexBuffer;
-		vertexBuffer.reset(RealEngine::VertexBuffer::Create(vertices, sizeof(vertices)));
-
-		RealEngine::BufferLayout layout = {
-			{ RealEngine::ShaderDataType::Float3, "a_Position"},
-			{ RealEngine::ShaderDataType::Float4, "a_Color"}
-		};
-
-		vertexBuffer->SetLayout(layout);
-		m_VertexArray->AddVertexBuffer(vertexBuffer);
-
-		//Needed for glDrawElements in the game loop
-		uint32_t indices[3] = { 0, 1, 2 };
-		RealEngine::Ref<RealEngine::IndexBuffer> indexBuffer;
-		indexBuffer.reset(RealEngine::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
-		m_VertexArray->SetIndexBuffer(indexBuffer);
-
-		/////////////////
-		/// Square VAO //
-		/////////////////
-
 		m_SquareVA.reset(RealEngine::VertexArray::Create());
 
 		float squareVertices[5 * 4] = {
@@ -62,39 +31,6 @@ public:
 		RealEngine::Ref<RealEngine::IndexBuffer> squareIB;
 		squareIB.reset(RealEngine::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
 		m_SquareVA->SetIndexBuffer(squareIB);
-
-		std::string vertexSrc = R"(
-			#version 330 core
-			
-			layout(location = 0) in vec3 a_Position;
-			layout(location = 1) in vec4 a_Color;
-
-			uniform mat4 u_ViewProjection;
-			uniform mat4 u_Transform;
-
-			out vec3 v_Position;
-			out vec4 v_Color;
-
-			void main() {
-				v_Position = a_Position;
-				gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);	
-				v_Color = a_Color;
-			})";
-
-		std::string fragmentSrc = R"(
-			#version 330 core
-			
-			layout(location = 0) out vec4 color;
-
-			in vec3 v_Position;
-			in vec4 v_Color;
-
-			void main() {
-				color = v_Color;
-			})";
-
-		//Triangle Shader
-		m_Shader.reset(RealEngine::Shader::Create(vertexSrc, fragmentSrc));
 
 		std::string squareVertexSrc = R"(
 			#version 330 core
@@ -119,16 +55,16 @@ public:
 			})";
 
 		//Square Color Shader
-		m_SquareShader.reset(RealEngine::Shader::Create(squareVertexSrc, squareFragmentSrc));
+		m_SquareShader = RealEngine::Shader::Create("Square Shader", squareVertexSrc, squareFragmentSrc);
 
 		//Texture Shader
-		m_TextureShader.reset(RealEngine::Shader::Create("assets/shaders/Texture.glsl"));
+		auto textureShader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
 	
 		m_Texture = RealEngine::Texture2D::Create("assets/textures/Checkerboard.png");
 		m_LogoTexture = RealEngine::Texture2D::Create("assets/textures/RealEngine.png");
 
-		std::dynamic_pointer_cast<RealEngine::OpenGLShader>(m_TextureShader)->Bind();
-		std::dynamic_pointer_cast<RealEngine::OpenGLShader>(m_TextureShader)->UploadUniformInt("u_Texture", 0);
+		std::dynamic_pointer_cast<RealEngine::OpenGLShader>(textureShader)->Bind();
+		std::dynamic_pointer_cast<RealEngine::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
 	}
 
 	void OnUpdate(RealEngine::Timestep ts) override {
@@ -168,12 +104,14 @@ public:
 			}
 		}
 
+		auto textureShader = m_ShaderLibrary.Get("Texture");
+
 		//Render with texture
 		m_Texture->Bind();
-		RealEngine::Renderer::Submit(m_TextureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+		RealEngine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
 		m_LogoTexture->Bind();
-		RealEngine::Renderer::Submit(m_TextureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+		RealEngine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
 		//RealEngine::Renderer::Submit(m_Shader, m_VertexArray);
 
@@ -189,10 +127,9 @@ public:
 	void OnEvent(RealEngine::Event& event) override {
 	}
 private:
-	RealEngine::Ref<RealEngine::Shader> m_Shader;
-	RealEngine::Ref<RealEngine::VertexArray> m_VertexArray;
+	RealEngine::ShaderLibrary m_ShaderLibrary;
 
-	RealEngine::Ref<RealEngine::Shader> m_SquareShader, m_TextureShader;
+	RealEngine::Ref<RealEngine::Shader> m_SquareShader;
 	RealEngine::Ref<RealEngine::VertexArray> m_SquareVA;
 
 	RealEngine::Ref<RealEngine::Texture2D> m_Texture;
