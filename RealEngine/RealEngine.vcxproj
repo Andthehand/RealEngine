@@ -164,6 +164,7 @@
     <ClInclude Include="src\RealEngine\LayerStack.h" />
     <ClInclude Include="src\RealEngine\Log.h" />
     <ClInclude Include="src\RealEngine\MouseButtonCodes.h" />
+    <ClInclude Include="src\RealEngine\OrthographicCameraController.h" />
     <ClInclude Include="src\RealEngine\Renderer\Buffer.h" />
     <ClInclude Include="src\RealEngine\Renderer\GraphicsContext.h" />
     <ClInclude Include="src\RealEngine\Renderer\OrthographicCamera.h" />
@@ -607,6 +608,7 @@
     <ClCompile Include="src\RealEngine\Layer.cpp" />
     <ClCompile Include="src\RealEngine\LayerStack.cpp" />
     <ClCompile Include="src\RealEngine\Log.cpp" />
+    <ClCompile Include="src\RealEngine\OrthographicCameraController.cpp" />
     <ClCompile Include="src\RealEngine\Renderer\Buffer.cpp" />
     <ClCompile Include="src\RealEngine\Renderer\OrthographicCamera.cpp" />
     <ClCompile Include="src\RealEngine\Renderer\RenderCommand.cpp" />

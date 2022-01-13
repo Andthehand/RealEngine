@@ -9,7 +9,7 @@
 
 class ExampleLayer : public RealEngine::Layer {
 public:
-	ExampleLayer() : Layer("Example"), m_Camera(-1.6f, 1.6f, -0.9f, 0.9f), m_CameraPosition(0.0f) {
+	ExampleLayer() : Layer("Example"), m_CameraController(1280.0f / 720.0f, true) {
 		m_SquareVA.reset(RealEngine::VertexArray::Create());
 
 		float squareVertices[5 * 4] = {
@@ -68,25 +68,12 @@ public:
 	}
 
 	void OnUpdate(RealEngine::Timestep ts) override {
-		if (RealEngine::Input::IsKeyPressed(RE_KEY_W)) {
-			m_CameraPosition.y += m_CameraSpeed * ts;
-		}
-		if (RealEngine::Input::IsKeyPressed(RE_KEY_A)) {
-			m_CameraPosition.x -= m_CameraSpeed * ts;
-		}
-		if (RealEngine::Input::IsKeyPressed(RE_KEY_S)) {
-			m_CameraPosition.y -= m_CameraSpeed * ts;
-		}
-		if (RealEngine::Input::IsKeyPressed(RE_KEY_D)) {
-			m_CameraPosition.x += m_CameraSpeed * ts;
-		}
+		m_CameraController.OnUpdate(ts);
 
 		RealEngine::RenderCommand::SetClearColor({ 0.1, 0.1, 0.1, 1 });
 		RealEngine::RenderCommand::Clear();
 
-		m_Camera.SetPosition(m_CameraPosition);
-
-		RealEngine::Renderer::BeginScene(m_Camera);
+		RealEngine::Renderer::BeginScene(m_CameraController.GetCamera());
 
 		//static makes it not recalculated every update
 		static glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
@@ -124,7 +111,8 @@ public:
 		ImGui::End();
 	}
 
-	void OnEvent(RealEngine::Event& event) override {
+	void OnEvent(RealEngine::Event& e) override {
+		m_CameraController.OnEvent(e);
 	}
 private:
 	RealEngine::ShaderLibrary m_ShaderLibrary;
@@ -135,9 +123,7 @@ private:
 	RealEngine::Ref<RealEngine::Texture2D> m_Texture;
 	RealEngine::Ref<RealEngine::Texture2D> m_LogoTexture;
 
-	RealEngine::OrthographicCamera m_Camera;
-	glm::vec3 m_CameraPosition;
-	const float m_CameraSpeed = 2.5f;
+	RealEngine::OrthographicCameraController m_CameraController;
 
 	glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f };
 };

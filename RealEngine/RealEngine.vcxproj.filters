@@ -126,6 +126,9 @@
     <ClInclude Include="src\RealEngine\MouseButtonCodes.h">
       <Filter>src\RealEngine</Filter>
     </ClInclude>
+    <ClInclude Include="src\RealEngine\OrthographicCameraController.h">
+      <Filter>src\RealEngine</Filter>
+    </ClInclude>
     <ClInclude Include="src\RealEngine\Renderer\Buffer.h">
       <Filter>src\RealEngine\Renderer</Filter>
     </ClInclude>
@@ -1449,6 +1452,9 @@
       <Filter>src\RealEngine</Filter>
     </ClCompile>
     <ClCompile Include="src\RealEngine\Log.cpp">
+      <Filter>src\RealEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RealEngine\OrthographicCameraController.cpp">
       <Filter>src\RealEngine</Filter>
     </ClCompile>
     <ClCompile Include="src\RealEngine\Renderer\Buffer.cpp">

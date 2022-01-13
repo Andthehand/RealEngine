@@ -9,6 +9,7 @@
 #include "RealEngine/Input.h"
 #include "RealEngine/KeyCodes.h"
 #include "RealEngine/MouseButtonCodes.h"
+#include "RealEngine/OrthographicCameraController.h"
 
 #include "RealEngine/ImGui/ImGuiLayer.h"
 
