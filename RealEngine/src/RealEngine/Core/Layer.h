@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RealEngine/Core.h"
+#include "RealEngine/Core/Core.h"
 #include "RealEngine/Core/TimeStep.h"
 #include "RealEngine/Events/Event.h"
 
@@ -8,7 +8,7 @@ namespace RealEngine {
 	class  Layer {
 	public:
 		Layer(const std::string& name = "Layer");
-		virtual ~Layer();
+		virtual ~Layer() = default;
 
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RealEngine/Input.h"
+#include "RealEngine/Core/Input.h"
 
 namespace RealEngine {
 	class WindowsInput : public Input {

@@ -1,10 +1,15 @@
 #pragma once
 
-#include "RealEngine/Core.h"
+#include "RealEngine/Core/Core.h"
 
 namespace RealEngine {
 	class  Input {
+	protected:
+		Input() = default;
 	public:
+		Input(const Input&) = delete;
+		Input& operator=(const Input&) = delete;
+
 		inline static bool IsKeyPressed(int keycode) { return s_Instance->IsKeyPressedImpl(keycode); }
 		
 		inline static bool IsMouseButtonPressed(int button) { return s_Instance->IsMouseButtonPressedImpl(button); }
@@ -21,6 +26,6 @@ namespace RealEngine {
 		virtual float GetMouseYImpl() = 0;
 
 	private:
-		static Input* s_Instance;
+		static Scope<Input> s_Instance;
 	};
 }

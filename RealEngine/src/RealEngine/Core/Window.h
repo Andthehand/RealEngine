@@ -2,7 +2,7 @@
 
 #include "repch.h"
 
-#include "RealEngine/Core.h"
+#include "RealEngine/Core/Core.h"
 #include "RealEngine/Events/Event.h"
 
 namespace RealEngine {
@@ -21,7 +21,7 @@ namespace RealEngine {
 	public:
 		using EventCallbackFn = std::function<void(Event&)>;
 
-		virtual ~Window() {}
+		virtual ~Window() = default;
 
 		virtual void OnUpdate() = 0;
 

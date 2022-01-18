@@ -6,7 +6,7 @@
 #include "examples/imgui_impl_glfw.h"
 #include "examples/imgui_impl_opengl3.h"
 
-#include "RealEngine/Application.h"
+#include "RealEngine/Core/Application.h"
 
 //Temp
 #include <GLFW/glfw3.h>
@@ -14,11 +14,6 @@
 
 namespace RealEngine {
 	ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {
-
-	}
-
-	ImGuiLayer::~ImGuiLayer() {
-
 	}
 
 	void ImGuiLayer::OnAttach() {

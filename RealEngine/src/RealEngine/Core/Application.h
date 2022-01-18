@@ -3,7 +3,7 @@
 #include "Core.h"
 
 #include "Window.h"
-#include "RealEngine/LayerStack.h"
+#include "RealEngine/Core/LayerStack.h"
 #include "RealEngine/Events/Event.h"
 #include "RealEngine/Events/ApplicationEvent.h"
 
@@ -16,7 +16,7 @@ namespace RealEngine {
 	class Application {
 	public:
 		Application();
-		virtual ~Application();
+		virtual ~Application() = default;
 
 		void Run();
 

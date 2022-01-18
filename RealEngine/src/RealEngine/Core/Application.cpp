@@ -3,7 +3,7 @@
 
 #include "RealEngine/Renderer/Renderer.h"
 
-#include "RealEngine/Log.h"
+#include "RealEngine/Core/Log.h"
 
 #include "Input.h"
 #include <GLFW/glfw3.h>
@@ -30,17 +30,12 @@ namespace RealEngine {
 		PushOverlay(m_ImGuiLayer);
 	}
 
-	Application::~Application() {
-	}
-
 	void Application::PushLayer(Layer* layer) {
 		m_LayerStack.PushLayer(layer);
-		layer->OnAttach();
 	}
 
 	void Application::PushOverlay(Layer* overlay) {
 		m_LayerStack.PushOverlay(overlay);
-		overlay->OnAttach();
 	}
 
 	void Application::OnEvent(Event& e) {

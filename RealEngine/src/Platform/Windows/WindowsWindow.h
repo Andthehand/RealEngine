@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RealEngine/Window.h"
+#include "RealEngine/Core/Window.h"
 
 #include <GLFW/glfw3.h>
 
@@ -28,7 +28,7 @@ namespace RealEngine {
 		virtual void Shutdown();
 
 		GLFWwindow* m_Window;
-		GraphicsContext* m_Context;
+		Scope<GraphicsContext> m_Context;
 
 		struct WindowData {
 			std::string Title;

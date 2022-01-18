@@ -12,7 +12,7 @@
 #include <vector>
 #include <unordered_set>
 
-#include "RealEngine/Log.h"
+#include "RealEngine/Core/Log.h"
 
 #ifdef RE_PLATFORM_WINDOWS
 	#include <Windows.h>

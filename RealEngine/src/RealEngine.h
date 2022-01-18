@@ -1,15 +1,14 @@
 #pragma once
 
-#include "RealEngine/Application.h"
-#include "RealEngine/Layer.h"
-#include "RealEngine/Log.h"
+#include "RealEngine/Core/Application.h"
+#include "RealEngine/Core/Layer.h"
+#include "RealEngine/Core/Log.h"
 
 #include "RealEngine/Core/TimeStep.h"
 
-#include "RealEngine/Input.h"
-#include "RealEngine/KeyCodes.h"
-#include "RealEngine/MouseButtonCodes.h"
-#include "RealEngine/OrthographicCameraController.h"
+#include "RealEngine/Core/Input.h"
+#include "RealEngine/Core/KeyCodes.h"
+#include "RealEngine/Core/MouseButtonCodes.h"
 
 #include "RealEngine/ImGui/ImGuiLayer.h"
 
@@ -23,8 +22,9 @@
 #include "RealEngine/Renderer/VertexArray.h"
 
 #include "RealEngine/Renderer/OrthographicCamera.h"
+#include "RealEngine/Renderer/OrthographicCameraController.h"
 // -----------------------------------
 
 // ---Entry Point---------------------
-#include "RealEngine/EntryPoint.h"
+#include "RealEngine/Core/EntryPoint.h"
 // -----------------------------------

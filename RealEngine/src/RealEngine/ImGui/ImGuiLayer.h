@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RealEngine/Layer.h"
+#include "RealEngine/Core/Layer.h"
 
 #include "RealEngine/Events/KeyEvent.h"
 #include "RealEngine/Events/MouseEvent.h"
@@ -10,7 +10,7 @@ namespace RealEngine {
 	class  ImGuiLayer : public Layer {
 	public:
 		ImGuiLayer();
-		~ImGuiLayer();
+		~ImGuiLayer() = default;
 
 		virtual void OnAttach() override;
 		virtual void OnDetach() override;

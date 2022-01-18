@@ -81,17 +81,38 @@
     <ClInclude Include="src\RealEngine.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\RealEngine\Application.h">
-      <Filter>src\RealEngine</Filter>
+    <ClInclude Include="src\RealEngine\Core\Application.h">
+      <Filter>src\RealEngine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\RealEngine\Core.h">
-      <Filter>src\RealEngine</Filter>
+    <ClInclude Include="src\RealEngine\Core\Core.h">
+      <Filter>src\RealEngine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RealEngine\Core\EntryPoint.h">
+      <Filter>src\RealEngine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RealEngine\Core\Input.h">
+      <Filter>src\RealEngine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RealEngine\Core\KeyCodes.h">
+      <Filter>src\RealEngine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RealEngine\Core\Layer.h">
+      <Filter>src\RealEngine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RealEngine\Core\LayerStack.h">
+      <Filter>src\RealEngine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RealEngine\Core\Log.h">
+      <Filter>src\RealEngine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RealEngine\Core\MouseButtonCodes.h">
+      <Filter>src\RealEngine\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\RealEngine\Core\TimeStep.h">
       <Filter>src\RealEngine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\RealEngine\EntryPoint.h">
-      <Filter>src\RealEngine</Filter>
+    <ClInclude Include="src\RealEngine\Core\Window.h">
+      <Filter>src\RealEngine\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\RealEngine\Events\ApplicationEvent.h">
       <Filter>src\RealEngine\Events</Filter>
@@ -108,27 +129,6 @@
     <ClInclude Include="src\RealEngine\ImGui\ImGuiLayer.h">
       <Filter>src\RealEngine\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="src\RealEngine\Input.h">
-      <Filter>src\RealEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RealEngine\KeyCodes.h">
-      <Filter>src\RealEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RealEngine\Layer.h">
-      <Filter>src\RealEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RealEngine\LayerStack.h">
-      <Filter>src\RealEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RealEngine\Log.h">
-      <Filter>src\RealEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RealEngine\MouseButtonCodes.h">
-      <Filter>src\RealEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RealEngine\OrthographicCameraController.h">
-      <Filter>src\RealEngine</Filter>
-    </ClInclude>
     <ClInclude Include="src\RealEngine\Renderer\Buffer.h">
       <Filter>src\RealEngine\Renderer</Filter>
     </ClInclude>
@@ -136,6 +136,9 @@
       <Filter>src\RealEngine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\RealEngine\Renderer\OrthographicCamera.h">
+      <Filter>src\RealEngine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RealEngine\Renderer\OrthographicCameraController.h">
       <Filter>src\RealEngine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\RealEngine\Renderer\RenderCommand.h">
@@ -155,9 +158,6 @@
     </ClInclude>
     <ClInclude Include="src\RealEngine\Renderer\VertexArray.h">
       <Filter>src\RealEngine\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RealEngine\Window.h">
-      <Filter>src\RealEngine</Filter>
     </ClInclude>
     <ClInclude Include="src\repch.h">
       <Filter>src</Filter>
@@ -1436,8 +1436,17 @@
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp">
       <Filter>src\Platform\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="src\RealEngine\Application.cpp">
-      <Filter>src\RealEngine</Filter>
+    <ClCompile Include="src\RealEngine\Core\Application.cpp">
+      <Filter>src\RealEngine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RealEngine\Core\Layer.cpp">
+      <Filter>src\RealEngine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RealEngine\Core\LayerStack.cpp">
+      <Filter>src\RealEngine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RealEngine\Core\Log.cpp">
+      <Filter>src\RealEngine\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\RealEngine\ImGui\ImGuiBuild.cpp">
       <Filter>src\RealEngine\ImGui</Filter>
@@ -1445,22 +1454,13 @@
     <ClCompile Include="src\RealEngine\ImGui\ImGuiLayer.cpp">
       <Filter>src\RealEngine\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="src\RealEngine\Layer.cpp">
-      <Filter>src\RealEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RealEngine\LayerStack.cpp">
-      <Filter>src\RealEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RealEngine\Log.cpp">
-      <Filter>src\RealEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RealEngine\OrthographicCameraController.cpp">
-      <Filter>src\RealEngine</Filter>
-    </ClCompile>
     <ClCompile Include="src\RealEngine\Renderer\Buffer.cpp">
       <Filter>src\RealEngine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\RealEngine\Renderer\OrthographicCamera.cpp">
+      <Filter>src\RealEngine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RealEngine\Renderer\OrthographicCameraController.cpp">
       <Filter>src\RealEngine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\RealEngine\Renderer\RenderCommand.cpp">
