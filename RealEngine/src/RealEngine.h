@@ -24,7 +24,3 @@
 #include "RealEngine/Renderer/OrthographicCamera.h"
 #include "RealEngine/Renderer/OrthographicCameraController.h"
 // -----------------------------------
-
-// ---Entry Point---------------------
-#include "RealEngine/Core/EntryPoint.h"
-// -----------------------------------

@@ -5,10 +5,10 @@
 #include "Platform/OpenGL/OpenGLVertexArray.h"
 
 namespace RealEngine {
-	VertexArray* VertexArray::Create() {
+	Ref<VertexArray> VertexArray::Create() {
 		switch (Renderer::GetAPI()) {
 			case RendererAPI::API::None:    RE_CORE_ASSERT(false, "RenderAPI::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:  return new OpenGLVertexArray();
+			case RendererAPI::API::OpenGL:  return CreateRef<OpenGLVertexArray>();
 		}
 
 		RE_CORE_ASSERT(false, "Unkown RendererAPI!");

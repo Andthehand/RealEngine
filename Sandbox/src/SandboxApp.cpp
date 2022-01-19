@@ -1,16 +1,21 @@
 #include <RealEngine.h>
-
-#include "imgui/imgui.h"
+#include <RealEngine/Core/EntryPoint.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "imgui/imgui.h"
+
 #include "Platform/OpenGL/OpenGLShader.h"
+
+#include "Sandbox2D.h"
 
 class ExampleLayer : public RealEngine::Layer {
 public:
-	ExampleLayer() : Layer("Example"), m_CameraController(1280.0f / 720.0f, true) {
-		m_SquareVA.reset(RealEngine::VertexArray::Create());
+	ExampleLayer() : Layer("Example"), m_CameraController(1280.0f / 720.0f, true) {	}
+
+	virtual void OnAttach() override {
+		m_SquareVA = RealEngine::VertexArray::Create();
 
 		float squareVertices[5 * 4] = {
 			 -0.5f,  -0.5f,  0.0f,  0.0f, 0.0f,
@@ -20,8 +25,8 @@ public:
 		};
 
 		RealEngine::Ref<RealEngine::VertexBuffer> squareVB;
-		squareVB.reset(RealEngine::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
-		squareVB->SetLayout({ 
+		squareVB = RealEngine::VertexBuffer::Create(squareVertices, sizeof(squareVertices));
+		squareVB->SetLayout({
 			{ RealEngine::ShaderDataType::Float3, "a_Position" },
 			{ RealEngine::ShaderDataType::Float2, "a_TexCoord" }
 		});
@@ -29,7 +34,7 @@ public:
 
 		uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
 		RealEngine::Ref<RealEngine::IndexBuffer> squareIB;
-		squareIB.reset(RealEngine::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
+		squareIB = RealEngine::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
 		m_SquareVA->SetIndexBuffer(squareIB);
 
 		std::string squareVertexSrc = R"(
@@ -59,7 +64,7 @@ public:
 
 		//Texture Shader
 		auto textureShader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
-	
+
 		m_Texture = RealEngine::Texture2D::Create("assets/textures/Checkerboard.png");
 		m_LogoTexture = RealEngine::Texture2D::Create("assets/textures/RealEngine.png");
 
@@ -131,7 +136,8 @@ private:
 class Sandbox : public RealEngine::Application {
 public:
 	Sandbox() {
-		PushLayer(new ExampleLayer);
+		//PushLayer(new ExampleLayer);
+		PushLayer(new Sandbox2D);
 	}
 
 	~Sandbox() {
