@@ -28,10 +28,10 @@ namespace RealEngine {
 		std::string Name;
 		ShaderDataType Type;
 		uint32_t Offset;
-		uint32_t Size;
+		size_t Size;
 		bool Normalized;
 
-		BufferElement() {}
+		BufferElement() = default;
 
 		BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
 			: Name(name), Type(type), Size(ShaderDataTypeSize(type)), Offset(0), Normalized(normalized) { }
@@ -58,7 +58,7 @@ namespace RealEngine {
 
 	class BufferLayout {
 	public:
-		BufferLayout() {}
+		BufferLayout() = default;
 
 		BufferLayout(const std::initializer_list<BufferElement>& elements) : m_Elements(elements) {
 			CalculateOffsetsAndStride();
@@ -74,7 +74,7 @@ namespace RealEngine {
 	private:
 		//Loops through all of the elemets that are passed into this class and calculates the offset and stride automatically
 		void CalculateOffsetsAndStride() {
-			uint32_t offset = 0;
+			size_t offset = 0;
 			m_Stride = 0;
 			for (auto& element : m_Elements) {
 				element.Offset = offset;

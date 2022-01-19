@@ -147,6 +147,9 @@
     <ClInclude Include="src\RealEngine\Renderer\Renderer.h">
       <Filter>src\RealEngine\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\RealEngine\Renderer\Renderer2D.h">
+      <Filter>src\RealEngine\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\RealEngine\Renderer\RendererAPI.h">
       <Filter>src\RealEngine\Renderer</Filter>
     </ClInclude>
@@ -1467,6 +1470,9 @@
       <Filter>src\RealEngine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\RealEngine\Renderer\Renderer.cpp">
+      <Filter>src\RealEngine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RealEngine\Renderer\Renderer2D.cpp">
       <Filter>src\RealEngine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\RealEngine\Renderer\RendererAPI.cpp">

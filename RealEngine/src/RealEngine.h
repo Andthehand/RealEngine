@@ -14,6 +14,7 @@
 
 // ---Renderer------------------------
 #include "RealEngine/Renderer/Renderer.h"
+#include "RealEngine/Renderer/Renderer2D.h"
 #include "RealEngine/Renderer/RenderCommand.h"
 
 #include "RealEngine/Renderer/Buffer.h"
