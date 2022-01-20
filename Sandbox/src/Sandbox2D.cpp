@@ -31,7 +31,13 @@ void Sandbox2D::OnUpdate(RealEngine::Timestep ts) {
 
 	RealEngine::Renderer2D::BeginScene(m_CameraController.GetCamera());
 
-	RealEngine::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 1.0f, 1.0f }, { 0.8f, 0.2f, 0.3f, 1.0f });
+	for(int x = -5; x < 5; x++) {
+		for (int y = -5; y < 5; y++) {
+			glm::vec2 position = { x + (x * 0.1f), y + (y * 0.1f) };
+			RealEngine::Renderer2D::DrawQuad(position, { 1.0f, 1.0f }, m_SquareColor);
+		}
+	}
+
 	RealEngine::Renderer2D::EndScene();
 }
 
