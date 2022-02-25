@@ -20,7 +20,6 @@ IncludeDir["Glad"] = "RealEngine/vendor/Glad/include"
 IncludeDir["ImGui"] = "RealEngine/vendor/imgui"
 IncludeDir["glm"] = "RealEngine/vendor/glm"
 IncludeDir["stb_image"] = "RealEngine/vendor/stb_image"
-IncludeDir["NetCommon"] = "RealEngine/vendor/NetCommon"
 
 group "Dependencies"
 
@@ -118,55 +117,6 @@ project "Sandbox"
 		"RealEngine/src",
 		"RealEngine/vendor",
 		"%{IncludeDir.glm}",
-	}
-
-	links {
-		"RealEngine"
-	}
-
-	filter "system:windows"
-		systemversion "latest"
-		
-		defines {
-			"RE_PLATFORM_WINDOWS"
-		}
-
-		filter "configurations:Debug"
-			defines "RE_DEBUG"
-			runtime "Debug"
-			symbols "on"
-
-		filter "configurations:Release"
-			defines "RE_RELEASE"
-			runtime "Release"
-			optimize"on"
-
-		filter "configurations:DIST"
-			defines "RE_DIST"
-			runtime "Release"
-			optimize"on"
-
-project "GameClient"
-	location "GameClient"
-	kind "ConsoleAPP"
-	language "C++"
-	cppdialect "C++17"
-	staticruntime "on"
-
-	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-	objdir("bin-int/" .. outputdir .. "/%{prj.name}")
-
-	files {
-		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
-	}
-
-	includedirs {
-		"RealEngine/vendor/spdlog/include",
-		"RealEngine/src",
-		"RealEngine/vendor",
-		"%{IncludeDir.glm}",
-		"%{IncludeDir.NetCommon}"
 	}
 
 	links {
