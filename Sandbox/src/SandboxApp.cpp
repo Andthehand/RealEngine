@@ -125,8 +125,7 @@ private:
 	RealEngine::Ref<RealEngine::Shader> m_SquareShader;
 	RealEngine::Ref<RealEngine::VertexArray> m_SquareVA;
 
-	RealEngine::Ref<RealEngine::Texture2D> m_Texture;
-	RealEngine::Ref<RealEngine::Texture2D> m_LogoTexture;
+	RealEngine::Ref<RealEngine::Texture2D> m_Texture, m_LogoTexture;
 
 	RealEngine::OrthographicCameraController m_CameraController;
 

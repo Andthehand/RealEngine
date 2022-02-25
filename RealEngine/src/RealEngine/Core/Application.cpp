@@ -51,7 +51,6 @@ namespace RealEngine {
 	}
 
 	void Application::Run() {
-		
 		while (m_Running) {
 			float time = (float)glfwGetTime(); //TODO: Move to Platform
 			Timestep timestep = time - m_LastFrameTime;

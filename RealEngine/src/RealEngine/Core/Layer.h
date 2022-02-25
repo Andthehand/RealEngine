@@ -5,7 +5,7 @@
 #include "RealEngine/Events/Event.h"
 
 namespace RealEngine {
-	class  Layer {
+	class Layer {
 	public:
 		Layer(const std::string& name = "Layer");
 		virtual ~Layer() = default;

@@ -18,5 +18,7 @@ private:
 	RealEngine::Ref<RealEngine::VertexArray> m_VertexArray;
 	RealEngine::Ref<RealEngine::Shader> m_SquareShader;
 
+	RealEngine::Ref<RealEngine::Texture2D> m_Texture;
+
 	glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f };
 };
