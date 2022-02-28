@@ -38,6 +38,8 @@ void Sandbox2D::OnUpdate(RealEngine::Timestep ts) {
 		}
 	}
 
+	RealEngine::Renderer2D::DrawQuad({ 0.5, 0.5, 1 }, {0.5f, 0.5f}, m_SquareColor);
+
 	RealEngine::Renderer2D::EndScene();
 }
 
