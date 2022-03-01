@@ -5,7 +5,7 @@
 #include "spdlog/fmt/ostr.h"
 
 namespace RealEngine {
-	class  Log {
+	class Log {
 	public:
 		static void Init();
 

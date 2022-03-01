@@ -21,4 +21,8 @@ private:
 	RealEngine::Ref<RealEngine::Texture2D> m_Texture;
 
 	glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f };
+
+	//FPS counter
+	float deltaTime = 0.0f;
+	float fps = 0.0f;
 };

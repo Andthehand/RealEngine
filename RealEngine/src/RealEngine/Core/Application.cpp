@@ -31,14 +31,22 @@ namespace RealEngine {
 	}
 
 	void Application::PushLayer(Layer* layer) {
+		RE_PROFILE_FUNCTION();
+
 		m_LayerStack.PushLayer(layer);
+		layer->OnAttach();
 	}
 
 	void Application::PushOverlay(Layer* overlay) {
+		RE_PROFILE_FUNCTION();
+
 		m_LayerStack.PushOverlay(overlay);
+		overlay->OnAttach();
 	}
 
 	void Application::OnEvent(Event& e) {
+		RE_PROFILE_FUNCTION();
+
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResize));
@@ -51,20 +59,30 @@ namespace RealEngine {
 	}
 
 	void Application::Run() {
+		RE_PROFILE_FUNCTION();
+
 		while (m_Running) {
+			RE_PROFILE_SCOPE("Run Loop");
+
 			float time = (float)glfwGetTime(); //TODO: Move to Platform
 			Timestep timestep = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 
 			if (!m_Minimized) {
+				RE_PROFILE_SCOPE("LayerStack OnUpdate");
+
 				//Update all layers/Overlays
 				for (Layer* layer : m_LayerStack)
 					layer->OnUpdate(timestep);
 			}
 
 			m_ImGuiLayer->Begin();
-			for (Layer* layer : m_LayerStack)
-				layer->OnImGuiRender();
+			{
+				RE_PROFILE_SCOPE("LayerStack OnImGuiRender");
+
+				for (Layer* layer : m_LayerStack)
+					layer->OnImGuiRender();
+			}
 			m_ImGuiLayer->End();
 
 			m_Window->OnUpdate();
@@ -77,6 +95,8 @@ namespace RealEngine {
 	}
 
 	bool Application::OnWindowResize(WindowResizeEvent& e) {
+		RE_PROFILE_FUNCTION();
+
 		if(e.GetWidth() == 0 || e.GetHeight() == 0) {
 			m_Minimized = true;
 			return false;

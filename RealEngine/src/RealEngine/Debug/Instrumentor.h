@@ -117,6 +117,6 @@ namespace RealEngine {
 #else
     #define RE_PROFILE_BEGIN_SESSION(name, filepath)
     #define RE_PROFILE_END_SESSION()
-    #define RE_PROFILE_FUNCTION(name)
-    #define RE_PROFILE_SCOPE()
+    #define RE_PROFILE_SCOPE(name)
+    #define RE_PROFILE_FUNCTION()
 #endif

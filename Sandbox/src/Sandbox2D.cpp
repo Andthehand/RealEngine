@@ -10,24 +10,32 @@
 Sandbox2D::Sandbox2D() : Layer("Sandbox2D"), m_CameraController(1280.0f / 720.0f, true) { }
 
 void Sandbox2D::OnAttach() {
+	RE_PROFILE_FUNCTION();
+
 	m_Texture = RealEngine::Texture2D::Create("assets/textures/Checkerboard.png");
 }
 
 void Sandbox2D::OnDetach() {
-
+	RE_PROFILE_FUNCTION();
 }
 
 void Sandbox2D::OnImGuiRender() {
 	RE_PROFILE_FUNCTION();
 
 	ImGui::Begin("Settings");
+	
 	ImGui::ColorEdit3("Square Color", glm::value_ptr(m_SquareColor));
+	ImGui::Text("FPS: %f", fps);
 
 	ImGui::End();
 }
 
 void Sandbox2D::OnUpdate(RealEngine::Timestep ts) {
 	RE_PROFILE_FUNCTION();
+
+	deltaTime += ts;
+	deltaTime /= 2.0f;
+	fps = 1.0f / deltaTime;
 
 	//Update
 	{
