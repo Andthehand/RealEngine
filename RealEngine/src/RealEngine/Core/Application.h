@@ -11,14 +11,14 @@
 
 #include "RealEngine/ImGui/ImGuiLayer.h"
 
+int main(int argc, char** argv);
+
 namespace RealEngine {
 
 	class Application {
 	public:
 		Application();
 		virtual ~Application() = default;
-
-		void Run();
 
 		void OnEvent(Event& e);
 
@@ -29,6 +29,7 @@ namespace RealEngine {
 		
 		inline static Application& Get() { return *s_Instance; }
 	private:
+		void Run();
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
 
@@ -40,6 +41,7 @@ namespace RealEngine {
 		float m_LastFrameTime;
 
 		static Application* s_Instance;
+		friend int ::main(int argc, char** argv);
 	};
 
 

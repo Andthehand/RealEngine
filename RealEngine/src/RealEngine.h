@@ -8,7 +8,7 @@
 
 #include "RealEngine/Core/Input.h"
 #include "RealEngine/Core/KeyCodes.h"
-#include "RealEngine/Core/MouseButtonCodes.h"
+#include "RealEngine/Core/MouseCodes.h"
 
 #include "RealEngine/ImGui/ImGuiLayer.h"
 

@@ -3,6 +3,9 @@
 !vendor/bin/premake/
 bin-int/
 
+# RealEngine files
+*.log
+
 # Visual Studio files and folder
 .vs/
 **.sln

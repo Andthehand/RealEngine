@@ -1,5 +1,5 @@
 workspace "RealEngine"
-	architecture "x64"
+	architecture "x86_64"
 	startproject "Sandbox"
 
 	configurations {
@@ -76,8 +76,6 @@ project "RealEngine"
 		systemversion "latest"
 		
 		defines {
-			"RE_PLATFORM_WINDOWS",
-			"RE_BUILD_DLL",
 			"GLFW_INCLUDE_NONE"
 		}
 
@@ -125,10 +123,6 @@ project "Sandbox"
 
 	filter "system:windows"
 		systemversion "latest"
-		
-		defines {
-			"RE_PLATFORM_WINDOWS"
-		}
 
 		filter "configurations:Debug"
 			defines "RE_DEBUG"

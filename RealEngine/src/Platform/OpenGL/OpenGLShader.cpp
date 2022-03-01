@@ -48,10 +48,16 @@ namespace RealEngine {
 		std::ifstream in(filepath, std::ios::in | std::ios::binary);
 		if (in) {
 			in.seekg(0, std::ios::end);
-			result.resize(in.tellg());
-			in.seekg(0, std::ios::beg);
-			in.read(&result[0], result.size());
-			in.close();
+			size_t size = in.tellg();
+			if (size != -1) {
+				result.resize(size);
+				in.seekg(0, std::ios::beg);
+				in.read(&result[0], size);
+				in.close();
+			}
+			else {
+				RE_CORE_ERROR("Could not read from file '{0}'", filepath);
+			}
 		}
 		else {
 			RE_CORE_ERROR("Could not open file '{0}'", filepath);
@@ -68,7 +74,8 @@ namespace RealEngine {
 		const char* typeToken = "#type";
 		size_t typeTokenLength = strlen(typeToken);
 		size_t pos = source.find(typeToken, 0); //Start of shader type declaration line
-		while (pos != std::string::npos) {
+		while (pos != std::string::npos)
+		{
 			size_t eol = source.find_first_of("\r\n", pos); //End of shader type declaration line
 			RE_CORE_ASSERT(eol != std::string::npos, "Syntax error");
 			size_t begin = pos + typeTokenLength + 1; //Start of shader type name (after "#type " keyword)

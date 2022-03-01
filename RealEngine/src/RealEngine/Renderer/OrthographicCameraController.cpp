@@ -36,11 +36,6 @@ namespace RealEngine {
 			if(RealEngine::Input::IsKeyPressed(RE_KEY_E))
 				m_CameraRotation -= m_CameraRotationSpeed * ts;
 
-			if (m_CameraRotation > 180.0f)
-				m_CameraRotation -= 360.0f;
-			else if (m_CameraRotation <= -180.0f)
-				m_CameraRotation += 360.0f;
-
 			m_Camera.SetRotation(m_CameraRotation);
 		}
 

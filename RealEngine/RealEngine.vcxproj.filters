@@ -19,6 +19,9 @@
     <Filter Include="src\RealEngine\Core">
       <UniqueIdentifier>{CE81A490-3AE3-819E-C350-C8502FB1B85D}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\RealEngine\Debug">
+      <UniqueIdentifier>{AC1641A5-98A5-CA6E-41C4-DE692D32DB14}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\RealEngine\Events">
       <UniqueIdentifier>{DA3EEE50-46AB-A94B-0F9F-41A97BCACBB3}</UniqueIdentifier>
     </Filter>
@@ -105,7 +108,7 @@
     <ClInclude Include="src\RealEngine\Core\Log.h">
       <Filter>src\RealEngine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\RealEngine\Core\MouseButtonCodes.h">
+    <ClInclude Include="src\RealEngine\Core\MouseCodes.h">
       <Filter>src\RealEngine\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\RealEngine\Core\TimeStep.h">
@@ -113,6 +116,9 @@
     </ClInclude>
     <ClInclude Include="src\RealEngine\Core\Window.h">
       <Filter>src\RealEngine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RealEngine\Debug\Instrumentor.h">
+      <Filter>src\RealEngine\Debug</Filter>
     </ClInclude>
     <ClInclude Include="src\RealEngine\Events\ApplicationEvent.h">
       <Filter>src\RealEngine\Events</Filter>
@@ -1413,7 +1419,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\RealEngine\Debug\Instrumentor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp">
@@ -1494,5 +1499,7 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\RealEngine\Core\Input.cpp" />
+    <ClCompile Include="src\RealEngine\Core\Window.cpp" />
   </ItemGroup>
 </Project>
