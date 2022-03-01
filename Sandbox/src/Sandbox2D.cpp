@@ -18,29 +18,44 @@ void Sandbox2D::OnDetach() {
 }
 
 void Sandbox2D::OnImGuiRender() {
+	RE_PROFILE_FUNCTION();
+
 	ImGui::Begin("Settings");
 	ImGui::ColorEdit3("Square Color", glm::value_ptr(m_SquareColor));
+
 	ImGui::End();
 }
 
 void Sandbox2D::OnUpdate(RealEngine::Timestep ts) {
-	m_CameraController.OnUpdate(ts);
+	RE_PROFILE_FUNCTION();
 
-	RealEngine::RenderCommand::SetClearColor({ 0.1, 0.1, 0.1, 1 });
-	RealEngine::RenderCommand::Clear();
-
-	RealEngine::Renderer2D::BeginScene(m_CameraController.GetCamera());
-
-	for(int x = -5; x < 5; x++) {
-		for (int y = -5; y < 5; y++) {
-			glm::vec2 position = { x + (x * 0.1f), y + (y * 0.1f) };
-			RealEngine::Renderer2D::DrawQuad(position, { 1.0f, 1.0f }, m_Texture);
-		}
+	//Update
+	{
+		RE_PROFILE_SCOPE("Camera Update");
+		m_CameraController.OnUpdate(ts);
+	}
+	
+	//Render
+	{
+		RE_PROFILE_SCOPE("Render Prep");
+		RealEngine::RenderCommand::SetClearColor({ 0.1, 0.1, 0.1, 1 });
+		RealEngine::RenderCommand::Clear();
 	}
 
-	RealEngine::Renderer2D::DrawQuad({ 0.5, 0.5, 1 }, {0.5f, 0.5f}, m_SquareColor);
+	//Draw
+	{
+		RE_PROFILE_SCOPE("Render Draw");
+		RealEngine::Renderer2D::BeginScene(m_CameraController.GetCamera());
+		for (int x = -5; x < 5; x++) {
+			for (int y = -5; y < 5; y++) {
+				glm::vec2 position = { x + (x * 0.1f), y + (y * 0.1f) };
+				RealEngine::Renderer2D::DrawQuad(position, { 1.0f, 1.0f }, m_Texture);
+			}
+		}
 
-	RealEngine::Renderer2D::EndScene();
+		RealEngine::Renderer2D::DrawQuad({ 0.5, 0.5, 1 }, { 0.5f, 0.5f }, m_SquareColor);
+		RealEngine::Renderer2D::EndScene();
+	}
 }
 
 void Sandbox2D::OnEvent(RealEngine::Event& e) {

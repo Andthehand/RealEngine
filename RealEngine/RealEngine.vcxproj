@@ -164,6 +164,7 @@
     <ClInclude Include="src\RealEngine\Core\MouseButtonCodes.h" />
     <ClInclude Include="src\RealEngine\Core\TimeStep.h" />
     <ClInclude Include="src\RealEngine\Core\Window.h" />
+    <ClInclude Include="src\RealEngine\Debug\Instrumentor.h" />
     <ClInclude Include="src\RealEngine\Events\ApplicationEvent.h" />
     <ClInclude Include="src\RealEngine\Events\Event.h" />
     <ClInclude Include="src\RealEngine\Events\KeyEvent.h" />
