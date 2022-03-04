@@ -145,7 +145,7 @@ namespace RealEngine {
 	};
 }
 
-#define RE_PROFILE 1
+#define RE_PROFILE 0
 //https://www.youtube.com/watch?v=qiD39bB7DvA&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT&index=56&ab_channel=TheCherno
 #if RE_PROFILE
     // Resolve which function signature macro will be used. Note that this only
