@@ -57,11 +57,11 @@ void Sandbox2D::OnUpdate(RealEngine::Timestep ts) {
 		for (int x = -5; x < 5; x++) {
 			for (int y = -5; y < 5; y++) {
 				glm::vec2 position = { x + (x * 0.1f), y + (y * 0.1f) };
-				RealEngine::Renderer2D::DrawQuad(position, { 1.0f, 1.0f }, m_Texture);
+				RealEngine::Renderer2D::DrawQuad({ position.x + (x * 0.1f), position.y + (y * 0.1f), 0.0f }, { 1.0f, 1.0f }, {m_SquareColor, 1.0f});
 			}
 		}
 
-		RealEngine::Renderer2D::DrawQuad({ 0.5, 0.5, 1 }, { 0.5f, 0.5f }, m_SquareColor);
+		RealEngine::Renderer2D::DrawQuad({ 0.5, 0.5, 1 }, { 0.5f, 0.5f }, m_Texture);
 		RealEngine::Renderer2D::EndScene();
 	}
 }
