@@ -24,6 +24,13 @@ void Sandbox2D::OnImGuiRender() {
 
 	ImGui::Begin("Settings");
 	
+	auto stats = RealEngine::Renderer2D::GetStats();
+	ImGui::Text("Renderer2D Stats:");
+	ImGui::Text("DrawCalls: %d", stats.DrawCalls);
+	ImGui::Text("QuadCount: %d", stats.QuadCount);
+	ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
+	ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
+
 	ImGui::ColorEdit3("Square Color", glm::value_ptr(m_SquareColor));
 	ImGui::Text("FPS: %f", fps);
 
@@ -43,6 +50,7 @@ void Sandbox2D::OnUpdate(RealEngine::Timestep ts) {
 		m_CameraController.OnUpdate(ts);
 	}
 	
+	RealEngine::Renderer2D::ResetStats();
 	//Render
 	{
 		RE_PROFILE_SCOPE("Render Prep");
@@ -61,7 +69,8 @@ void Sandbox2D::OnUpdate(RealEngine::Timestep ts) {
 			}
 		}
 
-		RealEngine::Renderer2D::DrawQuad({ 0.5, 0.5, 1 }, { 0.5f, 0.5f }, m_Texture);
+		RealEngine::Renderer2D::DrawQuad({ 0.5f, 0.5f, 1.0f }, { 0.5f, 0.5f }, m_Texture);
+		RealEngine::Renderer2D::DrawRotatedQuad({ -0.5f, 1.0f, 1.0f }, { 0.5f, 0.5f }, 45.0f, m_Texture);
 		RealEngine::Renderer2D::EndScene();
 	}
 }
