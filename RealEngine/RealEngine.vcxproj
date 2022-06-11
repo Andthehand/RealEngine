@@ -179,6 +179,7 @@
     <ClInclude Include="src\RealEngine\Renderer\Renderer2D.h" />
     <ClInclude Include="src\RealEngine\Renderer\RendererAPI.h" />
     <ClInclude Include="src\RealEngine\Renderer\Shader.h" />
+    <ClInclude Include="src\RealEngine\Renderer\SubTexture2D.h" />
     <ClInclude Include="src\RealEngine\Renderer\Texture.h" />
     <ClInclude Include="src\RealEngine\Renderer\VertexArray.h" />
     <ClInclude Include="src\repch.h" />
@@ -624,6 +625,7 @@
     <ClCompile Include="src\RealEngine\Renderer\Renderer2D.cpp" />
     <ClCompile Include="src\RealEngine\Renderer\RendererAPI.cpp" />
     <ClCompile Include="src\RealEngine\Renderer\Shader.cpp" />
+    <ClCompile Include="src\RealEngine\Renderer\SubTexture2D.cpp" />
     <ClCompile Include="src\RealEngine\Renderer\Texture.cpp" />
     <ClCompile Include="src\RealEngine\Renderer\VertexArray.cpp" />
     <ClCompile Include="src\repch.cpp">

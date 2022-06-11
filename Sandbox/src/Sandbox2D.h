@@ -19,6 +19,8 @@ private:
 	RealEngine::Ref<RealEngine::Shader> m_SquareShader;
 
 	RealEngine::Ref<RealEngine::Texture2D> m_Texture;
+	RealEngine::Ref<RealEngine::Texture2D> m_SpriteSheet;
+	RealEngine::Ref<RealEngine::SubTexture2D> m_GrassTexture;
 
 	glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f };
 
