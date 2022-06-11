@@ -15,6 +15,11 @@ void Sandbox2D::OnAttach() {
 	m_Texture = RealEngine::Texture2D::Create("assets/textures/Checkerboard.png");
 	m_SpriteSheet = RealEngine::Texture2D::Create("assets/textures/Spritesheet.png");
 	m_GrassTexture = RealEngine::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 0, 2 }, { 16, 16 });
+
+    RealEngine::FramebufferSpecification fbSpec;
+    fbSpec.Width = 1280;
+    fbSpec.Height= 720;
+    m_Framebuffer = RealEngine::Framebuffer::Create(fbSpec);
 }
 
 void Sandbox2D::OnDetach() {
@@ -87,6 +92,8 @@ void Sandbox2D::OnImGuiRender() {
     ImGui::ColorEdit3("Square Color", glm::value_ptr(m_SquareColor));
     ImGui::Text("FPS: %f", fps);
 
+    uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
+    ImGui::Image((void*)textureID, ImVec2{ 1280.0f, 720.0f });
     ImGui::End();
 
     ImGui::End();
@@ -109,7 +116,8 @@ void Sandbox2D::OnUpdate(RealEngine::Timestep ts) {
 	//Render
 	{
 		RE_PROFILE_SCOPE("Render Prep");
-		RealEngine::RenderCommand::SetClearColor({ 0.1, 0.1, 0.1, 1 });
+        m_Framebuffer->Bind();
+        RealEngine::RenderCommand::SetClearColor({ 0.1, 0.1, 0.1, 1 });
 		RealEngine::RenderCommand::Clear();
 	}
 
@@ -130,6 +138,7 @@ void Sandbox2D::OnUpdate(RealEngine::Timestep ts) {
 		RealEngine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, m_GrassTexture);
 
 		RealEngine::Renderer2D::EndScene();
+        m_Framebuffer->UnBind();
 	}
 }
 
