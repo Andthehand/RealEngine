@@ -205,8 +205,8 @@ namespace RealEngine {
 
     #define RE_PROFILE_BEGIN_SESSION(name, filepath) ::RealEngine::Instrumentor::Get().BeginSession(name, filepath)
     #define RE_PROFILE_END_SESSION() ::RealEngine::Instrumentor::Get().EndSession()
-	#define RE_PROFILE_SCOPE(name) constexpr auto fixedName = ::Hazel::InstrumentorUtils::CleanupOutputString(name, "__cdecl ");\
-									::Hazel::InstrumentationTimer timer##__LINE__(fixedName.Data)
+	#define RE_PROFILE_SCOPE(name) constexpr auto fixedName = ::RealEngine::InstrumentorUtils::CleanupOutputString(name, "__cdecl ");\
+									::RealEngine::InstrumentationTimer timer##__LINE__(fixedName.Data)
     #define RE_PROFILE_FUNCTION() RE_PROFILE_SCOPE(RE_FUNC_SIG)
 #else
     #define RE_PROFILE_BEGIN_SESSION(name, filepath)

@@ -1,4 +1,4 @@
-workspace "RealEngine"
+workspace "RealEngine-Editor"
 	architecture "x86_64"
 	startproject "Sandbox"
 
@@ -97,6 +97,50 @@ project "RealEngine"
 
 project "Sandbox"
 	location "Sandbox"
+	kind "ConsoleAPP"
+	language "C++"
+	cppdialect "C++17"
+	staticruntime "on"
+
+	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+	objdir("bin-int/" .. outputdir .. "/%{prj.name}")
+
+	files {
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp"
+	}
+
+	includedirs {
+		"RealEngine/vendor/spdlog/include",
+		"RealEngine/src",
+		"RealEngine/vendor",
+		"%{IncludeDir.glm}",
+	}
+
+	links {
+		"RealEngine"
+	}
+
+	filter "system:windows"
+		systemversion "latest"
+
+		filter "configurations:Debug"
+			defines "RE_DEBUG"
+			runtime "Debug"
+			symbols "on"
+
+		filter "configurations:Release"
+			defines "RE_RELEASE"
+			runtime "Release"
+			optimize"on"
+
+		filter "configurations:DIST"
+			defines "RE_DIST"
+			runtime "Release"
+			optimize"on"
+
+project "RealEngine-Editor"
+	location "RealEngine-Editor"
 	kind "ConsoleAPP"
 	language "C++"
 	cppdialect "C++17"

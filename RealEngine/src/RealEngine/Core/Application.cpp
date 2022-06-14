@@ -14,11 +14,11 @@ namespace RealEngine {
 
 	Application* Application::s_Instance = nullptr;
 
-	Application::Application() {
+	Application::Application(const std::string& name) {
 		RE_CORE_ASSERT(!s_Instance, "Application already exists!")
 		s_Instance = this;
 
-		m_Window = Scope<Window>(Window::Create());
+		m_Window = Window::Create(WindowProps(name));
 		//Sets the event callback of the window to the applictation.cpp OnEvent function
 		//i.e. resize event, mouse input, and keyboard input
 		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));

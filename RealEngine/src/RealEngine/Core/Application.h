@@ -17,7 +17,7 @@ namespace RealEngine {
 
 	class Application {
 	public:
-		Application();
+		Application(const std::string& name = "RealEngine App");
 		virtual ~Application() = default;
 
 		void OnEvent(Event& e);

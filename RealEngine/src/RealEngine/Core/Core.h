@@ -48,12 +48,12 @@
 #ifdef RE_PLATFORM_WINDOWS
 	#if RE_DYNAMIC_LINK
 		#ifdef RE_BUILD_DLL
-			#define HAZEL_API __declspec(dllexport)
+			#define RealEngine_API __declspec(dllexport)
 		#else
-			#define HAZEL_API __declspec(dllimport)
+			#define RealEngine_API __declspec(dllimport)
 		#endif
 	#else
-		#define HAZEL_API
+		#define RealEngine_API
 	#endif
 #else
 	#error RealEngine only supports Windows!

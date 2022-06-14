@@ -1,0 +1,31 @@
+#pragma once
+#include "RealEngine.h"
+
+namespace RealEngine {
+	class EditorLayer : public Layer {
+	public:
+		EditorLayer();
+		~EditorLayer() = default;
+
+		virtual void OnAttach() override;
+		virtual void OnDetach() override;
+		virtual void OnImGuiRender() override;
+		virtual void OnUpdate(Timestep ts) override;
+		virtual void OnEvent(Event& event) override;
+	private:
+		OrthographicCameraController m_CameraController;
+
+		Ref<RealEngine::Texture2D> m_Texture;
+		Ref<RealEngine::Texture2D> m_SpriteSheet;
+		Ref<RealEngine::SubTexture2D> m_GrassTexture;
+		Ref<RealEngine::Framebuffer> m_Framebuffer;
+
+		glm::vec2 m_ViewportSize;
+
+		glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f };
+
+		//FPS counter
+		float deltaTime = 0.0f;
+		float fps = 0.0f;
+	};
+}
