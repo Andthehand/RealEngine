@@ -27,6 +27,54 @@ namespace RealEngine {
         RE_PROFILE_FUNCTION();
     }
 
+    void EditorLayer::OnUpdate(Timestep ts) {
+        RE_PROFILE_FUNCTION();
+
+        // Resize
+        if (FramebufferSpecification spec = m_Framebuffer->GetSpecification();
+            m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && // zero sized framebuffer is invalid
+            (spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y)) {
+            m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+            m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
+        }
+
+        deltaTime += ts;
+        deltaTime /= 2.0f;
+        fps = 1.0f / deltaTime;
+
+        if (m_ViewportFocused)
+            m_CameraController.OnUpdate(ts);
+
+        Renderer2D::ResetStats();
+        //Render
+        {
+            RE_PROFILE_SCOPE("Render Prep");
+            m_Framebuffer->Bind();
+            RenderCommand::SetClearColor({ 0.1, 0.1, 0.1, 1 });
+            RenderCommand::Clear();
+        }
+
+        //Draw
+        {
+            RE_PROFILE_SCOPE("Render Draw");
+            Renderer2D::BeginScene(m_CameraController.GetCamera());
+            for (int x = -5; x < 5; x++) {
+                for (int y = -5; y < 5; y++) {
+                    glm::vec2 position = { x + (x * 0.1f), y + (y * 0.1f) };
+                    Renderer2D::DrawQuad({ position.x + (x * 0.1f), position.y + (y * 0.1f), 0.0f }, { 1.0f, 1.0f }, { m_SquareColor, 1.0f });
+                }
+            }
+
+            Renderer2D::DrawQuad({ 0.5f, 0.5f, 1.0f }, { 0.5f, 0.5f }, m_Texture);
+            Renderer2D::DrawRotatedQuad({ -0.5f, 1.0f, 1.0f }, { 0.5f, 0.5f }, 45.0f, m_Texture);
+
+            Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.1f }, { 1.0f, 1.0f }, m_GrassTexture);
+
+            Renderer2D::EndScene();
+            m_Framebuffer->UnBind();
+        }
+    }
+
     void EditorLayer::OnImGuiRender() {
         RE_PROFILE_FUNCTION();
 
@@ -97,62 +145,20 @@ namespace RealEngine {
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
         ImGui::Begin("Viewport");
+
+        m_ViewportFocused = ImGui::IsWindowFocused();
+        m_ViewportHovered = ImGui::IsWindowHovered();
+        Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused || !m_ViewportHovered);
+
         ImVec2 viewpoerPanelSize = ImGui::GetContentRegionAvail();
-        if (m_ViewportSize != *((glm::vec2*)&viewpoerPanelSize)) {
-            m_ViewportSize = { viewpoerPanelSize.x, viewpoerPanelSize.y };
-            m_Framebuffer->Resize((uint32_t)viewpoerPanelSize.x, (uint32_t)viewpoerPanelSize.y);
+        m_ViewportSize = { viewpoerPanelSize.x, viewpoerPanelSize.y };
         
-            m_CameraController.OnResize(viewpoerPanelSize.x, viewpoerPanelSize.y);
-        }
         uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
         ImGui::Image((void*)textureID, viewpoerPanelSize, ImVec2(0, 1), ImVec2(1, 0));
         ImGui::End();
         ImGui::PopStyleVar();
 
         ImGui::End();
-    }
-
-    void EditorLayer::OnUpdate(Timestep ts) {
-        RE_PROFILE_FUNCTION();
-
-        deltaTime += ts;
-        deltaTime /= 2.0f;
-        fps = 1.0f / deltaTime;
-
-        //Update
-        {
-            RE_PROFILE_SCOPE("Camera Update");
-            m_CameraController.OnUpdate(ts);
-        }
-
-        Renderer2D::ResetStats();
-        //Render
-        {
-            RE_PROFILE_SCOPE("Render Prep");
-            m_Framebuffer->Bind();
-            RenderCommand::SetClearColor({ 0.1, 0.1, 0.1, 1 });
-            RenderCommand::Clear();
-        }
-
-        //Draw
-        {
-            RE_PROFILE_SCOPE("Render Draw");
-            Renderer2D::BeginScene(m_CameraController.GetCamera());
-            for (int x = -5; x < 5; x++) {
-                for (int y = -5; y < 5; y++) {
-                    glm::vec2 position = { x + (x * 0.1f), y + (y * 0.1f) };
-                    Renderer2D::DrawQuad({ position.x + (x * 0.1f), position.y + (y * 0.1f), 0.0f }, { 1.0f, 1.0f }, { m_SquareColor, 1.0f });
-                }
-            }
-
-            Renderer2D::DrawQuad({ 0.5f, 0.5f, 1.0f }, { 0.5f, 0.5f }, m_Texture);
-            Renderer2D::DrawRotatedQuad({ -0.5f, 1.0f, 1.0f }, { 0.5f, 0.5f }, 45.0f, m_Texture);
-
-            Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.1f }, { 1.0f, 1.0f }, m_GrassTexture);
-
-            Renderer2D::EndScene();
-            m_Framebuffer->UnBind();
-        }
     }
 
     void EditorLayer::OnEvent(Event& e) {

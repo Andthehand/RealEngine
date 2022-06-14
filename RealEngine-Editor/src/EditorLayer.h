@@ -20,7 +20,8 @@ namespace RealEngine {
 		Ref<RealEngine::SubTexture2D> m_GrassTexture;
 		Ref<RealEngine::Framebuffer> m_Framebuffer;
 
-		glm::vec2 m_ViewportSize;
+		bool m_ViewportFocused = false, m_ViewportHovered = false;
+		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };;
 
 		glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f };
 
