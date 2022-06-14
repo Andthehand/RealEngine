@@ -1,6 +1,5 @@
 # Binaries
 **/bin/
-!vendor/bin/premake/
 bin-int/
 
 # RealEngine files

@@ -1,6 +1,6 @@
-workspace "RealEngine-Editor"
+workspace "RealEngine"
 	architecture "x86_64"
-	startproject "Sandbox"
+	startproject "RealEngine-Editor"
 
 	configurations {
 		"Debug",
