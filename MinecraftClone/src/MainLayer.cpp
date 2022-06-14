@@ -5,37 +5,53 @@
 
 #include "imgui/imgui.h"
 
-MainLayer::MainLayer(Application* app, int width, int height)
-	: Layer{ "Minecraft Main Layer" }, m_App(app), m_Camera(1280.0f / 720.0f) {
-}
+MainLayer::MainLayer(int width, int height)
+	: Layer{ "Minecraft Main Layer" }, m_CameraController(width / height, true) { }
 
 void MainLayer::OnAttach() {
 	//m_App->GetWindow().SetInputMode(m_MouseEnabled);
+	m_SpriteSheet = RealEngine::Texture2D::Create("assets/textures/Spritesheet.png");
+	m_GrassTexture = RealEngine::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 0, 2 }, { 16, 16 });
 }
 
 void MainLayer::OnDetach() {
 }
 
 void MainLayer::OnUpdate(Timestep ts) {
-	m_Camera.OnUpdate(ts);
-	//m_ChunkManager.OnUpdate(m_Camera.GetPosition());
-
 	FPSCounter(ts);
 
-	RenderCommand::SetClearColor({ 0.1, 0.1, 0.1, 1 });
-	RenderCommand::Clear();
+	//Update
+	{
+		RE_PROFILE_SCOPE("Camera Update");
+		m_CameraController.OnUpdate(ts);
+	}
 
-	Renderer2D::ResetStats();
-	Renderer2D::BeginScene(m_Camera.GetCamera());
-	//Renderer2D::SetColor(m_Color);
+	RealEngine::Renderer2D::ResetStats();
+	//Render
+	{
+		RE_PROFILE_SCOPE("Render Prep");
+		RealEngine::RenderCommand::SetClearColor({ 0.1, 0.1, 0.1, 1 });
+		RealEngine::RenderCommand::Clear();
+	}
 
-	//m_ChunkManager.RenderAll(m_Camera);
+	//Draw
+	{
+		RE_PROFILE_SCOPE("Render Draw");
+		RealEngine::Renderer2D::BeginScene(m_CameraController.GetCamera());
+		for (int x = -5; x < 5; x++) {
+			for (int y = -5; y < 5; y++) {
+				glm::vec2 position = { x + (x * 0.1f), y + (y * 0.1f) };
+				RealEngine::Renderer2D::DrawQuad({ position.x + (x * 0.1f), position.y + (y * 0.1f), 0.0f }, { 1.0f, 1.0f }, { m_Color, 1.0f });
+			}
+		}
 
-	Renderer::EndScene();
+		RealEngine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.1f }, { 1.0f, 1.0f }, m_GrassTexture);
+
+		RealEngine::Renderer2D::EndScene();
+	}
 }
 
 void MainLayer::OnImGuiRender(){
-
 	//Renderer Stats
 	ImGui::Begin("Stats");
 	ImGui::Text("FPS: %f", fps);
@@ -52,7 +68,7 @@ void MainLayer::OnImGuiRender(){
 	//Settings
 	ImGui::Begin("Settings");
 
-	ImGui::ColorEdit3("Cube Colors", glm::value_ptr(m_Color));
+	ImGui::ColorEdit3("Cube Colors", glm::value_ptr(m_Color));\
 
 	//ImGui::Text("Camera Chunk: %i, %i", ChunkManager::PositionToChunkPosition({ m_Camera.GetPosition().x, m_Camera.GetPosition().z }).x, ChunkManager::PositionToChunkPosition({ m_Camera.GetPosition().x, m_Camera.GetPosition().z }).z);
 	//ImGui::Text("Camera Pos: %f, %f, %f", m_Camera.GetPosition().x, m_Camera.GetPosition().z, m_Camera.GetPosition().y);
@@ -66,10 +82,10 @@ void MainLayer::OnImGuiRender(){
 }
 
 void MainLayer::OnEvent(Event& event) {
-	m_Camera.OnEvent(event);
+	m_CameraController.OnEvent(event);
 
-	EventDispatcher dispatcher(event);
-	dispatcher.Dispatch<KeyPressedEvent>(RE_BIND_EVENT_FN(MainLayer::OnKeyPressedEvent));
+	//EventDispatcher dispatcher(event);
+	//dispatcher.Dispatch<KeyPressedEvent>(RE_BIND_EVENT_FN(MainLayer::OnKeyPressedEvent));
 }
 
 bool MainLayer::OnKeyPressedEvent(KeyPressedEvent& e) {

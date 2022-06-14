@@ -5,7 +5,7 @@ using namespace RealEngine;
 
 class MainLayer : public Layer {
 public:
-	MainLayer(Application* app, int width, int height);
+	MainLayer(int width, int height);
 
 	virtual void OnAttach() override;
 	virtual void OnDetach() override;
@@ -21,8 +21,10 @@ private:
 		fps = 1.0f / deltaTime;
 	}
 private:
-	Application* m_App;
-	OrthographicCameraController m_Camera;
+	RealEngine::Ref<RealEngine::Texture2D> m_SpriteSheet;
+	RealEngine::Ref<RealEngine::SubTexture2D> m_GrassTexture;
+
+	OrthographicCameraController m_CameraController;
 
 	glm::vec3 m_Color = {1.0f, 0.0f, 0.0f};
 
