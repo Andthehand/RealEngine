@@ -12,6 +12,9 @@
 
 #include "RealEngine/ImGui/ImGuiLayer.h"
 
+#include "RealEngine/Scene/Scene.h"
+#include "RealEngine/Scene/Components.h"
+
 // ---Renderer------------------------
 #include "RealEngine/Renderer/Renderer.h"
 #include "RealEngine/Renderer/Renderer2D.h"

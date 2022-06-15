@@ -5,8 +5,6 @@
 
 #include "imgui/imgui.h"
 
-#include "Platform/OpenGL/OpenGLShader.h"
-
 Sandbox2D::Sandbox2D() : Layer("Sandbox2D"), m_CameraController(1280.0f / 720.0f, true) { }
 
 void Sandbox2D::OnAttach() {

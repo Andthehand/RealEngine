@@ -20,6 +20,7 @@ IncludeDir["Glad"] = "RealEngine/vendor/Glad/include"
 IncludeDir["ImGui"] = "RealEngine/vendor/imgui"
 IncludeDir["glm"] = "RealEngine/vendor/glm"
 IncludeDir["stb_image"] = "RealEngine/vendor/stb_image"
+IncludeDir["entt"] = "RealEngine/vendor/entt/include"
 
 group "Dependencies"
 
@@ -63,7 +64,8 @@ project "RealEngine"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.stb_image}"
+		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.entt}"
 	}
 
 	links {
@@ -115,6 +117,7 @@ project "Sandbox"
 		"RealEngine/src",
 		"RealEngine/vendor",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.entt}"
 	}
 
 	links {
@@ -159,6 +162,7 @@ project "RealEngine-Editor"
 		"RealEngine/src",
 		"RealEngine/vendor",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.entt}"
 	}
 
 	links {
