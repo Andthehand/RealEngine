@@ -56,6 +56,10 @@ namespace RealEngine {
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	}
 
+	void OpenGLRendererAPI::SetWireframe(bool enabled) {
+		glPolygonMode(GL_FRONT_AND_BACK, enabled ? GL_LINE : GL_FILL);
+	}
+
 	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount) {
 		uint32_t count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();
 		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);

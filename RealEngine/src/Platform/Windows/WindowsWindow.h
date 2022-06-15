@@ -21,6 +21,8 @@ namespace RealEngine {
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;
 
+		void SetInputMode(bool enabled) override;
+
 		inline virtual void* GetNativeWindow() const { return m_Window; }
 
 	private:

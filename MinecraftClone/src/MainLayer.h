@@ -5,7 +5,7 @@ using namespace RealEngine;
 
 class MainLayer : public Layer {
 public:
-	MainLayer(int width, int height);
+	MainLayer(Application* app, int width, int height);
 
 	virtual void OnAttach() override;
 	virtual void OnDetach() override;
@@ -21,6 +21,8 @@ private:
 		fps = 1.0f / deltaTime;
 	}
 private:
+	Application* m_App;
+
 	RealEngine::Ref<RealEngine::Texture2D> m_SpriteSheet;
 	RealEngine::Ref<RealEngine::SubTexture2D> m_GrassTexture;
 
@@ -29,7 +31,7 @@ private:
 	glm::vec3 m_Color = {1.0f, 0.0f, 0.0f};
 
 	bool m_Wireframe = false;
-	bool m_MouseEnabled = false;
+	bool m_MouseEnabled = true;
 
 	//FPS counter
 	float deltaTime = 0.0f;

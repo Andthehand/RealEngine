@@ -6,7 +6,7 @@
 class App : public RealEngine::Application {
 public:
 	App() : Application { "Minecraft" } {
-		PushLayer(new MainLayer(1280, 720));
+		PushLayer(new MainLayer(this, 1280, 720));
 	}
 
 	~App() = default;
