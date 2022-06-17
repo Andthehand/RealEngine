@@ -25,13 +25,9 @@ namespace RealEngine {
 	};
 
 	class Instrumentor {
-	private:
-		std::mutex m_Mutex;
-		InstrumentationSession* m_CurrentSession;
-		std::ofstream m_OutputStream;
 	public:
-		Instrumentor() : m_CurrentSession(nullptr) {
-		}
+		Instrumentor(const Instrumentor&) = delete;
+		Instrumentor(Instrumentor&&) = delete;
 
 		void BeginSession(const std::string& name, const std::string& filepath = "results.json")
 		{
@@ -99,6 +95,12 @@ namespace RealEngine {
 		}
 
 	private:
+		Instrumentor()
+			: m_CurrentSession(nullptr) { }
+
+		~Instrumentor() {
+			EndSession();
+		}
 
 		void WriteHeader() {
 			m_OutputStream << "{\"otherData\": {},\"traceEvents\":[{}";
@@ -120,7 +122,10 @@ namespace RealEngine {
 				m_CurrentSession = nullptr;
 			}
 		}
-
+	private:
+		std::mutex m_Mutex;
+		InstrumentationSession* m_CurrentSession;
+		std::ofstream m_OutputStream;
 	};
 
 	class InstrumentationTimer {
@@ -205,8 +210,10 @@ namespace RealEngine {
 
     #define RE_PROFILE_BEGIN_SESSION(name, filepath) ::RealEngine::Instrumentor::Get().BeginSession(name, filepath)
     #define RE_PROFILE_END_SESSION() ::RealEngine::Instrumentor::Get().EndSession()
-	#define RE_PROFILE_SCOPE(name) constexpr auto fixedName = ::RealEngine::InstrumentorUtils::CleanupOutputString(name, "__cdecl ");\
-									::RealEngine::InstrumentationTimer timer##__LINE__(fixedName.Data)
+	#define RE_PROFILE_SCOPE_LINE2(name, line) constexpr auto fixedName##line = ::RealEngine::InstrumentorUtils::CleanupOutputString(name, "__cdecl ");\
+												   ::RealEngine::InstrumentationTimer timer##line(fixedName##line.Data)
+	#define RE_PROFILE_SCOPE_LINE(name, line) RE_PROFILE_SCOPE_LINE2(name, line)
+	#define RE_PROFILE_SCOPE(name) RE_PROFILE_SCOPE_LINE(name, __LINE__)
     #define RE_PROFILE_FUNCTION() RE_PROFILE_SCOPE(RE_FUNC_SIG)
 #else
     #define RE_PROFILE_BEGIN_SESSION(name, filepath)

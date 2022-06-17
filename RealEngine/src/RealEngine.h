@@ -13,6 +13,7 @@
 #include "RealEngine/ImGui/ImGuiLayer.h"
 
 #include "RealEngine/Scene/Scene.h"
+#include "RealEngine/Scene/Entity.h"
 #include "RealEngine/Scene/Components.h"
 
 // ---Renderer------------------------

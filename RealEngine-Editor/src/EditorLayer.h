@@ -13,15 +13,14 @@ namespace RealEngine {
 		virtual void OnUpdate(Timestep ts) override;
 		virtual void OnEvent(Event& event) override;
 	private:
-		OrthographicCameraController m_CameraController;
-
 		Ref<RealEngine::Texture2D> m_Texture;
 		Ref<RealEngine::Texture2D> m_SpriteSheet;
 		Ref<RealEngine::SubTexture2D> m_GrassTexture;
 		Ref<RealEngine::Framebuffer> m_Framebuffer;
 
 		Ref<Scene> m_ActiveScene;
-		entt::entity m_SquareEntity;
+		Entity m_SquareEntity;
+		Entity m_CameraEntity;
 
 		bool m_ViewportFocused = false, m_ViewportHovered = false;
 		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };;

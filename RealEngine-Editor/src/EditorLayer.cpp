@@ -8,7 +8,7 @@
 #include "Platform/OpenGL/OpenGLShader.h"
 
 namespace RealEngine {
-    EditorLayer::EditorLayer() : Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f, true) { }
+    EditorLayer::EditorLayer() : Layer("EditorLayer") { }
 
     void EditorLayer::OnAttach() {
         RE_PROFILE_FUNCTION();
@@ -24,9 +24,13 @@ namespace RealEngine {
 
         m_ActiveScene = CreateRef<Scene>();
 
-        m_SquareEntity = m_ActiveScene->CreateEntity();
-        m_ActiveScene->Reg().emplace<TransformComponent>(m_SquareEntity);
-        m_ActiveScene->Reg().emplace<SpriteRendererComponent>(m_SquareEntity, glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
+        auto square = m_ActiveScene->CreateEntity("Green Square");
+        square.AddComponent<SpriteRendererComponent>(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+
+        m_SquareEntity = square;
+
+        m_CameraEntity = m_ActiveScene->CreateEntity("Camera Entity");
+        m_CameraEntity.AddComponent<CameraComponent>(glm::ortho(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f));
     }
 
     void EditorLayer::OnDetach() {
@@ -39,39 +43,23 @@ namespace RealEngine {
             m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && // zero sized framebuffer is invalid
             (spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y)) {
             m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-            m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
+            //m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
         }
 
         deltaTime += ts;
         deltaTime /= 2.0f;
         fps = 1.0f / deltaTime;
 
-        if (m_ViewportFocused)
-            m_CameraController.OnUpdate(ts);
+        //if (m_ViewportFocused)
+        //    m_CameraController.OnUpdate(ts);
 
         Renderer2D::ResetStats();
         m_Framebuffer->Bind();
         RenderCommand::SetClearColor({ 0.1, 0.1, 0.1, 1 });
         RenderCommand::Clear();
 
-
-        Renderer2D::BeginScene(m_CameraController.GetCamera());
         m_ActiveScene->OnUpdate(ts);
-        //for (int x = -5; x < 5; x++) {
-        //    for (int y = -5; y < 5; y++) {
-        //        glm::vec2 position = { x + (x * 0.1f), y + (y * 0.1f) };
-        //        Renderer2D::DrawQuad({ position.x + (x * 0.1f), position.y + (y * 0.1f), 0.0f }, { 1.0f, 1.0f }, { m_SquareColor, 1.0f });
-        //    }
-        //}
-        //
-        //Renderer2D::DrawQuad({ 0.5f, 0.5f, 1.0f }, { 0.5f, 0.5f }, m_Texture);
-        //Renderer2D::DrawRotatedQuad({ -0.5f, 1.0f, 1.0f }, { 0.5f, 0.5f }, 45.0f, m_Texture);
-        //
-        //Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.1f }, { 1.0f, 1.0f }, m_GrassTexture);
 
-
-
-        Renderer2D::EndScene();
         m_Framebuffer->UnBind();
     }
 
@@ -139,8 +127,14 @@ namespace RealEngine {
         ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
         ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
 
-        auto& squareColor = m_ActiveScene->Reg().get<SpriteRendererComponent>(m_SquareEntity).Color;
-        ImGui::ColorEdit3("Square Color", glm::value_ptr(squareColor));
+        ImGui::Separator();
+        if (m_SquareEntity) {
+            ImGui::Text("%s", m_SquareEntity.GetComponent<TagComponent>().Tag.c_str());
+            
+            auto& squareColor = m_SquareEntity.GetComponent<SpriteRendererComponent>().Color;
+            ImGui::ColorEdit3("Square Color", glm::value_ptr(squareColor));
+        }
+        ImGui::Separator();
 
         ImGui::Text("FPS: %f", fps);
         ImGui::End();
@@ -164,6 +158,6 @@ namespace RealEngine {
     }
 
     void EditorLayer::OnEvent(Event& e) {
-        m_CameraController.OnEvent(e);
+        //m_CameraController.OnEvent(e);
     }
 }

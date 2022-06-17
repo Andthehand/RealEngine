@@ -5,6 +5,8 @@
 #include "RealEngine/Renderer/Texture.h"
 #include "RealEngine/Renderer/SubTexture2D.h"
 
+#include "RealEngine/Renderer/Camera.h"
+
 namespace RealEngine {
 
 	class Renderer2D {
@@ -12,6 +14,7 @@ namespace RealEngine {
 		static void Init();
 		static void Shutdown();
 
+		static void BeginScene(const Camera& camera, const glm::mat4& transform);
 		static void BeginScene(const OrthographicCamera& camera);
 		static void EndScene();
 		static void Flush();
