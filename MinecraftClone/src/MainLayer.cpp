@@ -30,14 +30,14 @@ void MainLayer::OnUpdate(Timestep ts) {
 
 	//Draw
 	RealEngine::Renderer2D::BeginScene(m_CameraController.GetCamera());
-	for (int x = -5; x < 5; x++) {
-		for (int y = -5; y < 5; y++) {
-			glm::vec2 position = { x + (x * 0.1f), y + (y * 0.1f) };
-			RealEngine::Renderer2D::DrawQuad({ position.x + (x * 0.1f), position.y + (y * 0.1f), -10.0f }, { 1.0f, 1.0f }, { m_Color, 1.0f });
-		}
-	}
+	//for (int x = -5; x < 5; x++) {
+	//	for (int y = -5; y < 5; y++) {
+	//		glm::vec2 position = { x + (x * 0.1f), y + (y * 0.1f) };
+	//		RealEngine::Renderer2D::DrawQuad({ position.x + (x * 0.1f), position.y + (y * 0.1f), -10.0f }, { 1.0f, 1.0f }, { m_Color, 1.0f });
+	//	}
+	//}
 
-	RealEngine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.1f }, { 1.0f, 1.0f }, m_GrassTexture);
+	RealEngine::Renderer2D::DrawQuad({ 0.0f, 0.0f, -10.0f }, { 9.0f, 3.0f }, m_SpriteSheet);
 
 	RealEngine::Renderer2D::EndScene();
 }

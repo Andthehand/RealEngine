@@ -13,22 +13,26 @@ namespace RealEngine {
 	void OrthographicCameraController::OnUpdate(Timestep ts) {
 		RE_PROFILE_FUNCTION();
 
+		float velocity = m_CameraMoveSpeed * ts;
 		if (Input::IsKeyPressed(RE_KEY_A)) {
-			m_CameraPosition.x -= m_CameraMoveSpeed * ts;
-			m_CameraPosition.y -= m_CameraMoveSpeed * ts;
+			m_CameraPosition -= m_Camera.GetRightVector() * velocity;
 		}
 		else if (Input::IsKeyPressed(RE_KEY_D)) {
-			m_CameraPosition.x += m_CameraMoveSpeed * ts;
-			m_CameraPosition.y += m_CameraMoveSpeed * ts;
+			m_CameraPosition += m_Camera.GetRightVector() * velocity;
 		}
 
 		if (Input::IsKeyPressed(RE_KEY_W)) {
-			m_CameraPosition.x += m_CameraMoveSpeed * ts;
-			m_CameraPosition.y += m_CameraMoveSpeed * ts;
+			m_CameraPosition += m_Camera.GetFrontVector() * velocity;
 		}
 		else if (Input::IsKeyPressed(RE_KEY_S)) {
-			m_CameraPosition.x -= m_CameraMoveSpeed * ts;
-			m_CameraPosition.y -= m_CameraMoveSpeed * ts;
+			m_CameraPosition -= m_Camera.GetFrontVector() * velocity;
+		}
+
+		if (Input::IsKeyPressed(RE_KEY_SPACE)) {
+			m_CameraPosition += m_Camera.GetWorldUpVector() * velocity;
+		}
+		else if (Input::IsKeyPressed(RE_KEY_LEFT_SHIFT) || Input::IsKeyPressed(RE_KEY_RIGHT_SHIFT)) {
+			m_CameraPosition -= m_Camera.GetWorldUpVector() * velocity;
 		}
 
 		m_Camera.SetPosition(m_CameraPosition);

@@ -17,6 +17,10 @@ namespace RealEngine {
 		const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
 		const glm::mat4& GetViewProjectionMatrix() const { return m_ViewProjectionMatrix; }
 
+		const glm::vec3& GetFrontVector() { return Front; }
+		const glm::vec3& GetRightVector() { return Right; }
+		const glm::vec3& GetWorldUpVector() { return WorldUp; }
+
 		void UpdateCameraVectors(float yaw, float pitch) {
 			// calculate the new Front vector
 			glm::vec3 front;
@@ -33,7 +37,7 @@ namespace RealEngine {
 	private:
 		void RecalculateViewMatrix();
 
-		glm::vec3 Front= glm::vec3(0.0f, 0.0f, -1.0f);
+		glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
 		glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
 		glm::vec3 Right;
 		glm::vec3 WorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
