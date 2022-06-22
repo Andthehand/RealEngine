@@ -24,12 +24,12 @@ void MainLayer::OnUpdate(Timestep ts) {
 	m_CameraController.OnUpdate(ts);
 
 	//Render Prep
-	RealEngine::Renderer2D::ResetStats();
+	RealEngine::Renderer::ResetStats();
 	RealEngine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 	RealEngine::RenderCommand::Clear();
 
 	//Draw
-	RealEngine::Renderer2D::BeginScene(m_CameraController.GetCamera());
+	RealEngine::Renderer::BeginScene(m_CameraController.GetCamera());
 	//for (int x = -5; x < 5; x++) {
 	//	for (int y = -5; y < 5; y++) {
 	//		glm::vec2 position = { x + (x * 0.1f), y + (y * 0.1f) };
@@ -37,9 +37,10 @@ void MainLayer::OnUpdate(Timestep ts) {
 	//	}
 	//}
 
-	RealEngine::Renderer2D::DrawQuad({ 0.0f, 0.0f, -10.0f }, { 9.0f, 3.0f }, m_SpriteSheet);
+	//RealEngine::Renderer::DrawQuad({ 0.0f, 0.0f, -10.0f }, { 9.0f, 3.0f }, m_SpriteSheet);
+	RealEngine::Renderer::DrawQuad({ 0.0f, 0.0f, -10.0f }, { 9.0f, 3.0f }, { m_Color, 1.0f });
 
-	RealEngine::Renderer2D::EndScene();
+	RealEngine::Renderer::EndScene();
 }
 
 void MainLayer::OnImGuiRender(){
@@ -48,7 +49,7 @@ void MainLayer::OnImGuiRender(){
 	ImGui::Text("FPS: %f", fps);
 	ImGui::Text("");
 
-	auto stats = RealEngine::Renderer2D::GetStats();
+	auto stats = RealEngine::Renderer::GetStats();
 	ImGui::Text("Renderer Stats:");
 	ImGui::Text("DrawCalls: %d", stats.DrawCalls);
 	ImGui::Text("QuadCount: %d", stats.QuadCount);

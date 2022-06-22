@@ -29,6 +29,6 @@ public:
         return names;
     }
 
-    static int32_t blockTypeToIndex(BlockData::BlockType type);
+    static int32_t BlockTypeToIndex(BlockData::BlockType type);
     static const char* blockTypeToName(BlockData::BlockType type);
 };
