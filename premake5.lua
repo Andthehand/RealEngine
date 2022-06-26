@@ -116,7 +116,8 @@ project "Sandbox"
 		"RealEngine/vendor/spdlog/include",
 		"RealEngine/src",
 		"RealEngine/vendor",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.entt}"
 	}
 
 	links {

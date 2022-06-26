@@ -14,6 +14,7 @@
 
 #include "RealEngine/Scene/Scene.h"
 #include "RealEngine/Scene/Entity.h"
+#include "RealEngine/Scene/ScriptableEntity.h"
 #include "RealEngine/Scene/Components.h"
 
 // ---Renderer------------------------

@@ -30,7 +30,32 @@ namespace RealEngine {
         m_SquareEntity = square;
 
         m_CameraEntity = m_ActiveScene->CreateEntity("Camera Entity");
-        m_CameraEntity.AddComponent<CameraComponent>(glm::ortho(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f));
+        m_CameraEntity.AddComponent<CameraComponent>();
+
+        class CameraController : public ScriptableEntity {
+        public:
+            void OnCreate() {
+            }
+
+            void OnDestroy() {
+            }
+
+            void OnUpdate(Timestep ts) {
+                auto& transform = GetComponent<TransformComponent>().Transform;
+                float speed = 5.0f;
+
+                if (Input::IsKeyPressed(KeyCode::A))
+                    transform[3][0] -= speed * ts;
+                if (Input::IsKeyPressed(KeyCode::D))
+                    transform[3][0] += speed * ts;
+                if (Input::IsKeyPressed(KeyCode::W))
+                    transform[3][1] += speed * ts;
+                if (Input::IsKeyPressed(KeyCode::S))
+                    transform[3][1] -= speed * ts;
+            }
+        };
+
+        m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
     }
 
     void EditorLayer::OnDetach() {
@@ -43,7 +68,8 @@ namespace RealEngine {
             m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && // zero sized framebuffer is invalid
             (spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y)) {
             m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-            //m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
+        
+            m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
         }
 
         deltaTime += ts;
@@ -59,6 +85,13 @@ namespace RealEngine {
         RenderCommand::Clear();
 
         m_ActiveScene->OnUpdate(ts);
+
+
+        Renderer2D::BeginScene(m_CameraEntity.GetComponent<CameraComponent>().Camera, m_CameraEntity.GetComponent<TransformComponent>().Transform);
+        
+        //Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.1f }, { 4.0f, 4.0f }, m_SpriteSheet);
+        
+        Renderer2D::EndScene();
 
         m_Framebuffer->UnBind();
     }
@@ -150,7 +183,7 @@ namespace RealEngine {
         m_ViewportSize = { viewpoerPanelSize.x, viewpoerPanelSize.y };
         
         uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
-        ImGui::Image((void*)textureID, viewpoerPanelSize, ImVec2(0, 1), ImVec2(1, 0));
+        ImGui::Image((void*)textureID, viewpoerPanelSize, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
         ImGui::End();
         ImGui::PopStyleVar();
 
