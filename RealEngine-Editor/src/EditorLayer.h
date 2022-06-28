@@ -1,5 +1,6 @@
 #pragma once
 #include "RealEngine.h"
+#include "Panels/SceneHierarchyPanel.h"
 
 namespace RealEngine {
 	class EditorLayer : public Layer {
@@ -30,5 +31,8 @@ namespace RealEngine {
 		//FPS counter
 		float deltaTime = 0.0f;
 		float fps = 0.0f;
+
+		//Panels
+		SceneHierarchyPanel m_SceneHierarchyPanel;
 	};
 }
