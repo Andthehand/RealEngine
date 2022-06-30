@@ -26,11 +26,18 @@ namespace RealEngine {
 
         auto square = m_ActiveScene->CreateEntity("Green Square");
         square.AddComponent<SpriteRendererComponent>(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+        
+        auto redsquare = m_ActiveScene->CreateEntity("Red Square");
+        redsquare.AddComponent<SpriteRendererComponent>(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+        redsquare.GetComponent<TransformComponent>().Transform[3][0] = 1.0f;
 
         m_SquareEntity = square;
 
         m_CameraEntity = m_ActiveScene->CreateEntity("Camera Entity");
         m_CameraEntity.AddComponent<CameraComponent>();
+
+        m_SecondCamera = m_ActiveScene->CreateEntity("Second Camera");
+        m_SecondCamera.AddComponent<CameraComponent>().Primary = false;
 
         class CameraController : public ScriptableEntity {
         public:
@@ -78,22 +85,12 @@ namespace RealEngine {
         deltaTime /= 2.0f;
         fps = 1.0f / deltaTime;
 
-        //if (m_ViewportFocused)
-        //    m_CameraController.OnUpdate(ts);
-
         Renderer2D::ResetStats();
         m_Framebuffer->Bind();
         RenderCommand::SetClearColor({ 0.1, 0.1, 0.1, 1 });
         RenderCommand::Clear();
 
         m_ActiveScene->OnUpdate(ts);
-
-
-        Renderer2D::BeginScene(m_CameraEntity.GetComponent<CameraComponent>().Camera, m_CameraEntity.GetComponent<TransformComponent>().Transform);
-        
-        //Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.1f }, { 4.0f, 4.0f }, m_SpriteSheet);
-        
-        Renderer2D::EndScene();
 
         m_Framebuffer->UnBind();
     }
@@ -165,16 +162,23 @@ namespace RealEngine {
 
         ImGui::Separator();
         if (m_SquareEntity) {
+            ImGui::Separator();
             ImGui::Text("%s", m_SquareEntity.GetComponent<TagComponent>().Tag.c_str());
             
             auto& squareColor = m_SquareEntity.GetComponent<SpriteRendererComponent>().Color;
             ImGui::ColorEdit3("Square Color", glm::value_ptr(squareColor));
+            ImGui::Separator();
         }
-        ImGui::Separator();
+
+        if (ImGui::Checkbox("Camera A", &m_PrimaryCamera)) {
+            m_CameraEntity.GetComponent<CameraComponent>().Primary = m_PrimaryCamera;
+            m_SecondCamera.GetComponent<CameraComponent>().Primary = !m_PrimaryCamera;
+        }
 
         ImGui::Text("FPS: %f", fps);
         ImGui::End();
 
+        //ImGui Viewport Window/Panel
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
         ImGui::Begin("Viewport");
 
