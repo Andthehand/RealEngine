@@ -1,6 +1,7 @@
 #pragma once
+#include <functional>
 
-#include "repch.h"
+#include "RealEngine/Debug/Instrumentor.h"
 #include "RealEngine/Core/Core.h"
 
 namespace RealEngine {

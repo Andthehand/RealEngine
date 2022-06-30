@@ -41,11 +41,17 @@ namespace RealEngine {
 		Compile(sources);
 	}
 
+	OpenGLShader::~OpenGLShader() {
+		RE_PROFILE_FUNCTION();
+
+		glDeleteProgram(m_RendererID);
+	}
+
 	std::string OpenGLShader::ReadFile(const std::string& filepath) {
 		RE_PROFILE_FUNCTION();
 
 		std::string result;
-		std::ifstream in(filepath, std::ios::in | std::ios::binary);
+		std::ifstream in(filepath, std::ios::in | std::ios::binary); // ifstream closes itself due to RAII
 		if (in) {
 			in.seekg(0, std::ios::end);
 			size_t size = in.tellg();
@@ -53,7 +59,6 @@ namespace RealEngine {
 				result.resize(size);
 				in.seekg(0, std::ios::beg);
 				in.read(&result[0], size);
-				in.close();
 			}
 			else {
 				RE_CORE_ERROR("Could not read from file '{0}'", filepath);
@@ -168,12 +173,6 @@ namespace RealEngine {
 			glDeleteShader(glShaderID);
 		}
 		m_RendererID = program;
-	}
-
-	OpenGLShader::~OpenGLShader() {
-		RE_PROFILE_FUNCTION();
-
-		glDeleteProgram(m_RendererID);
 	}
 
 	void OpenGLShader::Bind() const {

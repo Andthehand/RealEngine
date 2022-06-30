@@ -7,6 +7,10 @@
 #include <iomanip>
 #include <string>
 #include <thread>
+#include <mutex>
+#include <sstream>
+
+#include "RealEngine/Core/Log.h"
 
 namespace RealEngine {
 

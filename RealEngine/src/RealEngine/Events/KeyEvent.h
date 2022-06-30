@@ -1,7 +1,7 @@
 #pragma once
 
 #include "RealEngine/Events/Event.h"
-#include "RealEngine/Core/Input.h"
+#include "RealEngine/Core/KeyCodes.h"
 
 namespace RealEngine {
 	class  KeyEvent : public Event {
@@ -10,16 +10,16 @@ namespace RealEngine {
 
 		EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 	protected:
-		KeyEvent(KeyCode keycode) : m_KeyCode(keycode) {}
+		KeyEvent(const KeyCode keycode) : m_KeyCode(keycode) {}
 
 		KeyCode m_KeyCode;
 	};
 
 	class  KeyPressedEvent : public KeyEvent {
 	public:
-		KeyPressedEvent(KeyCode keycode, int repeatCount) : KeyEvent(keycode), m_RepeatCount(repeatCount) {}
+		KeyPressedEvent(const KeyCode keycode, const uint16_t repeatCount) : KeyEvent(keycode), m_RepeatCount(repeatCount) {}
 
-		inline int GetRepeatCount() const { return m_RepeatCount; }
+		uint16_t GetRepeatCount() const { return m_RepeatCount; }
 
 		std::string ToString() const override {
 			std::stringstream ss;
@@ -29,12 +29,12 @@ namespace RealEngine {
 
 		EVENT_CLASS_TYPE(KeyPressed)
 	private:
-		int m_RepeatCount;
+		uint16_t m_RepeatCount;
 	};
 
 	class  KeyReleasedEvent : public KeyEvent {
 	public:
-		KeyReleasedEvent(KeyCode keycode) : KeyEvent(keycode) {}
+		KeyReleasedEvent(const KeyCode keycode) : KeyEvent(keycode) {}
 
 		std::string ToString() const override {
 			std::stringstream ss;
@@ -47,7 +47,7 @@ namespace RealEngine {
 
 	class  KeyTypedEvent : public KeyEvent {
 	public:
-		KeyTypedEvent(KeyCode keycode) : KeyEvent(keycode) {}
+		KeyTypedEvent(const KeyCode keycode) : KeyEvent(keycode) {}
 
 		std::string ToString() const override {
 			std::stringstream ss;

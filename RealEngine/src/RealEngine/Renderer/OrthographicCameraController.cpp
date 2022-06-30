@@ -12,28 +12,28 @@ namespace RealEngine {
 	void OrthographicCameraController::OnUpdate(Timestep ts) {
 		RE_PROFILE_FUNCTION();
 
-		if (Input::IsKeyPressed(RE_KEY_A)) {
+		if (Input::IsKeyPressed(Key::A)) {
 			m_CameraPosition.x -= cos(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * ts;
 			m_CameraPosition.y -= sin(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * ts;
 		}
-		else if (Input::IsKeyPressed(RE_KEY_D)) {
+		else if (Input::IsKeyPressed(Key::D)) {
 			m_CameraPosition.x += cos(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * ts;
 			m_CameraPosition.y += sin(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * ts;
 		}
 
-		if (Input::IsKeyPressed(RE_KEY_W)) {
+		if (Input::IsKeyPressed(Key::W)) {
 			m_CameraPosition.x += -sin(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * ts;
 			m_CameraPosition.y += cos(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * ts;
 		}
-		else if (Input::IsKeyPressed(RE_KEY_S)) {
+		else if (Input::IsKeyPressed(Key::S)) {
 			m_CameraPosition.x -= -sin(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * ts;
 			m_CameraPosition.y -= cos(glm::radians(m_CameraRotation)) * m_CameraMoveSpeed * ts;
 		}
 
 		if (m_Rotation) {
-			if (RealEngine::Input::IsKeyPressed(RE_KEY_Q))
+			if (RealEngine::Input::IsKeyPressed(Key::Q))
 				m_CameraRotation += m_CameraRotationSpeed * ts;
-			if(RealEngine::Input::IsKeyPressed(RE_KEY_E))
+			if(RealEngine::Input::IsKeyPressed(Key::E))
 				m_CameraRotation -= m_CameraRotationSpeed * ts;
 
 			m_Camera.SetRotation(m_CameraRotation);
