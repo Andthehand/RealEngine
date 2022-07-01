@@ -19,7 +19,7 @@ namespace RealEngine {
 			case ShaderDataType::Int4:	  return 4 * 4;
 			case ShaderDataType::Bool:	  return 1;
 		}
-		RE_ASSERT(false, "No ShaderDataType of type{0}", type);
+		RE_CORE_ASSERT(false, "Unknown ShaderDataType!");
 
 		return 0;
 	}

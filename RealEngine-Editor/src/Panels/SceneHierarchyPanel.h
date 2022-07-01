@@ -1,6 +1,5 @@
 #pragma once
 #include "RealEngine/Core/Core.h"
-#include "RealEngine/Core/Log.h"
 #include "RealEngine/Scene/Scene.h"
 #include "RealEngine/Scene/Entity.h"
 

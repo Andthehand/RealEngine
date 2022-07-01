@@ -18,13 +18,8 @@
 	#define RE_DEBUGBREAK()
 #endif
 
-#ifdef RE_ENABLE_ASSERTS
-	#define RE_ASSERT(x, ...) { if(!(x)) { RE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
-	#define RE_CORE_ASSERT(x, ...) { if(!(x)) { RE_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
-#else
-	#define RE_ASSERT(x, ...)
-	#define RE_CORE_ASSERT(x, ...)
-#endif
+#define RE_EXPAND_MACRO(x) x
+#define RE_STRINGIFY_MACRO(x) #x
 
 #define BIT(x) (1 << x)
 
@@ -45,3 +40,6 @@ namespace RealEngine {
 		return std::make_shared<T>(std::forward<Args>(args)...);
 	}
 }
+
+#include "RealEngine/Core/Log.h"
+#include "RealEngine/Core/Assert.h"

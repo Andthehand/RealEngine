@@ -8,20 +8,20 @@ namespace RealEngine {
 		RecalculateProjection();
 	}
 
-	void SceneCamera::SetOrthographic(float size, float nearClip, float farClip) {
-		m_ProjectionType = ProjectionType::Orthographic;
-		m_OrthgraphicSize = size;
-		m_OrthgraphicNear = nearClip;
-		m_OrthgraphicFar = farClip;
-
-		RecalculateProjection();
-	}
-
 	void SceneCamera::SetPerspective(float verticalFOV, float nearClip, float farClip) {
 		m_ProjectionType = ProjectionType::Perspective;
 		m_PerspectiveFOV = verticalFOV;
 		m_PerspectiveNear = nearClip;
 		m_PerspectiveFar = farClip;
+
+		RecalculateProjection();
+	}
+
+	void SceneCamera::SetOrthographic(float size, float nearClip, float farClip) {
+		m_ProjectionType = ProjectionType::Orthographic;
+		m_OrthgraphicSize = size;
+		m_OrthgraphicNear = nearClip;
+		m_OrthgraphicFar = farClip;
 
 		RecalculateProjection();
 	}
