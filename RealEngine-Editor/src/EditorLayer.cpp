@@ -33,10 +33,10 @@ namespace RealEngine {
 
         m_SquareEntity = square;
 
-        m_CameraEntity = m_ActiveScene->CreateEntity("Camera Entity");
+        m_CameraEntity = m_ActiveScene->CreateEntity("Camera A");
         m_CameraEntity.AddComponent<CameraComponent>();
 
-        m_SecondCamera = m_ActiveScene->CreateEntity("Second Camera");
+        m_SecondCamera = m_ActiveScene->CreateEntity("Camera B");
         m_SecondCamera.AddComponent<CameraComponent>().Primary = false;
 
         class CameraController : public ScriptableEntity {
@@ -151,7 +151,7 @@ namespace RealEngine {
 
         m_SceneHierarchyPanel.OnImGuiRender();
 
-        ImGui::Begin("Settings");
+        ImGui::Begin("Stats");
 
         auto stats = Renderer2D::GetStats();
         ImGui::Text("Renderer2D Stats:");
@@ -159,21 +159,6 @@ namespace RealEngine {
         ImGui::Text("QuadCount: %d", stats.QuadCount);
         ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
         ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
-
-        ImGui::Separator();
-        if (m_SquareEntity) {
-            ImGui::Separator();
-            ImGui::Text("%s", m_SquareEntity.GetComponent<TagComponent>().Tag.c_str());
-            
-            auto& squareColor = m_SquareEntity.GetComponent<SpriteRendererComponent>().Color;
-            ImGui::ColorEdit3("Square Color", glm::value_ptr(squareColor));
-            ImGui::Separator();
-        }
-
-        if (ImGui::Checkbox("Camera A", &m_PrimaryCamera)) {
-            m_CameraEntity.GetComponent<CameraComponent>().Primary = m_PrimaryCamera;
-            m_SecondCamera.GetComponent<CameraComponent>().Primary = !m_PrimaryCamera;
-        }
 
         ImGui::Text("FPS: %f", fps);
         ImGui::End();
