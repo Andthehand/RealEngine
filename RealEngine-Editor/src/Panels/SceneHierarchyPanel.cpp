@@ -22,7 +22,7 @@ namespace RealEngine {
 			Entity entity{ entityID, m_Context.get() };
 
 			DrawEntityNode(entity);
-			});
+		});
 
 		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 			m_SelectionContext = {};

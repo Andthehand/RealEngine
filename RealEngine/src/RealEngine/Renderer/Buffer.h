@@ -60,7 +60,7 @@ namespace RealEngine {
 	public:
 		BufferLayout() = default;
 
-		BufferLayout(const std::initializer_list<BufferElement>& elements) : m_Elements(elements) {
+		BufferLayout(std::initializer_list<BufferElement> elements) : m_Elements(elements) {
 			CalculateOffsetsAndStride();
 		}
 
