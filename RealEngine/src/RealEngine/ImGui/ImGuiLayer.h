@@ -2,12 +2,14 @@
 
 #include "RealEngine/Core/Layer.h"
 
+#include "RealEngine/Events/ApplicationEvent.h"
 #include "RealEngine/Events/KeyEvent.h"
 #include "RealEngine/Events/MouseEvent.h"
-#include "RealEngine/Events/ApplicationEvent.h"
 
 namespace RealEngine {
-	class  ImGuiLayer : public Layer {
+
+	class ImGuiLayer : public Layer
+	{
 	public:
 		ImGuiLayer();
 		~ImGuiLayer() = default;
@@ -20,8 +22,11 @@ namespace RealEngine {
 		void End();
 
 		void BlockEvents(bool block) { m_BlockEvents = block; }
+
+		void SetDarkThemeColors();
 	private:
 		bool m_BlockEvents = true;
 		float m_Time = 0.0f;
 	};
+
 }
