@@ -17,3 +17,6 @@
 	path = RealEngine/vendor/imgui
 	url = https://github.com/TheCherno/imgui.git
 	branch = docking
+[submodule "RealEngine/vendor/yaml-cpp"]
+	path = RealEngine/vendor/yaml-cpp
+	url = https://github.com/TheCherno/yaml-cpp.git

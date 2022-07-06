@@ -28,15 +28,16 @@ IncludeDir["ImGui"] = "%{wks.location}/RealEngine/vendor/imgui"
 IncludeDir["glm"] = "%{wks.location}/RealEngine/vendor/glm"
 IncludeDir["stb_image"] = "%{wks.location}/RealEngine/vendor/stb_image"
 IncludeDir["entt"] = "%{wks.location}/RealEngine/vendor/entt/include"
+IncludeDir["yaml_cpp"] = "%{wks.location}/RealEngine/vendor/yaml-cpp/include"
 
 group "Dependencies"
 	include "vendor/premake"
 	include "RealEngine/vendor/GLFW"
 	include "RealEngine/vendor/Glad"
 	include "RealEngine/vendor/imgui"
-
+	include "RealEngine/vendor/yaml-cpp"
 group ""
 
 include "RealEngine"
-include "RealEngine-Editor"
 include "Sandbox"
+include "RealEngine-Editor"
