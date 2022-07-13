@@ -14,6 +14,12 @@ namespace RealEngine {
 		virtual void OnUpdate(Timestep ts) override;
 		virtual void OnEvent(Event& event) override;
 	private:
+		bool OnKeyPressed(KeyPressedEvent& e);
+
+		void NewScene();
+		void OpenScene();
+		void SaveSceneAs();
+	private:
 		Ref<RealEngine::Texture2D> m_Texture;
 		Ref<RealEngine::Texture2D> m_SpriteSheet;
 		Ref<RealEngine::SubTexture2D> m_GrassTexture;

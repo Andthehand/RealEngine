@@ -5,6 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "RealEngine/Scene/SceneSerializer.h"
+#include "RealEngine/Utils/PlatformUtils.h"
 
 namespace RealEngine {
     EditorLayer::EditorLayer() : Layer("EditorLayer") { }
@@ -22,48 +23,6 @@ namespace RealEngine {
         m_Framebuffer = Framebuffer::Create(fbSpec);
 
         m_ActiveScene = CreateRef<Scene>();
-
-#if 0
-        auto square = m_ActiveScene->CreateEntity("Green Square");
-        square.AddComponent<SpriteRendererComponent>(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-        
-        auto redsquare = m_ActiveScene->CreateEntity("Red Square");
-        redsquare.AddComponent<SpriteRendererComponent>(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-        redsquare.GetComponent<TransformComponent>().Translation.x = 1.0f;
-
-        m_SquareEntity = square;
-
-        m_CameraEntity = m_ActiveScene->CreateEntity("Camera A");
-        m_CameraEntity.AddComponent<CameraComponent>();
-
-        m_SecondCamera = m_ActiveScene->CreateEntity("Camera B");
-        m_SecondCamera.AddComponent<CameraComponent>().Primary = false;
-
-        class CameraController : public ScriptableEntity {
-        public:
-            void OnCreate() {
-            }
-
-            void OnDestroy() {
-            }
-
-            void OnUpdate(Timestep ts) {
-                auto& translation = GetComponent<TransformComponent>().Translation;
-                float speed = 5.0f;
-
-                if (Input::IsKeyPressed(Key::A))
-					translation.x -= speed * ts;
-                if (Input::IsKeyPressed(Key::D))
-					translation.x += speed * ts;
-                if (Input::IsKeyPressed(Key::W))
-					translation.y += speed * ts;
-                if (Input::IsKeyPressed(Key::S))
-					translation.y -= speed * ts;
-            }
-        };
-
-        m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
-#endif
 
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
     }
@@ -152,12 +111,20 @@ namespace RealEngine {
                 // which we can't undo at the moment without finer window depth/z control.
                 //ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
 
-				if (ImGui::MenuItem("Serialize")) {
-					SceneSerializer serializer(m_ActiveScene);
-					serializer.Serialize("assets/scenes/Example.scene");
+				if (ImGui::MenuItem("New", "Ctrl+N")) {
+					NewScene();
 				}
 
-				if (ImGui::MenuItem("Deserialize")) {
+				if (ImGui::MenuItem("Open...", "Ctrl+O")) {
+					OpenScene();
+				}
+
+				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S")) {
+					SaveSceneAs();
+				}
+
+
+				if (ImGui::MenuItem("Save", "Ctrl+S")) {
 					SceneSerializer serializer(m_ActiveScene);
 					serializer.Deserialize("assets/scenes/Example.scene");
 				}
@@ -168,47 +135,102 @@ namespace RealEngine {
 					}
 				}
 
-                if (ImGui::MenuItem("Exit")) Application::Get().Close();
-                ImGui::EndMenu();
-            }
+				if (ImGui::MenuItem("Exit")) Application::Get().Close();
+				ImGui::EndMenu();
+			}
 
-            ImGui::EndMenuBar();
-        }
+			ImGui::EndMenuBar();
+		}
 
-        m_SceneHierarchyPanel.OnImGuiRender();
+		m_SceneHierarchyPanel.OnImGuiRender();
 
-        ImGui::Begin("Stats");
+		ImGui::Begin("Stats");
 
-        auto stats = Renderer2D::GetStats();
-        ImGui::Text("Renderer2D Stats:");
-        ImGui::Text("DrawCalls: %d", stats.DrawCalls);
-        ImGui::Text("QuadCount: %d", stats.QuadCount);
-        ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
-        ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
+		auto stats = Renderer2D::GetStats();
+		ImGui::Text("Renderer2D Stats:");
+		ImGui::Text("DrawCalls: %d", stats.DrawCalls);
+		ImGui::Text("QuadCount: %d", stats.QuadCount);
+		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
+		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
 
-        ImGui::Text("FPS: %f", fps);
-        ImGui::End();
+		ImGui::Text("FPS: %f", fps);
+		ImGui::End();
 
-        //ImGui Viewport Window/Panel
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-        ImGui::Begin("Viewport");
+		//ImGui Viewport Window/Panel
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		ImGui::Begin("Viewport");
 
-        m_ViewportFocused = ImGui::IsWindowFocused();
-        m_ViewportHovered = ImGui::IsWindowHovered();
-        Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused || !m_ViewportHovered);
+		m_ViewportFocused = ImGui::IsWindowFocused();
+		m_ViewportHovered = ImGui::IsWindowHovered();
+		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused || !m_ViewportHovered);
 
-        ImVec2 viewpoerPanelSize = ImGui::GetContentRegionAvail();
-        m_ViewportSize = { viewpoerPanelSize.x, viewpoerPanelSize.y };
-        
-        uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
-        ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
-        ImGui::End();
-        ImGui::PopStyleVar();
+		ImVec2 viewpoerPanelSize = ImGui::GetContentRegionAvail();
+		m_ViewportSize = { viewpoerPanelSize.x, viewpoerPanelSize.y };
 
-        ImGui::End();
-    }
+		uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
+		ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
+		ImGui::End();
+		ImGui::PopStyleVar();
 
-    void EditorLayer::OnEvent(Event& e) {
-        //m_CameraController.OnEvent(e);
-    }
+		ImGui::End();
+	}
+
+	void EditorLayer::OnEvent(Event& e) {
+		EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<KeyPressedEvent>(RE_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+	}
+
+	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e) {
+		if (e.GetRepeatCount() > 0)
+			return false;
+		bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
+		bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
+
+		switch (e.GetKeyCode()) {
+		case Key::N:
+			if (control)
+				NewScene();
+		break; 
+
+		case Key::O:
+			if (control)
+				OpenScene();
+			break;
+
+		case Key::S:
+			if (control && shift)
+				SaveSceneAs();
+			break;
+		}
+		
+		return false;
+	}
+
+	void EditorLayer::NewScene() {
+		m_ActiveScene = CreateRef<Scene>();
+		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+	}
+	
+	void EditorLayer::OpenScene() {
+		std::optional<std::string> filepath = FileDialogs::OpenFile("RealEngine (*.scene)\0*.scene\0");
+
+		if (filepath) {
+			m_ActiveScene = CreateRef<Scene>();
+			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Deserialize(*filepath);
+		}
+	}
+	
+	void EditorLayer::SaveSceneAs(){
+		std::optional<std::string> filepath = FileDialogs::SaveFile("RealEngine (*.scene)\0*.scene\0");
+
+		if (filepath) {
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Serialize(*filepath);
+		}
+	}
 }
