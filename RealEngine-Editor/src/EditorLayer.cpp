@@ -125,8 +125,7 @@ namespace RealEngine {
 
 
 				if (ImGui::MenuItem("Save", "Ctrl+S")) {
-					SceneSerializer serializer(m_ActiveScene);
-					serializer.Deserialize("assets/scenes/Example.scene");
+					SaveScene();
 				}
 
 				if (ImGui::MenuItem("Add 250 squares")) {
@@ -189,17 +188,26 @@ namespace RealEngine {
 		switch (e.GetKeyCode()) {
 		case Key::N:
 			if (control)
+				//Ctrl+N
 				NewScene();
 		break; 
 
 		case Key::O:
 			if (control)
+				//Ctrl+O
 				OpenScene();
 			break;
 
 		case Key::S:
-			if (control && shift)
-				SaveSceneAs();
+			if (control) {
+				if(shift) {
+					//Ctrl+Shift+S
+					SaveSceneAs();
+					break;
+				}
+				//Ctrl+S
+				SaveScene();
+			}
 			break;
 		}
 		
@@ -209,6 +217,7 @@ namespace RealEngine {
 	void EditorLayer::NewScene() {
 		m_ActiveScene = CreateRef<Scene>();
 		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+		m_ActiveScene->savePath = std::string();
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 	}
 	
@@ -218,6 +227,7 @@ namespace RealEngine {
 		if (filepath) {
 			m_ActiveScene = CreateRef<Scene>();
 			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_ActiveScene->savePath = *filepath;
 			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
 			SceneSerializer serializer(m_ActiveScene);
@@ -229,8 +239,21 @@ namespace RealEngine {
 		std::optional<std::string> filepath = FileDialogs::SaveFile("RealEngine (*.scene)\0*.scene\0");
 
 		if (filepath) {
+			m_ActiveScene->savePath = *filepath;
+			
 			SceneSerializer serializer(m_ActiveScene);
 			serializer.Serialize(*filepath);
+		}
+	}
+	
+	void EditorLayer::SaveScene() {		
+		if (!m_ActiveScene->savePath.empty()) {
+			RE_CORE_INFO("Scene saved in: {}", m_ActiveScene->savePath);
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Serialize(m_ActiveScene->savePath);
+		}
+		else {
+			SaveSceneAs();
 		}
 	}
 }

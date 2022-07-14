@@ -19,6 +19,7 @@ namespace RealEngine {
 		void NewScene();
 		void OpenScene();
 		void SaveSceneAs();
+		void SaveScene();
 	private:
 		Ref<RealEngine::Texture2D> m_Texture;
 		Ref<RealEngine::Texture2D> m_SpriteSheet;
