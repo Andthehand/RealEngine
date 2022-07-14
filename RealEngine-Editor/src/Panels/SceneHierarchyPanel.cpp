@@ -158,6 +158,9 @@ namespace RealEngine {
 	static void DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction) {
 		const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
 		if (entity.HasComponent<T>()) {
+			ImGuiIO& io = ImGui::GetIO();
+			auto boldFont = io.Fonts->Fonts[0];
+			
 			auto& component = entity.GetComponent<T>();
 			ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
 
@@ -168,9 +171,11 @@ namespace RealEngine {
 			ImGui::PopStyleVar();
 
 			ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
-			if (ImGui::Button("+", ImVec2{ lineHeight, lineHeight })) {
+			ImGui::PushFont(boldFont);
+			if (ImGui::Button("...", ImVec2{ lineHeight, lineHeight })) {
 				ImGui::OpenPopup("ComponentSettings");
 			}
+			ImGui::PopFont();
 
 			bool removeComponent = false;
 			if (ImGui::BeginPopup("ComponentSettings")) {
@@ -209,6 +214,14 @@ namespace RealEngine {
 			ImGui::OpenPopup("AddComponent");
 
 		if (ImGui::BeginPopup("AddComponent")) {
+			if (ImGui::MenuItem("Transform")) {
+				if (!m_SelectionContext.HasComponent<TransformComponent>())
+					m_SelectionContext.AddComponent<TransformComponent>();
+				else
+					RE_CORE_WARN("This entity already has the Transform Component!");
+				ImGui::CloseCurrentPopup();
+			}
+
 			if (ImGui::MenuItem("Camera")) {
 				if (!m_SelectionContext.HasComponent<CameraComponent>())
 					m_SelectionContext.AddComponent<CameraComponent>();
