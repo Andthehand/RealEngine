@@ -16,10 +16,6 @@ namespace RealEngine {
     void EditorLayer::OnAttach() {
         RE_PROFILE_FUNCTION();
 
-        m_Texture = Texture2D::Create("assets/textures/Checkerboard.png");
-        m_SpriteSheet = Texture2D::Create("assets/textures/Spritesheet.png");
-        m_GrassTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 0, 2 }, { 16, 16 });
-
         FramebufferSpecification fbSpec;
         fbSpec.Width = 1280;
         fbSpec.Height = 720;
@@ -28,6 +24,8 @@ namespace RealEngine {
         m_ActiveScene = CreateRef<Scene>();
 
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+
+		m_EditorCamera = EditorCamera(30.0f, 1.778, .01f, 1000.0f);
     }
 
     void EditorLayer::OnDetach() {
@@ -39,8 +37,9 @@ namespace RealEngine {
         if (FramebufferSpecification spec = m_Framebuffer->GetSpecification();
             m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && // zero sized framebuffer is invalid
             (spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y)) {
-            m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-        
+            
+			m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+            m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
             m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
         }
 
@@ -53,7 +52,7 @@ namespace RealEngine {
         RenderCommand::SetClearColor({ 0.1, 0.1, 0.1, 1 });
         RenderCommand::Clear();
 
-        m_ActiveScene->OnUpdate(ts);
+        m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
 
         m_Framebuffer->UnBind();
     }
@@ -174,17 +173,22 @@ namespace RealEngine {
 		
 		//Gizmos
 		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
-		Entity cameraEntity = m_ActiveScene->GetPrimaryComponentEntity();
-		if (selectedEntity && cameraEntity && m_GizmoType != -1) {
+		if (selectedEntity && m_GizmoType != -1) {
 			ImGuizmo::SetOrthographic(false);
 			ImGuizmo::SetDrawlist();
 			float windowWidth = (float)ImGui::GetWindowWidth();
 			float windowHeight = (float)ImGui::GetWindowHeight();
 			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
 			
-			const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
-			const glm::mat4 cameraProjection = camera.GetProjection();
-			glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+			// Runtime camera from entity
+			// auto cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
+			// const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
+			// const glm::mat4& cameraProjection = camera.GetProjection();
+			// glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+
+			// Editor camera
+			const glm::mat4& cameraProjection = m_EditorCamera.GetProjection();
+			glm::mat4 cameraView = m_EditorCamera.GetViewMatrix();
 
 			//Entity transform
 			auto& tc = selectedEntity.GetComponent<TransformComponent>();
@@ -213,6 +217,8 @@ namespace RealEngine {
 	}
 
 	void EditorLayer::OnEvent(Event& e) {
+		m_EditorCamera.OnEvent(e);
+
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<KeyPressedEvent>(RE_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 	}

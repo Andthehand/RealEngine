@@ -2,6 +2,7 @@
 #include <entt.hpp>
 
 #include "RealEngine/Core/TimeStep.h"
+#include "RealEngine/Renderer/EditorCamera.h"
 
 namespace RealEngine {
 	class Entity;
@@ -14,7 +15,8 @@ namespace RealEngine {
 		Entity CreateEntity(const std::string& name = std::string());
 		void DestroyEntity(Entity entity);
 
-		void OnUpdate(Timestep ts);
+		void OnUpdateEditor(Timestep ts, EditorCamera& editorCamera);
+		void OnUpdateRuntime(Timestep ts);
 		void OnViewportResize(uint32_t width, uint32_t height);
 	
 		Entity GetPrimaryComponentEntity();
