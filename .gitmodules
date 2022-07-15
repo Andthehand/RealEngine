@@ -20,3 +20,6 @@
 [submodule "RealEngine/vendor/yaml-cpp"]
 	path = RealEngine/vendor/yaml-cpp
 	url = https://github.com/TheCherno/yaml-cpp.git
+[submodule "RealEngine/vendor/ImGuizmo"]
+	path = RealEngine/vendor/ImGuizmo
+	url = https://github.com/TheCherno/ImGuizmo.git

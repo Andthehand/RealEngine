@@ -17,7 +17,8 @@ project "RealEngine-Editor"
 		"%{wks.location}/RealEngine/src",
 		"%{wks.location}/RealEngine/vendor",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.ImGuizmo}"
 	}
 
 	links {
