@@ -47,6 +47,8 @@ namespace RealEngine {
         deltaTime /= 2.0f;
         fps = 1.0f / deltaTime;
 
+		m_EditorCamera.OnUpdate(ts);
+
         Renderer2D::ResetStats();
         m_Framebuffer->Bind();
         RenderCommand::SetClearColor({ 0.1, 0.1, 0.1, 1 });
