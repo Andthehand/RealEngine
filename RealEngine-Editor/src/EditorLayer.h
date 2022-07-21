@@ -38,6 +38,8 @@ namespace RealEngine {
 		float deltaTime = 0.0f;
 		float fps = 0.0f;
 
+		bool m_Wireframe = false;
+
 		//Panels
 		SceneHierarchyPanel m_SceneHierarchyPanel;
 	};

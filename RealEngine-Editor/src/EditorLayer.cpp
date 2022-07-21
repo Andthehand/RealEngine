@@ -25,7 +25,7 @@ namespace RealEngine {
 
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
-		m_EditorCamera = EditorCamera(30.0f, 1.778, .01f, 1000.0f);
+		m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.01f, 1000.0f);
     }
 
     void EditorLayer::OnDetach() {
@@ -59,163 +59,168 @@ namespace RealEngine {
         m_Framebuffer->UnBind();
     }
 
-    void EditorLayer::OnImGuiRender() {
-        RE_PROFILE_FUNCTION();
+void EditorLayer::OnImGuiRender() {
+	RE_PROFILE_FUNCTION();
 
-		static bool dockspaceOpen = true;
-		static bool opt_fullscreen_persistant = true;
-		bool opt_fullscreen = opt_fullscreen_persistant;
-		static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+	static bool dockspaceOpen = true;
+	static bool opt_fullscreen_persistant = true;
+	bool opt_fullscreen = opt_fullscreen_persistant;
+	static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
 
-		// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
-		// because it would be confusing to have two docking targets within each others.
-		ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-		if (opt_fullscreen) {
-			ImGuiViewport* viewport = ImGui::GetMainViewport();
-			ImGui::SetNextWindowPos(viewport->Pos);
-			ImGui::SetNextWindowSize(viewport->Size);
-			ImGui::SetNextWindowViewport(viewport->ID);
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-			window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-			window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-		}
+	// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
+	// because it would be confusing to have two docking targets within each others.
+	ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+	if (opt_fullscreen) {
+		ImGuiViewport* viewport = ImGui::GetMainViewport();
+		ImGui::SetNextWindowPos(viewport->Pos);
+		ImGui::SetNextWindowSize(viewport->Size);
+		ImGui::SetNextWindowViewport(viewport->ID);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+		window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+	}
 
-		// When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background and handle the pass-thru hole, so we ask Begin() to not render a background.
-		if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
-			window_flags |= ImGuiWindowFlags_NoBackground;
+	// When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background and handle the pass-thru hole, so we ask Begin() to not render a background.
+	if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
+		window_flags |= ImGuiWindowFlags_NoBackground;
 
-		// Important: note that we proceed even if Begin() returns false (aka window is collapsed).
-		// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive, 
-		// all active windows docked into it will lose their parent and become undocked.
-		// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise 
-		// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
-		ImGui::PopStyleVar();
+	// Important: note that we proceed even if Begin() returns false (aka window is collapsed).
+	// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive, 
+	// all active windows docked into it will lose their parent and become undocked.
+	// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise 
+	// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+	ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
+	ImGui::PopStyleVar();
 
-		if (opt_fullscreen)
-			ImGui::PopStyleVar(2);
+	if (opt_fullscreen)
+		ImGui::PopStyleVar(2);
 
-		// DockSpace
-		ImGuiIO& io = ImGui::GetIO();
-		ImGuiStyle& style = ImGui::GetStyle();
-		float minWinSizeX = style.WindowMinSize.x;
-		style.WindowMinSize.x = 370.0f;
-		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
-			ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
-		}
+	// DockSpace
+	ImGuiIO& io = ImGui::GetIO();
+	ImGuiStyle& style = ImGui::GetStyle();
+	float minWinSizeX = style.WindowMinSize.x;
+	style.WindowMinSize.x = 370.0f;
+	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
+		ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+	}
 
-		style.WindowMinSize.x = minWinSizeX;
+	style.WindowMinSize.x = minWinSizeX;
 
-        if (ImGui::BeginMenuBar()) {
-            if (ImGui::BeginMenu("File")) {
-                // Disabling fullscreen would allow the window to be moved to the front of other windows, 
-                // which we can't undo at the moment without finer window depth/z control.
-                //ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
+	if (ImGui::BeginMenuBar()) {
+		if (ImGui::BeginMenu("File")) {
+			// Disabling fullscreen would allow the window to be moved to the front of other windows, 
+			// which we can't undo at the moment without finer window depth/z control.
+			//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
 
-				if (ImGui::MenuItem("New", "Ctrl+N")) {
-					NewScene();
-				}
-
-				if (ImGui::MenuItem("Open...", "Ctrl+O")) {
-					OpenScene();
-				}
-
-				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S")) {
-					SaveSceneAs();
-				}
-
-
-				if (ImGui::MenuItem("Save", "Ctrl+S")) {
-					SaveScene();
-				}
-
-				if (ImGui::MenuItem("Add 250 squares")) {
-					for (int i = 0; i < 250; i++) {
-						m_ActiveScene->CreateEntity("Square").AddComponent<SpriteRendererComponent>();
-					}
-				}
-
-				if (ImGui::MenuItem("Exit")) Application::Get().Close();
-				ImGui::EndMenu();
+			if (ImGui::MenuItem("New", "Ctrl+N")) {
+				NewScene();
 			}
 
-			ImGui::EndMenuBar();
+			if (ImGui::MenuItem("Open...", "Ctrl+O")) {
+				OpenScene();
+			}
+
+			if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S")) {
+				SaveSceneAs();
+			}
+
+
+			if (ImGui::MenuItem("Save", "Ctrl+S")) {
+				SaveScene();
+			}
+
+			if (ImGui::MenuItem("Add 250 squares")) {
+				for (int i = 0; i < 250; i++) {
+					m_ActiveScene->CreateEntity("Square").AddComponent<SpriteRendererComponent>();
+				}
+			}
+
+			if (ImGui::MenuItem("Exit")) Application::Get().Close();
+			ImGui::EndMenu();
 		}
 
-		m_SceneHierarchyPanel.OnImGuiRender();
+		ImGui::EndMenuBar();
+	}
 
-		ImGui::Begin("Stats");
+	m_SceneHierarchyPanel.OnImGuiRender();
 
-		auto stats = Renderer2D::GetStats();
-		ImGui::Text("Renderer2D Stats:");
-		ImGui::Text("DrawCalls: %d", stats.DrawCalls);
-		ImGui::Text("QuadCount: %d", stats.QuadCount);
-		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
-		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
+	ImGui::Begin("Stats");
 
-		ImGui::Text("FPS: %f", fps);
-		ImGui::End();
+	auto stats = Renderer2D::GetStats();
+	ImGui::Text("Renderer2D Stats:");
+	ImGui::Text("DrawCalls: %d", stats.DrawCalls);
+	ImGui::Text("QuadCount: %d", stats.QuadCount);
+	ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
+	ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
 
-		//ImGui Viewport Window/Panel
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImGui::Begin("Viewport");
+	ImGui::Text("FPS: %f", fps);
 
-		m_ViewportFocused = ImGui::IsWindowFocused();
-		m_ViewportHovered = ImGui::IsWindowHovered();
-		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
+	if (ImGui::Button("Wireframe")) {
+		m_Wireframe = !m_Wireframe;
+		RenderCommand::SetWireFrame(m_Wireframe);
+	}
+	ImGui::End();
 
-		ImVec2 viewpoerPanelSize = ImGui::GetContentRegionAvail();
-		m_ViewportSize = { viewpoerPanelSize.x, viewpoerPanelSize.y };
+	//ImGui Viewport Window/Panel
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+	ImGui::Begin("Viewport");
 
-		uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
-		ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+	m_ViewportFocused = ImGui::IsWindowFocused();
+	m_ViewportHovered = ImGui::IsWindowHovered();
+	Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
+
+	ImVec2 viewpoerPanelSize = ImGui::GetContentRegionAvail();
+	m_ViewportSize = { viewpoerPanelSize.x, viewpoerPanelSize.y };
+
+	uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
+	ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 		
-		//Gizmos
-		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
-		if (selectedEntity && m_GizmoType != -1) {
-			ImGuizmo::SetOrthographic(false);
-			ImGuizmo::SetDrawlist();
-			float windowWidth = (float)ImGui::GetWindowWidth();
-			float windowHeight = (float)ImGui::GetWindowHeight();
-			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+	//Gizmos
+	Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
+	if (selectedEntity && m_GizmoType != -1) {
+		ImGuizmo::SetOrthographic(false);
+		ImGuizmo::SetDrawlist();
+		float windowWidth = (float)ImGui::GetWindowWidth();
+		float windowHeight = (float)ImGui::GetWindowHeight();
+		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
 			
-			// Runtime camera from entity
-			// auto cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
-			// const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
-			// const glm::mat4& cameraProjection = camera.GetProjection();
-			// glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+		// Runtime camera from entity
+		// auto cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
+		// const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
+		// const glm::mat4& cameraProjection = camera.GetProjection();
+		// glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
 
-			// Editor camera
-			const glm::mat4& cameraProjection = m_EditorCamera.GetProjection();
-			glm::mat4 cameraView = m_EditorCamera.GetViewMatrix();
+		// Editor camera
+		const glm::mat4& cameraProjection = m_EditorCamera.GetProjection();
+		glm::mat4 cameraView = m_EditorCamera.GetViewMatrix();
 
-			//Entity transform
-			auto& tc = selectedEntity.GetComponent<TransformComponent>();
-			glm::mat4 transform = tc.GetTransform();
+		//Entity transform
+		auto& tc = selectedEntity.GetComponent<TransformComponent>();
+		glm::mat4 transform = tc.GetTransform();
 
-			ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection), 
-				(ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform));
+		ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection), 
+			(ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform));
 		
-			if (ImGuizmo::IsUsing()) {
-				glm::vec3 translation, rotation, scale;
-				Math::DecomposeTransform(transform, translation, rotation, scale);
+		if (ImGuizmo::IsUsing()) {
+			glm::vec3 translation, rotation, scale;
+			Math::DecomposeTransform(transform, translation, rotation, scale);
 				
-				//To avoid gimble lock
-				glm::vec3 deltaRotation = rotation - tc.Rotation;
+			//To avoid gimble lock
+			glm::vec3 deltaRotation = rotation - tc.Rotation;
 
-				tc.Translation = translation;
-				tc.Rotation += deltaRotation;
-				tc.Scale = scale;
-			}
+			tc.Translation = translation;
+			tc.Rotation += deltaRotation;
+			tc.Scale = scale;
 		}
+	}
 
-		ImGui::End();
-		ImGui::PopStyleVar();
+	ImGui::End();
+	ImGui::PopStyleVar();
 
-		ImGui::End();
+	ImGui::End();
 	}
 
 	void EditorLayer::OnEvent(Event& e) {

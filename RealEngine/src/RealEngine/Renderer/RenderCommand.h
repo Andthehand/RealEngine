@@ -13,6 +13,10 @@ namespace RealEngine {
 			s_RendererAPI->SetViewport(x, y, width, height);
 		}
 
+		inline static void SetWireFrame(bool enabled) {
+			s_RendererAPI->SetWireFrame(enabled);
+		}
+
 		inline static void SetClearColor(const glm::vec4& color) {
 			s_RendererAPI->SetClearColor(color);
 		}

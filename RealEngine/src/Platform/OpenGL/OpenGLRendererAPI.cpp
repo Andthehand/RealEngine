@@ -40,12 +40,14 @@ namespace RealEngine {
 
 		glEnable(GL_DEPTH_TEST);
 
-		//Draw Wireframe
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
 	void OpenGLRendererAPI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
 		glViewport(x, y, width, height);
+	}
+
+	void OpenGLRendererAPI::SetWireFrame(bool enabled) {
+		glPolygonMode(GL_FRONT_AND_BACK, enabled ? GL_LINE : GL_FILL);
 	}
 	
 	void OpenGLRendererAPI::SetClearColor(const glm::vec4& color) {
