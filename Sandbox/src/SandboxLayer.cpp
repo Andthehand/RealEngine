@@ -4,6 +4,8 @@
 
 #include "implot.h"
 
+#include "MachineLearning.h"
+
 void SandboxLayer::OnUpdate(RealEngine::Timestep ts) {
 	RenderCommand::SetClearColor({ 0.1, 0.1, 0.1, 1 });
 	RenderCommand::Clear();
@@ -68,27 +70,46 @@ void SandboxLayer::OnImGuiRender() {
 	ImGui::End();
 
 	ImGui::Begin("Plots");
+	ImPlot::BeginPlot("Log Function");
 
-	srand(0);
-	static float xs1[100], ys1[100];
-	for (int i = 0; i < 100; ++i) {
-		xs1[i] = i * 0.01f;
-		ys1[i] = xs1[i] + 0.1f * ((float)rand() / (float)RAND_MAX);
-	}
-	static float xs2[50], ys2[50];
-	for (int i = 0; i < 50; i++) {
-		xs2[i] = 0.25f + 0.2f * ((float)rand() / (float)RAND_MAX);
-		ys2[i] = 0.75f + 0.2f * ((float)rand() / (float)RAND_MAX);
+
+	std::vector<Point> points = MachineLearning::GetPoints();
+	ImPlot::PlotScatter("House Pricing", &points[0].x, &points[0].y, points.size(), 0, 0, (int)(sizeof(float) * 2));
+
+	{
+		static float x[1001], y[1001];
+		for (int i = 0; i < 1001; ++i) {
+			x[i] = i * 0.01f;
+			y[i] = MachineLearning::LogFunction(x[i]);
+		}
+
+		ImPlot::PlotLine("f(x)", x, y, 1001);
 	}
 
-	if (ImPlot::BeginPlot("Scatter Plot")) {
-		ImPlot::PlotScatter("Data 1", xs1, ys1, 100);
-		ImPlot::PushStyleVar(ImPlotStyleVar_FillAlpha, 0.25f);
-		ImPlot::SetNextMarkerStyle(ImPlotMarker_Square, 6, ImPlot::GetColormapColor(1), IMPLOT_AUTO, ImPlot::GetColormapColor(1));
-		ImPlot::PlotScatter("Data 2", xs2, ys2, 50);
-		ImPlot::PopStyleVar();
-		ImPlot::EndPlot();
+	ImPlot::EndPlot();
+
+	ImPlot::BeginPlot("Error Function");
+
+	static float x[1001], y[1001];
+	for (int i = 0; i < 1001; ++i) {
+		x[i] = (i - 500) * 0.1f;
+		y[i] = MachineLearning::CostFunction({ 0.0f ,x[i] });
 	}
+
+	ImPlot::PlotLine("J(x)", x, y, 1001);
+	float tempx[1] = { MachineLearning::CostFunction(MachineLearning::GetTheta(), points) };
+	float tempy[1] = { MachineLearning::CostFunction({ 0, tempx[0] })};
+	ImPlot::PlotScatter("Error", tempx, tempy, 1);
+
+
+	ImPlot::EndPlot();
+
+	float tempTheta = MachineLearning::GetTheta()[1];
+	ImGui::DragFloat("Theta", &tempTheta, 0.1f, -10.0f, 10.0f);
+	MachineLearning::SetTheta({ 0.0f, tempTheta });
+
 	
+	ImGui::Text("The error of theta: %f", MachineLearning::CostFunction());
+
 	ImGui::End();
 }
