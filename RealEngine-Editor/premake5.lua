@@ -16,9 +16,11 @@ project "RealEngine-Editor"
 		"%{wks.location}/RealEngine/vendor/spdlog/include",
 		"%{wks.location}/RealEngine/src",
 		"%{wks.location}/RealEngine/vendor",
+		"%{wks.location}/RealEngine/vendor/imgui",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
-		"%{IncludeDir.ImGuizmo}"
+		"%{IncludeDir.ImGuizmo}",
+		"%{IncludeDir.ImPlot}"
 	}
 
 	links {

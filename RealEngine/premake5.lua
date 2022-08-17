@@ -19,6 +19,8 @@ project "RealEngine"
 		"vendor/glm/glm/**.inl",
 		"vendor/ImGuizmo/ImGuizmo.h",
 		"vendor/ImGuizmo/ImGuizmo.cpp",
+		"vendor/ImPlot/**.cpp",
+		"vendor/ImPlot/**.h"
 	}
 
 	defines {
@@ -36,7 +38,8 @@ project "RealEngine"
 		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.yaml_cpp}",
-		"%{IncludeDir.ImGuizmo}"
+		"%{IncludeDir.ImGuizmo}",
+		"%{IncludeDir.ImPlot}"
 	}
 
 	links {
@@ -48,6 +51,9 @@ project "RealEngine"
 	}
 
 	filter "files:vendor/ImGuizmo/**.cpp"
+	flags { "NoPCH" }
+
+	filter "files:vendor/ImPlot/**.cpp"
 	flags { "NoPCH" }
 
 	filter "system:windows"

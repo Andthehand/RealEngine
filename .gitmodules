@@ -23,3 +23,6 @@
 [submodule "RealEngine/vendor/ImGuizmo"]
 	path = RealEngine/vendor/ImGuizmo
 	url = https://github.com/TheCherno/ImGuizmo.git
+[submodule "RealEngine/vendor/ImPlot"]
+	path = RealEngine/vendor/ImPlot
+	url = https://github.com/epezent/implot.git
