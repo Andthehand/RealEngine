@@ -13,10 +13,6 @@
 	path = RealEngine/vendor/spdlog
 	url = https://github.com/gabime/spdlog.git
 	branch = v1.x
-[submodule "RealEngine/vendor/imgui"]
-	path = RealEngine/vendor/imgui
-	url = https://github.com/TheCherno/imgui.git
-	branch = docking
 [submodule "RealEngine/vendor/yaml-cpp"]
 	path = RealEngine/vendor/yaml-cpp
 	url = https://github.com/TheCherno/yaml-cpp.git
@@ -26,3 +22,6 @@
 [submodule "RealEngine/vendor/ImPlot"]
 	path = RealEngine/vendor/ImPlot
 	url = https://github.com/epezent/implot.git
+[submodule "RealEngine/vendor/imgui"]
+	path = RealEngine/vendor/imgui
+	url = https://github.com/Andthehand/imgui.git

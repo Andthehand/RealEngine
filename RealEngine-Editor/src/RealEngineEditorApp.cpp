@@ -8,7 +8,6 @@ namespace RealEngine {
 	public:
 		RealEngineEditor() 
 			: Application("RealEngine Editor") {
-			//PushLayer(new ExampleLayer);
 			PushLayer(new EditorLayer());
 		}
 

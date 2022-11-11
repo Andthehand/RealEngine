@@ -1,14 +1,13 @@
 #include <RealEngine.h>
 #include <RealEngine/Core/EntryPoint.h>
 
-#include "Sandbox2D.h"
-#include "ExampleLayer.h"
+#include "MainLayer.h"
 
 class Sandbox : public RealEngine::Application {
 public:
-	Sandbox() {
-		//PushLayer(new ExampleLayer);
-		PushLayer(new Sandbox2D);
+	Sandbox() 
+		: Application("NES Emulator") {
+		PushLayer(new MainLayer());
 	}
 
 	~Sandbox() {

@@ -128,13 +128,12 @@ void EditorLayer::OnImGuiRender() {
 				SaveSceneAs();
 			}
 
-
 			if (ImGui::MenuItem("Save", "Ctrl+S")) {
 				SaveScene();
 			}
 
-			if (ImGui::MenuItem("Add 250 squares")) {
-				for (int i = 0; i < 250; i++) {
+			if (ImGui::MenuItem("Add 100000 squares")) {
+				for (int i = 0; i < 100000; i++) {
 					m_ActiveScene->CreateEntity("Square").AddComponent<SpriteRendererComponent>();
 				}
 			}
@@ -164,6 +163,7 @@ void EditorLayer::OnImGuiRender() {
 		RenderCommand::SetWireFrame(m_Wireframe);
 	}
 
+	/* This is a demo of ImPlot
 	srand(0);
 	static float xs1[100], ys1[100];
 	for (int i = 0; i < 100; ++i) {
@@ -184,6 +184,7 @@ void EditorLayer::OnImGuiRender() {
 		ImPlot::PopStyleVar();
 		ImPlot::EndPlot();
 	}
+	*/
 
 	ImGui::End();
 
