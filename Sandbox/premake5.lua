@@ -1,4 +1,4 @@
-project "MachineLearningSandbox"
+project "Sandbox"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++17"
@@ -19,6 +19,7 @@ project "MachineLearningSandbox"
 		"%{wks.location}/RealEngine/vendor/imgui",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
+		"%{IncludeDir.ImGuizmo}",
 		"%{IncludeDir.ImPlot}"
 	}
 
