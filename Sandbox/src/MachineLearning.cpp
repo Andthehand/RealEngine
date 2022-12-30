@@ -1,5 +1,9 @@
 ﻿#include "MachineLearning.h"
 
+glm::vec5 MachineLearning::MultivariateLinearRegression(glm::vec5 x, glm::vec5 theta) {
+	return theta * x;
+}
+
 float MachineLearning::LogFunction(float graphX, std::vector<float> theta) {
 	return theta[0] + (theta[1] * graphX);
 }

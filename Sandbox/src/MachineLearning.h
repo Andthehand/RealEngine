@@ -2,14 +2,23 @@
 #include <iostream>
 #include <vector>
 
+#include <glm/glm.hpp>
+#include <glm/detail/qualifier.hpp>
+
 struct Point {
 	float x = 0;
 	float y = 0;
 };
 
+namespace glm {
+	typedef vec<2, float, defaultp>	vec5;
+}
+
 class MachineLearning {
 public:
 	//θ = theta
+
+	glm::vec5 MultivariateLinearRegression(glm::vec5 x, glm::vec5 theta);
 
 	//y = hθ(x) = θzero + (θone * x)
 	static float LogFunction(float graphX, std::vector<float> theta = m_Theta);
