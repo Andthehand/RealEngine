@@ -2,7 +2,7 @@ include "./vendor/premake/premake_customization/solution_items.lua"
 
 workspace "RealEngine"
 	architecture "x86_64"
-	startproject "RealEngine-Editor"
+	startproject "Sandbox"
 
 	configurations {
 		"Debug",
@@ -41,5 +41,4 @@ group "Dependencies"
 group ""
 
 include "RealEngine"
-include "Sandbox"
-include "RealEngine-Editor"
+include "MachineLearningSandbox"
