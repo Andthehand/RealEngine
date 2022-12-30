@@ -19,6 +19,7 @@ project "MachineLearningSandbox"
 		"%{wks.location}/RealEngine/vendor/imgui",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
+		"%{IncludeDir.ImGuizmo}",
 		"%{IncludeDir.ImPlot}"
 	}
 
