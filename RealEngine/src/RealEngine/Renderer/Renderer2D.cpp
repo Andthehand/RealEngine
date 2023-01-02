@@ -6,7 +6,6 @@
 #include "RealEngine/Renderer/RenderCommand.h"
 
 #include <glm/gtc/matrix_transform.hpp>
-#include "Renderer2D.h"
 
 namespace RealEngine {
 
