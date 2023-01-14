@@ -9,6 +9,7 @@ public:
 	virtual void OnUpdate(RealEngine::Timestep ts);
 	virtual void OnEvent(RealEngine::Event& event) override;
 
+	bool OnKeyPressed(RealEngine::KeyPressedEvent& e);
 private:
 	RealEngine::Ref<RealEngine::Shader> m_ChunkShader;
 	RealEngine::EditorCamera m_EditorCamera;

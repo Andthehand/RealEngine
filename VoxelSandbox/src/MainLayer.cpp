@@ -14,9 +14,16 @@ void MainLayer::OnUpdate(RealEngine::Timestep ts) {
 	m_EditorCamera.OnUpdate(ts);
 	m_ChunkShader->SetMat4("u_ViewProjection", m_EditorCamera.GetViewProjection());
 	
-	m_ChunkManager.Render();
+	m_ChunkManager.Render(m_EditorCamera);
 }
 
 void MainLayer::OnEvent(RealEngine::Event& event) {
 	m_EditorCamera.OnEvent(event);
+
+	RealEngine::EventDispatcher dispatcher(event);
+	dispatcher.Dispatch<RealEngine::KeyPressedEvent>(RE_BIND_EVENT_FN(MainLayer::OnKeyPressed));
+}
+
+bool MainLayer::OnKeyPressed(RealEngine::KeyPressedEvent& e) {
+	return false;
 }

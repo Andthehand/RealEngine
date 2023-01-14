@@ -4,152 +4,189 @@ struct VoxelBuffer {
 	glm::vec3 Position;
 };
 
-static const struct VerticesLookup {
-	const std::array<glm::vec3, 4> Top = {{ 
-		{ 0, 1, 0 },
-		{ 1, 1, 0 },
-		{ 0, 1, 1 },
-		{ 1, 1, 1 } 
-	}};
-	const std::array<glm::vec3, 4> Bottom = { {
-		{ 0, 0, 0 },
-		{ 1, 0, 0 },
-		{ 0, 0, 1 },
-		{ 1, 0, 1 }
-	}};
-	const std::array<glm::vec3, 4> Left = { {
-		{ 0, 1, 1 },
-		{ 0, 1, 0 }, 
-		{ 0, 0, 1 }, 
-		{ 0, 0, 0 } 
-	}};
-	const std::array<glm::vec3, 4> Right = {{
-		{ 1, 1, 1 },
-		{ 1, 1, 0 },
-		{ 1, 0, 1 },
-		{ 1, 0, 0 }
-	}};
-	const std::array<glm::vec3, 4> Front = {{
-		{ 0, 1, 1 },
-		{ 1, 1, 1 },
-		{ 0, 0, 1 },
-		{ 1, 0, 1 }
-	}};
-	const std::array<glm::vec3, 4> Back = {{
-		{ 0, 1, 0 },
-		{ 1, 1, 0 },
-		{ 0, 0, 0 },
-		{ 1, 0, 0 }
-	}};
-} verticesLookup;
-
 Chunk::~Chunk(){
-	for (int i = 0; i < CHUNK_SIZE; ++i) {
-		for (int j = 0; j < CHUNK_SIZE; ++j) {
-			delete[] m_Voxels[i][j];
-		}
-		delete[] m_Voxels[i];
-	}
-	delete[] m_Voxels;
+
 }
 
-void Chunk::Init(glm::vec3 worldOffset) {
-	m_WorldOffset = worldOffset;
+Chunk::Chunk(glm::ivec3 worldOffset) : m_WorldOffset(worldOffset) {
+	m_Voxels = std::vector<std::vector<std::vector<Voxel>>>(CHUNK_SIZE, 
+									 std::vector<std::vector<Voxel>>(CHUNK_SIZE, 
+									 std::vector<Voxel>(CHUNK_SIZE)));
 
-	m_Voxels = new Voxel * *[CHUNK_SIZE];
-	for (int x = 0; x < CHUNK_SIZE; ++x) {
-		m_Voxels[x] = new Voxel * [CHUNK_SIZE];
-		for (int y = 0; y < CHUNK_SIZE; ++y) {
-			m_Voxels[x][y] = new Voxel[CHUNK_SIZE];
-			for (int z = 0; z < CHUNK_SIZE; ++z) { // initialize the values to whatever you want the default to be
-				//m_Voxels[x][y][z] = Voxel();
+	for (int i = 0; i < CHUNK_SIZE; i++) {
+		for (int j = 0; j < CHUNK_SIZE; j++) {
+			for (int k = 0; k < CHUNK_SIZE; k++) {
+				m_Voxels[i][j][k].SetActive(true);
+				/*if (k % 2 == 0 && j % 2 == 0 && i % 2 == 0) {
+					m_Voxels[i][j][k].SetActive(true);
+				}
+				else {
+					m_Voxels[i][j][k].SetActive(false);
+				}*/
 			}
 		}
 	}
 
-	m_VertexArray = RealEngine::VertexArray::Create();
 	CreateMesh();
+	CreateBuffers();
 }
 
 void Chunk::UpdateMesh(float dt) {
 
 }
 
+// Helper function to add a face to the left side of the current voxel
+void Chunk::AddLeftFace(int x, int y, int z) {
+	m_Vertices.push_back(glm::vec3(x, y, z));
+	m_Vertices.push_back(glm::vec3(x, y, z + 1));
+	m_Vertices.push_back(glm::vec3(x, y + 1, z + 1));
+	m_Vertices.push_back(glm::vec3(x, y + 1, z));
+	// Add the indices for the vertices of the left face
+	int index = (int)m_Vertices.size() - 4;
+	m_Indices.push_back(index);
+	m_Indices.push_back(index + 1);
+	m_Indices.push_back(index + 2);
+	m_Indices.push_back(index);
+	m_Indices.push_back(index + 2);
+	m_Indices.push_back(index + 3);
+}
+
+// Helper function to add a face to the right side of the current voxel
+void Chunk::AddRightFace(int x, int y, int z) {
+	m_Vertices.push_back(glm::vec3(x + 1, y, z));
+	m_Vertices.push_back(glm::vec3(x + 1, y + 1, z));
+	m_Vertices.push_back(glm::vec3(x + 1, y + 1, z + 1));
+	m_Vertices.push_back(glm::vec3(x + 1, y, z + 1));
+	// Add the indices for the vertices of the right face
+	int index = (int)m_Vertices.size() - 4;
+	m_Indices.push_back(index);
+	m_Indices.push_back(index + 1);
+	m_Indices.push_back(index + 2);
+	m_Indices.push_back(index);
+	m_Indices.push_back(index + 2);
+	m_Indices.push_back(index + 3);
+}
+
+// Helper function to add a face to the bottom side of the current voxel
+void Chunk::AddBottomFace(int x, int y, int z) {
+	m_Vertices.push_back(glm::vec3(x, y, z));
+	m_Vertices.push_back(glm::vec3(x + 1, y, z));
+	m_Vertices.push_back(glm::vec3(x + 1, y, z + 1));
+	m_Vertices.push_back(glm::vec3(x, y, z + 1));
+	// Add the indices for the vertices of the bottom face
+	int index = (int)m_Vertices.size() - 4;
+	m_Indices.push_back(index);
+	m_Indices.push_back(index + 1);
+	m_Indices.push_back(index + 2);
+	m_Indices.push_back(index);
+	m_Indices.push_back(index + 2);
+	m_Indices.push_back(index + 3);
+}
+
+// Helper function to add a face to the top side of the current voxel
+void Chunk::AddTopFace(int x, int y, int z) {
+	m_Vertices.push_back(glm::vec3(x, y + 1, z));
+	m_Vertices.push_back(glm::vec3(x, y + 1, z + 1));
+	m_Vertices.push_back(glm::vec3(x + 1, y + 1, z + 1));
+	m_Vertices.push_back(glm::vec3(x + 1, y + 1, z));
+	// Add the indices for the vertices of the top face
+	int index = (int)m_Vertices.size() - 4;
+	m_Indices.push_back(index);
+	m_Indices.push_back(index + 1);
+	m_Indices.push_back(index + 2);
+	m_Indices.push_back(index);
+	m_Indices.push_back(index + 2);
+	m_Indices.push_back(index + 3);
+}
+
+// Helper function to add a face to the back side of the current voxel
+void Chunk::AddBackFace(int x, int y, int z) {
+	m_Vertices.push_back(glm::vec3(x, y, z));
+	m_Vertices.push_back(glm::vec3(x, y + 1, z));
+	m_Vertices.push_back(glm::vec3(x + 1, y + 1, z));
+	m_Vertices.push_back(glm::vec3(x + 1, y, z));
+	// Add the indices for the vertices of the back face
+	int index = (int)m_Vertices.size() - 4;
+	m_Indices.push_back(index);
+	m_Indices.push_back(index + 1);
+	m_Indices.push_back(index + 2);
+	m_Indices.push_back(index);
+	m_Indices.push_back(index + 2);
+	m_Indices.push_back(index + 3);
+}
+
+// Helper function to add a face to the front side of the current voxel
+void Chunk::AddFrontFace(int x, int y, int z) {
+	m_Vertices.push_back(glm::vec3(x, y, z + 1));
+	m_Vertices.push_back(glm::vec3(x + 1, y, z + 1));
+	m_Vertices.push_back(glm::vec3(x + 1, y + 1, z + 1));
+	m_Vertices.push_back(glm::vec3(x, y + 1, z + 1));
+	// Add the indices for the vertices of the front face
+	int index = (int)m_Vertices.size() - 4;
+	m_Indices.push_back(index);
+	m_Indices.push_back(index + 1);
+	m_Indices.push_back(index + 2);
+	m_Indices.push_back(index);
+	m_Indices.push_back(index + 2);
+	m_Indices.push_back(index + 3);
+}
+
 void Chunk::CreateMesh() {
-	std::array<glm::vec3, 4> tempVertice;
+	// Face culling algorithm
 	for (int x = 0; x < CHUNK_SIZE; x++) {
 		for (int y = 0; y < CHUNK_SIZE; y++) {
 			for (int z = 0; z < CHUNK_SIZE; z++) {
-				if (!m_Voxels[x][y][z].IsActive())
-					continue;
+				if (!m_Voxels[x][y][z].IsActive()) continue;
 
-				//Front
-				for (size_t i = 0; i < 4; i++) {
-					tempVertice[i] = glm::vec3(x, y, z) + m_WorldOffset + verticesLookup.Front[i];
-				}
-				m_Mesh.push_back(tempVertice);
+				int tempX = x + m_WorldOffset.x;
+				int tempY = y + m_WorldOffset.y;
+				int tempZ = z + m_WorldOffset.z;
 
-				//Back
-				for (size_t i = 0; i < 4; i++) {
-					tempVertice[i] = glm::vec3(x, y, z) + m_WorldOffset + verticesLookup.Back[i];
+				// Check for inactive voxels around the current voxel
+				if (x == 0 || !m_Voxels[x - 1][y][z].IsActive()) {
+					// Add a face to the vertices and indices for the left side
+					AddLeftFace(tempX, tempY, tempZ);
 				}
-				m_Mesh.push_back(tempVertice);
-
-				//Left
-				for (size_t i = 0; i < 4; i++) {
-					tempVertice[i] = glm::vec3(x, y, z) + m_WorldOffset + verticesLookup.Left[i];
+				if (x == CHUNK_SIZE - 1 || !m_Voxels[x + 1][y][z].IsActive()) {
+					// Add a face to the vertices and indices for the right side
+					AddRightFace(tempX, tempY, tempZ);
 				}
-				m_Mesh.push_back(tempVertice);
-
-				//Right
-				for (size_t i = 0; i < 4; i++) {
-					tempVertice[i] = glm::vec3(x, y, z) + m_WorldOffset + verticesLookup.Right[i];
+				if (y == 0 || !m_Voxels[x][y - 1][z].IsActive()) {
+					// Add a face to the vertices and indices for the bottom side
+					AddBottomFace(tempX, tempY, tempZ);
 				}
-				m_Mesh.push_back(tempVertice);
-
-				//Top
-				for (size_t i = 0; i < 4; i++) {
-					tempVertice[i] = glm::vec3(x, y, z) + m_WorldOffset + verticesLookup.Top[i];
+				if (y == CHUNK_SIZE - 1 || !m_Voxels[x][y + 1][z].IsActive()) {
+					// Add a face to the vertices and indices for the top side
+					AddTopFace(tempX, tempY, tempZ);
 				}
-				m_Mesh.push_back(tempVertice);
-
-				//Bottom
-				for (size_t i = 0; i < 4; i++) {
-					tempVertice[i] = glm::vec3(x, y, z) + m_WorldOffset + verticesLookup.Bottom[i];
+				if (z == 0 || !m_Voxels[x][y][z - 1].IsActive()) {
+					// Add a face to the vertices and indices for the back side
+					AddBackFace(tempX, tempY, tempZ);
 				}
-				m_Mesh.push_back(tempVertice);
+				if (z == CHUNK_SIZE - 1 || !m_Voxels[x][y][z + 1].IsActive()) {
+					// Add a face to the vertices and indices for the front side
+					AddFrontFace(tempX, tempY, tempZ);
+				}
 			}
 		}
 	}
+}
 
-	uint32_t* quadIndices = new uint32_t[m_Mesh.size() * 6];
-	uint32_t offset = 0;
-	for (uint32_t i = 0; i < m_Mesh.size() * 6; i += 6) {
-		quadIndices[i + 0] = offset + 0;
-		quadIndices[i + 1] = offset + 1;
-		quadIndices[i + 2] = offset + 2;
-
-		quadIndices[i + 3] = offset + 2;
-		quadIndices[i + 4] = offset + 3;
-		quadIndices[i + 5] = offset + 1;
-
-		offset += 4;
-	}
-
-													//I have to cast from a std::array<glm::vec3, 4>* to a float
-	m_VertexBuffer = RealEngine::VertexBuffer::Create((float*)std::data(m_Mesh), (sizeof(VoxelBuffer) * 4) * m_Mesh.size());
+void Chunk::CreateBuffers() {
+	//I have to cast from a std::array<glm::vec3, 4>* to a float
+	m_VertexArray = RealEngine::VertexArray::Create();
+	m_VertexBuffer = RealEngine::VertexBuffer::Create((float*)std::data(m_Vertices), sizeof(VoxelBuffer) * (uint32_t)m_Vertices.size());
 	m_VertexBuffer->SetLayout({
 		{ RealEngine::ShaderDataType::Float3, "a_Position" }
-	});
+		});
 	m_VertexArray->AddVertexBuffer(m_VertexBuffer);
 
- 	RealEngine::Ref<RealEngine::IndexBuffer> indexBuffer = RealEngine::IndexBuffer::Create(quadIndices, m_Mesh.size() * 6);
-	delete[] quadIndices;
+	RealEngine::Ref<RealEngine::IndexBuffer> indexBuffer = RealEngine::IndexBuffer::Create(std::data(m_Indices), (uint32_t)m_Indices.size());
 
 	m_VertexArray->SetIndexBuffer(indexBuffer);
 }
 
 void Chunk::Render() {
 	m_VertexArray->Bind();
-	RealEngine::RenderCommand::DrawIndexed(m_VertexArray, m_Mesh.size() * 6);
+	RealEngine::RenderCommand::DrawIndexed(m_VertexArray, (uint32_t)m_Indices.size());
 }
