@@ -19,7 +19,7 @@ namespace std {
 class Chunk {
 public:
 	Chunk(glm::ivec3 worldOffset);
-	~Chunk();
+	~Chunk() = default;
 
 	void UpdateMesh(float dt);
 	void CreateMesh();

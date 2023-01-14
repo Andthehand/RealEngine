@@ -4,10 +4,6 @@ struct VoxelBuffer {
 	glm::vec3 Position;
 };
 
-Chunk::~Chunk(){
-
-}
-
 Chunk::Chunk(glm::ivec3 worldOffset) : m_WorldOffset(worldOffset) {
 	m_Voxels = std::vector<std::vector<std::vector<Voxel>>>(CHUNK_SIZE, 
 									 std::vector<std::vector<Voxel>>(CHUNK_SIZE, 
@@ -29,6 +25,10 @@ Chunk::Chunk(glm::ivec3 worldOffset) : m_WorldOffset(worldOffset) {
 
 	CreateMesh();
 	CreateBuffers();
+
+	//After creating the mesh and buffers I already moved all the data to the gpu so i don't need to keep it in ram any more
+	m_Indices.clear();
+	m_Vertices.clear();
 }
 
 void Chunk::UpdateMesh(float dt) {
