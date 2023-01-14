@@ -8,6 +8,8 @@
 ChunkManager::ChunkManager(glm::ivec3& cameraPos) : m_PreviousCameraPos(ClampToNum(cameraPos, Chunk::CHUNK_SIZE)) {
 	m_ActiveChunks.reserve((2 * RENDER_DISTANCE) * (2 * RENDER_DISTANCE) * (2 * RENDER_DISTANCE));
 
+	//TODO: Move this to a function?
+	//Populate m_ActiveChunks with actaul chunks
 	for (int x = -RENDER_DISTANCE; x < RENDER_DISTANCE; x++) {
 		for (int y = -RENDER_DISTANCE; y < RENDER_DISTANCE; y++) {
 			for (int z = -RENDER_DISTANCE; z < RENDER_DISTANCE; z++) {
@@ -18,6 +20,7 @@ ChunkManager::ChunkManager(glm::ivec3& cameraPos) : m_PreviousCameraPos(ClampToN
 	}
 }
 
+//This is used to get the frustum from the camera for frustum culling
 void ExtractFrustum(glm::vec4* frustumPlanes, const glm::mat4& viewProjectionMatrix) {
 	// Extract the right plane
 	frustumPlanes[0] = glm::row(viewProjectionMatrix, 3) - glm::row(viewProjectionMatrix, 0);
@@ -42,6 +45,7 @@ void ExtractFrustum(glm::vec4* frustumPlanes, const glm::mat4& viewProjectionMat
 	}
 }
 
+//This is to check if the bounding boxes for the chunks are in the frustum
 bool IntersectFrustum(const glm::vec4* frustumPlanes, const glm::vec3& min, const glm::vec3& max) {
 	// Check if each corner of the bounding box is inside the frustum
 	for (int i = 0; i < 6; i++) {
@@ -59,76 +63,96 @@ bool IntersectFrustum(const glm::vec4* frustumPlanes, const glm::vec3& min, cons
 	return true;
 }
 
-glm::ivec3 currentCameraPos;
-glm::vec3 cameraDist;
 void ChunkManager::Render(RealEngine::EditorCamera& editorCamera) {
-	currentCameraPos = editorCamera.GetPosition();
+	ResetStatistics();
+
+	glm::ivec3 currentCameraPos	= editorCamera.GetPosition();
 	
-	cameraDist[0] = (float)std::abs(currentCameraPos.x - m_PreviousCameraPos.x);
-	cameraDist[1] = (float)std::abs(currentCameraPos.y - m_PreviousCameraPos.y);
-	cameraDist[2] = (float)std::abs(currentCameraPos.z - m_PreviousCameraPos.z);
-	if (cameraDist[0] >= Chunk::CHUNK_SIZE || 
-		cameraDist[1] >= Chunk::CHUNK_SIZE || 
-		cameraDist[2] >= Chunk::CHUNK_SIZE) {
+	glm::ivec3 cameraDist;
+	cameraDist.x = std::abs(currentCameraPos.x - m_PreviousCameraPos.x);
+	cameraDist.y = std::abs(currentCameraPos.y - m_PreviousCameraPos.y);
+	cameraDist.z = std::abs(currentCameraPos.z - m_PreviousCameraPos.z);
+	m_Statistics.CameraDist = cameraDist;
+	if (cameraDist.x >= Chunk::CHUNK_SIZE || 
+		cameraDist.y >= Chunk::CHUNK_SIZE || 
+		cameraDist.z >= Chunk::CHUNK_SIZE) {
 		m_PreviousCameraPos = ClampToNum(currentCameraPos, Chunk::CHUNK_SIZE);
 		UpdateChunkMap(currentCameraPos);
 	}
 
+	//This is used for the frustum culling
 	ExtractFrustum(frustumPlanes, editorCamera.GetViewProjection());
-	
 	for (auto& [pos, chunk] : m_ActiveChunks) {
+		//Calcualte the boudning box of the chunk
 		glm::vec3 min = (glm::vec3)pos;
 		glm::vec3 max = (glm::vec3)pos + glm::vec3(Chunk::CHUNK_SIZE);
 		
+		//This is the frustum culling
 		if (IntersectFrustum(frustumPlanes, min, max)) {
 			chunk->Render();
+			m_Statistics.ChunksRendered++;
 		}
 	}
 }
 
 void ChunkManager::OnImGuiRender() {
 	ImGui::Text("Previous Camera Pos: %f, %f, %f", m_PreviousCameraPos.x, m_PreviousCameraPos.y, m_PreviousCameraPos.z);
-	ImGui::Text("Distance: %f, %f, %f", cameraDist.x, cameraDist.y, cameraDist.z);
-	ImGui::Text("Num Chunks %i", (uint32_t)m_ActiveChunks.size());
+	ImGui::Text("Distance: %i, %i, %i", m_Statistics.CameraDist.x, m_Statistics.CameraDist.y, m_Statistics.CameraDist.z);
+	ImGui::Text("Num Chunks Rendered %i", m_Statistics.ChunksRendered);
+	ImGui::Text("Num Chunks %i", m_ActiveChunks.size());
 }
 
+void ChunkManager::ResetStatistics() {
+	m_Statistics.ChunksRendered = 0;
+}
+
+//Formats { 15, 32, -16 } to { 0, 2, -1 }
 inline glm::ivec3 ChunkManager::Vec3ToChunkCords(glm::ivec3 cords) {
+	//Floor only returns a float and cast to float so that the divide is a float divide not an int divide
 	int x = (int)std::floor((float)cords.x / Chunk::CHUNK_SIZE);
 	int y = (int)std::floor((float)cords.y / Chunk::CHUNK_SIZE);
 	int z = (int)std::floor((float)cords.z / Chunk::CHUNK_SIZE);
 	return glm::ivec3(x, y, z);
 }
 
+//This formats the cords to chunk cords then multipiles it by the num
 inline glm::ivec3 ChunkManager::ClampToNum(glm::ivec3& cords, int num) {
 	return Vec3ToChunkCords(cords) * glm::ivec3(num);
 }
 
+//This checks the m_ActiveChunks to discard chunks to far away and add chunks that are in render distance
 void ChunkManager::UpdateChunkMap(glm::ivec3& cameraPos) {
 	glm::ivec3 chunkCameraDist;
 	for (auto& chunk : m_ActiveChunks) {
-		chunkCameraDist[0] = std::abs(cameraPos.x - chunk.first.x);
-		chunkCameraDist[1] = std::abs(cameraPos.y - chunk.first.y);
-		chunkCameraDist[2] = std::abs(cameraPos.z - chunk.first.z);
+		chunkCameraDist.x = std::abs(cameraPos.x - chunk.first.x);
+		chunkCameraDist.y = std::abs(cameraPos.y - chunk.first.y);
+		chunkCameraDist.z = std::abs(cameraPos.z - chunk.first.z);
 
-		if (chunkCameraDist[0] >= Chunk::CHUNK_SIZE * RENDER_DISTANCE || 
-			chunkCameraDist[1] >= Chunk::CHUNK_SIZE * RENDER_DISTANCE || 
-			chunkCameraDist[2] >= Chunk::CHUNK_SIZE * RENDER_DISTANCE) {
+		//Is the current chunk within the render distance
+		if (chunkCameraDist.x >= Chunk::CHUNK_SIZE * RENDER_DISTANCE || 
+			chunkCameraDist.y >= Chunk::CHUNK_SIZE * RENDER_DISTANCE || 
+			chunkCameraDist.z >= Chunk::CHUNK_SIZE * RENDER_DISTANCE) {
+			//If not put in que to delete
 			m_ChunksToDelete.emplace(chunk);
 			continue;
 		}
 	}
 
 	//For some reason I can't delete in the for each loop above
+	//Which kinda makes sense
 	for (auto& chunk : m_ChunksToDelete) {
 		m_ActiveChunks.erase(chunk.first);
 	}
 
+	//TODO: Do this on another thread
 	m_ChunksToDelete.clear();
 
+	//TODO: Do this on another thread
 	for (int x = -RENDER_DISTANCE; x < RENDER_DISTANCE; x++) {
 		for (int y = -RENDER_DISTANCE; y < RENDER_DISTANCE; y++) {
 			for (int z = -RENDER_DISTANCE; z < RENDER_DISTANCE; z++) {
 				glm::ivec3 newChunkPos = m_PreviousCameraPos - (glm::ivec3(x, y, z) * 16);
+				//Check if the chunkpos is already in the unordered_map
 				if (m_ActiveChunks.find(newChunkPos) == m_ActiveChunks.end()) {
 					// Load new chunk and add it to the unordered map
 					m_ActiveChunks.insert({ newChunkPos, std::make_shared<Chunk>(newChunkPos) });
