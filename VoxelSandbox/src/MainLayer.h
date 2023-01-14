@@ -6,7 +6,8 @@
 class MainLayer : public RealEngine::Layer {
 public:
 	MainLayer();
-	virtual void OnUpdate(RealEngine::Timestep ts);
+	virtual void OnUpdate(RealEngine::Timestep ts) override;
+	virtual void OnImGuiRender() override;
 	virtual void OnEvent(RealEngine::Event& event) override;
 
 	bool OnKeyPressed(RealEngine::KeyPressedEvent& e);

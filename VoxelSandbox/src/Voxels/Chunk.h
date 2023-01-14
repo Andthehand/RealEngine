@@ -4,12 +4,12 @@
 #include "Voxel.h"
 
 namespace std {
-	template<> struct hash<glm::vec3> {
-		size_t operator()(const glm::vec3& v) const {
+	template<> struct hash<glm::ivec3> {
+		size_t operator()(const glm::ivec3& v) const {
 			// Use the built-in hash function for the individual components
-			size_t h1 = std::hash<float>()(v.x);
-			size_t h2 = std::hash<float>()(v.y);
-			size_t h3 = std::hash<float>()(v.z);
+			size_t h1 = std::hash<int>()(v.x);
+			size_t h2 = std::hash<int>()(v.y);
+			size_t h3 = std::hash<int>()(v.z);
 			// Combine the hash values using a combination of bitwise operators
 			return h1 ^ (h2 << 1) ^ (h3 << 2);
 		}
@@ -23,6 +23,7 @@ public:
 
 	void UpdateMesh(float dt);
 	void CreateMesh();
+	
 	void Render();
 
 	static const int CHUNK_SIZE = 16;

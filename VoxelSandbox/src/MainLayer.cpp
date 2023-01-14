@@ -1,6 +1,9 @@
 #include "MainLayer.h"
 
-MainLayer::MainLayer() : m_EditorCamera(90.0f, RealEngine::Application::Get().GetWindow().GetWidth() / RealEngine::Application::Get().GetWindow().GetHeight(), 0.1f, 1000.0f) {
+#include "imgui/imgui.h"
+
+MainLayer::MainLayer() : m_EditorCamera(90.0f, (float)(RealEngine::Application::Get().GetWindow().GetWidth() / RealEngine::Application::Get().GetWindow().GetHeight()), 0.1f, 1000.0f),
+						m_ChunkManager((glm::ivec3)m_EditorCamera.GetPosition()) {
 	m_ChunkShader = RealEngine::Shader::Create("assets/shaders/Chunk.glsl");
 	
 	RealEngine::RenderCommand::SetWireFrame(true);
@@ -15,6 +18,15 @@ void MainLayer::OnUpdate(RealEngine::Timestep ts) {
 	m_ChunkShader->SetMat4("u_ViewProjection", m_EditorCamera.GetViewProjection());
 	
 	m_ChunkManager.Render(m_EditorCamera);
+}
+
+void MainLayer::OnImGuiRender() {
+	ImGui::Begin("Test Variables");
+
+	ImGui::Text("Camera Pos: %f, %f, %f", m_EditorCamera.GetPosition().x, m_EditorCamera.GetPosition().z, m_EditorCamera.GetPosition().y);
+	m_ChunkManager.OnImGuiRender();
+
+	ImGui::End();
 }
 
 void MainLayer::OnEvent(RealEngine::Event& event) {
