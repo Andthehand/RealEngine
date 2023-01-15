@@ -17,6 +17,8 @@ public:
 	Statistics GetStatistics() { return m_Statistics; }
 	void ResetStatistics();
 
+	std::shared_ptr<Chunk> GetChunk(glm::ivec3 chunkPos) { return (m_ActiveChunks.find(chunkPos) != m_ActiveChunks.end()) ? m_ActiveChunks.find(chunkPos)->second : nullptr; }
+
 public:
 	//This is the amount of chunks that will be rendered in one direction around the camera
 	static const int WORLD_HEIGHT = 256;

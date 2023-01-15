@@ -3,6 +3,8 @@
 
 #include "Voxel.h"
 
+class ChunkManager;
+
 namespace std {
 	template<> struct hash<glm::ivec3> {
 		size_t operator()(const glm::ivec3& v) const {
@@ -20,7 +22,7 @@ class Chunk {
 public:
 	static std::vector<std::shared_ptr<Chunk>> MemoryPool;
 
-	Chunk(glm::ivec3 worldOffset);
+	Chunk(glm::ivec3 worldOffset, ChunkManager& manager);
 	~Chunk() = default;
 
 	void ReuseChunk(glm::ivec3 worldOffset);
@@ -30,17 +32,21 @@ public:
 	
 	void Render();
 
+	inline Voxel& GetVoxel(glm::ivec3 pos) { return m_Voxels[pos.x][pos.y][pos.z]; }
+
 	static const int CHUNK_SIZE = 16;
 private:
 	void CreateBuffers();
 	void UpdateBuffers();
 
-	void AddLeftFace(int x, int y, int z);
-	void AddRightFace(int x, int y, int z);
-	void AddBottomFace(int x, int y, int z);
-	void AddTopFace(int x, int y, int z);
-	void AddBackFace(int x, int y, int z);
-	void AddFrontFace(int x, int y, int z);
+	void AddLeftFace(glm::ivec3& pos);
+	void AddRightFace(glm::ivec3& pos);
+	void AddBottomFace(glm::ivec3& pos);
+	void AddTopFace(glm::ivec3& pos);
+	void AddBackFace(glm::ivec3& pos);
+	void AddFrontFace(glm::ivec3& pos);
+
+	ChunkManager& m_ChunkManager;
 
 	glm::ivec3 m_WorldOffset;
 

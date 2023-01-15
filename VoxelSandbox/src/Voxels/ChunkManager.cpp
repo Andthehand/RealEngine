@@ -15,9 +15,14 @@ ChunkManager::ChunkManager(glm::ivec3& cameraPos) : m_PreviousCameraPos(ClampToN
 		for (int y = -m_RenderDistance; y <= m_RenderDistance; y++) {
 			for (int z = -m_RenderDistance; z <= m_RenderDistance; z++) {
 				glm::vec3 chunkPos = (ClampToNum(cameraPos, Chunk::CHUNK_SIZE)) - (glm::ivec3(x, y, z) * 16);
-				m_ActiveChunks.insert({ chunkPos, std::make_shared<Chunk>(chunkPos) });
+				m_ActiveChunks.insert({ chunkPos, std::make_shared<Chunk>(chunkPos, *this) });
 			}
 		}
+	}
+
+	//Create the actaul meshes of the chunks
+	for (auto& [key, chunk] : m_ActiveChunks) {
+		chunk->CreateMesh();
 	}
 }
 
@@ -102,7 +107,7 @@ void ChunkManager::OnImGuiRender() {
 	ImGui::Text("Distance: %i, %i, %i", m_Statistics.CameraDist.x, m_Statistics.CameraDist.y, m_Statistics.CameraDist.z);
 	ImGui::Text("Num Chunks Rendered %i", m_Statistics.ChunksRendered);
 	ImGui::Text("Num Chunks %i", m_ActiveChunks.size());
-	if (ImGui::SliderInt("Render Distance", &m_RenderDistance, 1, 7)) UpdateChunkMap(currentCameraPos);
+	if (ImGui::SliderInt("Render Distance", &m_RenderDistance, 1, 10)) UpdateChunkMap(currentCameraPos);
 }
 
 void ChunkManager::ResetStatistics() {
@@ -125,7 +130,7 @@ inline glm::ivec3 ChunkManager::ClampToNum(glm::ivec3& cords, int num) {
 
 //This checks the m_ActiveChunks to discard chunks to far away and add chunks that are in render distance
 void ChunkManager::UpdateChunkMap(glm::ivec3& cameraPos) {
-	std::vector<glm::ivec3> tempErase;
+	static std::vector<glm::ivec3> tempErase;
 	for (auto& chunk : m_ActiveChunks) {
 		glm::ivec3 chunkCameraDist;
 		chunkCameraDist.x = std::abs(cameraPos.x - chunk.first.x);
@@ -145,6 +150,7 @@ void ChunkManager::UpdateChunkMap(glm::ivec3& cameraPos) {
 	for (auto& cords : tempErase) {
 		m_ActiveChunks.erase(cords);
 	}
+	tempErase.clear();
 
 	//TODO: Do this on another thread
 	for (int x = -m_RenderDistance; x <= m_RenderDistance; x++) {
@@ -155,7 +161,7 @@ void ChunkManager::UpdateChunkMap(glm::ivec3& cameraPos) {
 				if (m_ActiveChunks.find(newChunkPos) == m_ActiveChunks.end()) {
 					// See if the MemoryPool already has a chunk or else loads a new one
 					if (Chunk::MemoryPool.empty()) {
-						m_ActiveChunks.insert({ newChunkPos, std::make_shared<Chunk>(newChunkPos) });
+						m_ActiveChunks.insert({ newChunkPos, std::make_shared<Chunk>(newChunkPos, *this) });
 					}
 					else {
 						Chunk::MemoryPool.back()->ReuseChunk(newChunkPos);
@@ -165,5 +171,10 @@ void ChunkManager::UpdateChunkMap(glm::ivec3& cameraPos) {
 				}
 			}
 		}
+	}
+
+	//TODO: Only update the chunk meshes of the chunks next to the added and removed chunks
+	for (auto& [key, chunk] : m_ActiveChunks) {
+		chunk->CreateMesh();
 	}
 }
