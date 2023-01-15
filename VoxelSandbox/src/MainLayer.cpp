@@ -10,6 +10,8 @@ MainLayer::MainLayer() : m_EditorCamera(90.0f, (float)(RealEngine::Application::
 }
 
 void MainLayer::OnUpdate(RealEngine::Timestep ts) {
+	FPSCounter(ts);
+
 	RealEngine::RenderCommand::SetClearColor({ 0.1, 0.1, 0.1, 1 });
 	RealEngine::RenderCommand::Clear();
 
@@ -22,6 +24,8 @@ void MainLayer::OnUpdate(RealEngine::Timestep ts) {
 
 void MainLayer::OnImGuiRender() {
 	ImGui::Begin("Test Variables");
+
+	ImGui::Text("FPS: %f", fps);
 
 	ImGui::Text("Camera Pos: %f, %f, %f", m_EditorCamera.GetPosition().x, m_EditorCamera.GetPosition().z, m_EditorCamera.GetPosition().y);
 	m_ChunkManager.OnImGuiRender();

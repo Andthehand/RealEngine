@@ -18,8 +18,12 @@ namespace std {
 
 class Chunk {
 public:
+	static std::vector<std::shared_ptr<Chunk>> MemoryPool;
+
 	Chunk(glm::ivec3 worldOffset);
 	~Chunk() = default;
+
+	void ReuseChunk(glm::ivec3 worldOffset);
 
 	void UpdateMesh(float dt);
 	void CreateMesh();
@@ -29,6 +33,7 @@ public:
 	static const int CHUNK_SIZE = 16;
 private:
 	void CreateBuffers();
+	void UpdateBuffers();
 
 	void AddLeftFace(int x, int y, int z);
 	void AddRightFace(int x, int y, int z);
@@ -43,7 +48,9 @@ private:
 	std::vector<std::vector<std::vector<Voxel>>> m_Voxels;
 
 	// vectors to hold vertex and index data for rendering
+	int m_VertIndex = 0;
 	std::vector<glm::vec3> m_Vertices;
+	int m_IndicesIndex = 0;
 	std::vector<uint32_t> m_Indices;
 
 	RealEngine::Ref<RealEngine::VertexArray> m_VertexArray;

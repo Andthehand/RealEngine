@@ -19,8 +19,8 @@ public:
 
 public:
 	//This is the amount of chunks that will be rendered in one direction around the camera
-	static const int RENDER_DISTANCE = 6;
 	static const int WORLD_HEIGHT = 256;
+	int m_RenderDistance = 4;
 
 	glm::vec4 frustumPlanes[6];
 private:
@@ -30,7 +30,6 @@ private:
 
 	glm::ivec3 m_PreviousCameraPos = glm::vec3(0);
 	std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>> m_ActiveChunks;
-	std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>> m_ChunksToDelete;
 
 	Statistics m_Statistics;
 };

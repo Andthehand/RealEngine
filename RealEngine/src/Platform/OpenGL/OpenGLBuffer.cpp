@@ -71,6 +71,12 @@ namespace RealEngine {
 		glDeleteBuffers(1, &m_RendererID);
 	}
 
+	void OpenGLIndexBuffer::SetData(const uint32_t* data, uint32_t count) {
+		m_Count = count;
+		glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(uint32_t), data);
+	}
+
 	void OpenGLIndexBuffer::Bind() const {
 		RE_PROFILE_FUNCTION();
 

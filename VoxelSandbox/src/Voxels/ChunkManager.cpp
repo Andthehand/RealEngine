@@ -6,13 +6,14 @@
 #include "imgui/imgui.h"
 
 ChunkManager::ChunkManager(glm::ivec3& cameraPos) : m_PreviousCameraPos(ClampToNum(cameraPos, Chunk::CHUNK_SIZE)) {
-	m_ActiveChunks.reserve((2 * RENDER_DISTANCE) * (2 * RENDER_DISTANCE) * (2 * RENDER_DISTANCE));
+	m_ActiveChunks.reserve((3 * m_RenderDistance) * (3 * m_RenderDistance) * (3 * m_RenderDistance));
+	Chunk::MemoryPool.reserve((3 * m_RenderDistance) * (3 * m_RenderDistance) * (3 * m_RenderDistance));
 
-	//TODO: Move this to a function?
+	//TODO: Move this to a seperate  function?
 	//Populate m_ActiveChunks with actaul chunks
-	for (int x = -RENDER_DISTANCE; x < RENDER_DISTANCE; x++) {
-		for (int y = -RENDER_DISTANCE; y < RENDER_DISTANCE; y++) {
-			for (int z = -RENDER_DISTANCE; z < RENDER_DISTANCE; z++) {
+	for (int x = -m_RenderDistance; x <= m_RenderDistance; x++) {
+		for (int y = -m_RenderDistance; y <= m_RenderDistance; y++) {
+			for (int z = -m_RenderDistance; z <= m_RenderDistance; z++) {
 				glm::vec3 chunkPos = (ClampToNum(cameraPos, Chunk::CHUNK_SIZE)) - (glm::ivec3(x, y, z) * 16);
 				m_ActiveChunks.insert({ chunkPos, std::make_shared<Chunk>(chunkPos) });
 			}
@@ -63,10 +64,11 @@ bool IntersectFrustum(const glm::vec4* frustumPlanes, const glm::vec3& min, cons
 	return true;
 }
 
+glm::ivec3 currentCameraPos;
 void ChunkManager::Render(RealEngine::EditorCamera& editorCamera) {
 	ResetStatistics();
 
-	glm::ivec3 currentCameraPos	= editorCamera.GetPosition();
+	currentCameraPos = editorCamera.GetPosition();
 	
 	glm::ivec3 cameraDist;
 	cameraDist.x = std::abs(currentCameraPos.x - m_PreviousCameraPos.x);
@@ -96,10 +98,11 @@ void ChunkManager::Render(RealEngine::EditorCamera& editorCamera) {
 }
 
 void ChunkManager::OnImGuiRender() {
-	ImGui::Text("Previous Camera Pos: %f, %f, %f", m_PreviousCameraPos.x, m_PreviousCameraPos.y, m_PreviousCameraPos.z);
+	ImGui::Text("Previous Camera Pos: %i, %i, %i", m_PreviousCameraPos.x, m_PreviousCameraPos.y, m_PreviousCameraPos.z);
 	ImGui::Text("Distance: %i, %i, %i", m_Statistics.CameraDist.x, m_Statistics.CameraDist.y, m_Statistics.CameraDist.z);
 	ImGui::Text("Num Chunks Rendered %i", m_Statistics.ChunksRendered);
 	ImGui::Text("Num Chunks %i", m_ActiveChunks.size());
+	if (ImGui::SliderInt("Render Distance", &m_RenderDistance, 1, 7)) UpdateChunkMap(currentCameraPos);
 }
 
 void ChunkManager::ResetStatistics() {
@@ -122,40 +125,43 @@ inline glm::ivec3 ChunkManager::ClampToNum(glm::ivec3& cords, int num) {
 
 //This checks the m_ActiveChunks to discard chunks to far away and add chunks that are in render distance
 void ChunkManager::UpdateChunkMap(glm::ivec3& cameraPos) {
-	glm::ivec3 chunkCameraDist;
+	std::vector<glm::ivec3> tempErase;
 	for (auto& chunk : m_ActiveChunks) {
+		glm::ivec3 chunkCameraDist;
 		chunkCameraDist.x = std::abs(cameraPos.x - chunk.first.x);
 		chunkCameraDist.y = std::abs(cameraPos.y - chunk.first.y);
 		chunkCameraDist.z = std::abs(cameraPos.z - chunk.first.z);
 
 		//Is the current chunk within the render distance
-		if (chunkCameraDist.x >= Chunk::CHUNK_SIZE * RENDER_DISTANCE || 
-			chunkCameraDist.y >= Chunk::CHUNK_SIZE * RENDER_DISTANCE || 
-			chunkCameraDist.z >= Chunk::CHUNK_SIZE * RENDER_DISTANCE) {
-			//If not put in que to delete
-			m_ChunksToDelete.emplace(chunk);
-			continue;
+		if (chunkCameraDist.x >= Chunk::CHUNK_SIZE * m_RenderDistance ||
+			chunkCameraDist.y >= Chunk::CHUNK_SIZE * m_RenderDistance ||
+			chunkCameraDist.z >= Chunk::CHUNK_SIZE * m_RenderDistance) {
+			Chunk::MemoryPool.push_back(chunk.second);
+			tempErase.push_back(chunk.first);
 		}
 	}
 
-	//For some reason I can't delete in the for each loop above
-	//Which kinda makes sense
-	for (auto& chunk : m_ChunksToDelete) {
-		m_ActiveChunks.erase(chunk.first);
+	//Can't figure out how to erase inside of the top for each loop
+	for (auto& cords : tempErase) {
+		m_ActiveChunks.erase(cords);
 	}
 
 	//TODO: Do this on another thread
-	m_ChunksToDelete.clear();
-
-	//TODO: Do this on another thread
-	for (int x = -RENDER_DISTANCE; x < RENDER_DISTANCE; x++) {
-		for (int y = -RENDER_DISTANCE; y < RENDER_DISTANCE; y++) {
-			for (int z = -RENDER_DISTANCE; z < RENDER_DISTANCE; z++) {
+	for (int x = -m_RenderDistance; x <= m_RenderDistance; x++) {
+		for (int y = -m_RenderDistance; y <= m_RenderDistance; y++) {
+			for (int z = -m_RenderDistance; z <= m_RenderDistance; z++) {
 				glm::ivec3 newChunkPos = m_PreviousCameraPos - (glm::ivec3(x, y, z) * 16);
 				//Check if the chunkpos is already in the unordered_map
 				if (m_ActiveChunks.find(newChunkPos) == m_ActiveChunks.end()) {
-					// Load new chunk and add it to the unordered map
-					m_ActiveChunks.insert({ newChunkPos, std::make_shared<Chunk>(newChunkPos) });
+					// See if the MemoryPool already has a chunk or else loads a new one
+					if (Chunk::MemoryPool.empty()) {
+						m_ActiveChunks.insert({ newChunkPos, std::make_shared<Chunk>(newChunkPos) });
+					}
+					else {
+						Chunk::MemoryPool.back()->ReuseChunk(newChunkPos);
+						m_ActiveChunks.insert({ newChunkPos, Chunk::MemoryPool.back()});
+						Chunk::MemoryPool.pop_back();
+					}
 				}
 			}
 		}
