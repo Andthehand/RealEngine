@@ -113,7 +113,12 @@ void ChunkManager::OnImGuiRender() {
 	ImGui::Text("Distance: %i, %i, %i", m_Statistics.CameraDist.x, m_Statistics.CameraDist.y, m_Statistics.CameraDist.z);
 	ImGui::Text("Num Chunks Rendered %i", m_Statistics.ChunksRendered);
 	ImGui::Text("Num Chunks %i", m_ActiveChunks.size());
-	if (ImGui::SliderInt("Render Distance", &m_RenderDistance, 1, 10)) UpdateChunkMap(currentCameraPos);
+	if (ImGui::SliderInt("Render Distance", &m_RenderDistance, 1, 10)) {
+		for (auto& [key, chunk] : m_ActiveChunks) {
+			chunk->GetFlags().ShouldGenerateMesh = true;
+		}
+		UpdateChunkMap(currentCameraPos);
+	}
 	if (ImGui::Button("Freeze Frustum")) m_FrustumFrozen = !m_FrustumFrozen;
 }
 
