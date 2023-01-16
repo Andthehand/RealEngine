@@ -5,36 +5,27 @@
 
 class ChunkManager;
 
-namespace std {
-	template<> struct hash<glm::ivec3> {
-		size_t operator()(const glm::ivec3& v) const {
-			// Use the built-in hash function for the individual components
-			size_t h1 = std::hash<int>()(v.x);
-			size_t h2 = std::hash<int>()(v.y);
-			size_t h3 = std::hash<int>()(v.z);
-			// Combine the hash values using a combination of bitwise operators
-			return h1 ^ (h2 << 1) ^ (h3 << 2);
-		}
-	};
-}
-
 class Chunk {
 public:
-	static std::vector<std::shared_ptr<Chunk>> MemoryPool;
-
 	Chunk(glm::ivec3 worldOffset, ChunkManager& manager);
 	~Chunk() = default;
 
 	void ReuseChunk(glm::ivec3 worldOffset);
 
-	void UpdateMesh(float dt);
 	void CreateMesh();
-	
 	void Render();
 
 	inline Voxel& GetVoxel(glm::ivec3 pos) { return m_Voxels[pos.x][pos.y][pos.z]; }
 
+	struct Flags {
+		bool ShouldRender = false;
+		bool ShouldGenerateMesh = true;
+	};
+	Flags& GetFlags() { return m_Flags; }
+public:
 	static const int CHUNK_SIZE = 16;
+	static std::vector<std::shared_ptr<Chunk>> MemoryPool;
+	
 private:
 	void CreateBuffers();
 	void UpdateBuffers();
@@ -46,7 +37,10 @@ private:
 	void AddBackFace(glm::ivec3& pos);
 	void AddFrontFace(glm::ivec3& pos);
 
+private:
 	ChunkManager& m_ChunkManager;
+
+	Flags m_Flags;
 
 	glm::ivec3 m_WorldOffset;
 

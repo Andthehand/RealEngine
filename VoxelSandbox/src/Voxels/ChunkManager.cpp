@@ -6,23 +6,18 @@
 #include "imgui/imgui.h"
 
 ChunkManager::ChunkManager(glm::ivec3& cameraPos) : m_PreviousCameraPos(ClampToNum(cameraPos, Chunk::CHUNK_SIZE)) {
-	m_ActiveChunks.reserve((3 * m_RenderDistance) * (3 * m_RenderDistance) * (3 * m_RenderDistance));
-	Chunk::MemoryPool.reserve((3 * m_RenderDistance) * (3 * m_RenderDistance) * (3 * m_RenderDistance));
+	m_ActiveChunks.reserve((2 * m_RenderDistance + 1) ^ 3);
+	Chunk::MemoryPool.reserve((2 * m_RenderDistance + 1) ^ 3);
 
 	//TODO: Move this to a seperate  function?
 	//Populate m_ActiveChunks with actaul chunks
 	for (int x = -m_RenderDistance; x <= m_RenderDistance; x++) {
 		for (int y = -m_RenderDistance; y <= m_RenderDistance; y++) {
 			for (int z = -m_RenderDistance; z <= m_RenderDistance; z++) {
-				glm::vec3 chunkPos = (ClampToNum(cameraPos, Chunk::CHUNK_SIZE)) - (glm::ivec3(x, y, z) * 16);
+				glm::vec3 chunkPos = (ClampToNum(cameraPos, Chunk::CHUNK_SIZE)) - (glm::ivec3(x, y, z) * Chunk::CHUNK_SIZE);
 				m_ActiveChunks.insert({ chunkPos, std::make_shared<Chunk>(chunkPos, *this) });
 			}
 		}
-	}
-
-	//Create the actaul meshes of the chunks
-	for (auto& [key, chunk] : m_ActiveChunks) {
-		chunk->CreateMesh();
 	}
 }
 
@@ -88,26 +83,38 @@ void ChunkManager::Render(RealEngine::EditorCamera& editorCamera) {
 	}
 
 	//This is used for the frustum culling
-	ExtractFrustum(frustumPlanes, editorCamera.GetViewProjection());
+	if(!m_FrustumFrozen) ExtractFrustum(m_FrustumPlanes, editorCamera.GetViewProjection());
+	
+	uint32_t count = 0;
 	for (auto& [pos, chunk] : m_ActiveChunks) {
 		//Calcualte the boudning box of the chunk
 		glm::vec3 min = (glm::vec3)pos;
 		glm::vec3 max = (glm::vec3)pos + glm::vec3(Chunk::CHUNK_SIZE);
 		
+		if (chunk->GetFlags().ShouldGenerateMesh) {
+			chunk->CreateMesh();
+			count++;
+		}
+
 		//This is the frustum culling
-		if (IntersectFrustum(frustumPlanes, min, max)) {
+		if (chunk->GetFlags().ShouldRender && IntersectFrustum(m_FrustumPlanes, min, max)) {
+			//TODO: Put this into a display list
 			chunk->Render();
 			m_Statistics.ChunksRendered++;
 		}
 	}
+	if (count) RE_INFO("Count: {0}", count);
 }
 
 void ChunkManager::OnImGuiRender() {
 	ImGui::Text("Previous Camera Pos: %i, %i, %i", m_PreviousCameraPos.x, m_PreviousCameraPos.y, m_PreviousCameraPos.z);
+	glm::ivec3 temp = Vec3ToChunkCords(m_PreviousCameraPos);
+	ImGui::Text("Previous Chunk Pos: %i, %i, %i", temp.x, temp.y, temp.z);
 	ImGui::Text("Distance: %i, %i, %i", m_Statistics.CameraDist.x, m_Statistics.CameraDist.y, m_Statistics.CameraDist.z);
 	ImGui::Text("Num Chunks Rendered %i", m_Statistics.ChunksRendered);
 	ImGui::Text("Num Chunks %i", m_ActiveChunks.size());
 	if (ImGui::SliderInt("Render Distance", &m_RenderDistance, 1, 10)) UpdateChunkMap(currentCameraPos);
+	if (ImGui::Button("Freeze Frustum")) m_FrustumFrozen = !m_FrustumFrozen;
 }
 
 void ChunkManager::ResetStatistics() {
@@ -130,33 +137,53 @@ inline glm::ivec3 ChunkManager::ClampToNum(glm::ivec3& cords, int num) {
 
 //This checks the m_ActiveChunks to discard chunks to far away and add chunks that are in render distance
 void ChunkManager::UpdateChunkMap(glm::ivec3& cameraPos) {
-	static std::vector<glm::ivec3> tempErase;
+	static std::vector<glm::ivec3> tempCords;
 	for (auto& chunk : m_ActiveChunks) {
 		glm::ivec3 chunkCameraDist;
-		chunkCameraDist.x = std::abs(cameraPos.x - chunk.first.x);
-		chunkCameraDist.y = std::abs(cameraPos.y - chunk.first.y);
-		chunkCameraDist.z = std::abs(cameraPos.z - chunk.first.z);
+		chunkCameraDist.x = std::abs(m_PreviousCameraPos.x - chunk.first.x);
+		chunkCameraDist.y = std::abs(m_PreviousCameraPos.y - chunk.first.y);
+		chunkCameraDist.z = std::abs(m_PreviousCameraPos.z - chunk.first.z);
 
 		//Is the current chunk within the render distance
-		if (chunkCameraDist.x >= Chunk::CHUNK_SIZE * m_RenderDistance ||
-			chunkCameraDist.y >= Chunk::CHUNK_SIZE * m_RenderDistance ||
-			chunkCameraDist.z >= Chunk::CHUNK_SIZE * m_RenderDistance) {
+		if (chunkCameraDist.x > Chunk::CHUNK_SIZE * m_RenderDistance ||
+			chunkCameraDist.y > Chunk::CHUNK_SIZE * m_RenderDistance ||
+			chunkCameraDist.z > Chunk::CHUNK_SIZE * m_RenderDistance) {
 			Chunk::MemoryPool.push_back(chunk.second);
-			tempErase.push_back(chunk.first);
+			tempCords.push_back(chunk.first);
 		}
 	}
 
 	//Can't figure out how to erase inside of the top for each loop
-	for (auto& cords : tempErase) {
+	for (auto& cords : tempCords) {
 		m_ActiveChunks.erase(cords);
 	}
-	tempErase.clear();
+
+	for(auto& cords : tempCords) {
+		//This bool is because a deleted chunk shouldn't have more than one neighbor maybe
+		for (int i = -1; i < 2; i += 2) {
+			std::shared_ptr<Chunk> chunk = GetChunk({ cords.x + (Chunk::CHUNK_SIZE * i), cords.y, cords.z });
+			if (chunk != nullptr) {
+				chunk->GetFlags().ShouldGenerateMesh = true;
+			}
+
+			chunk = GetChunk({ cords.x, cords.y + (Chunk::CHUNK_SIZE * i), cords.z });
+			if (chunk != nullptr) {
+				chunk->GetFlags().ShouldGenerateMesh = true;
+			}
+
+			chunk = GetChunk({ cords.x, cords.y, cords.z + (Chunk::CHUNK_SIZE * i) });
+			if (chunk != nullptr) {
+				chunk->GetFlags().ShouldGenerateMesh = true;
+			}
+		}
+	}
+	tempCords.clear();
 
 	//TODO: Do this on another thread
 	for (int x = -m_RenderDistance; x <= m_RenderDistance; x++) {
 		for (int y = -m_RenderDistance; y <= m_RenderDistance; y++) {
 			for (int z = -m_RenderDistance; z <= m_RenderDistance; z++) {
-				glm::ivec3 newChunkPos = m_PreviousCameraPos - (glm::ivec3(x, y, z) * 16);
+				glm::ivec3 newChunkPos = m_PreviousCameraPos - (glm::ivec3(x, y, z) * Chunk::CHUNK_SIZE);
 				//Check if the chunkpos is already in the unordered_map
 				if (m_ActiveChunks.find(newChunkPos) == m_ActiveChunks.end()) {
 					// See if the MemoryPool already has a chunk or else loads a new one
@@ -167,14 +194,31 @@ void ChunkManager::UpdateChunkMap(glm::ivec3& cameraPos) {
 						Chunk::MemoryPool.back()->ReuseChunk(newChunkPos);
 						m_ActiveChunks.insert({ newChunkPos, Chunk::MemoryPool.back()});
 						Chunk::MemoryPool.pop_back();
+
+						tempCords.push_back(newChunkPos);
 					}
 				}
 			}
 		}
 	}
 
-	//TODO: Only update the chunk meshes of the chunks next to the added and removed chunks
-	for (auto& [key, chunk] : m_ActiveChunks) {
-		chunk->CreateMesh();
+	for (auto& cords : tempCords) {
+		for (int i = -1; i < 2; i += 2) {
+			std::shared_ptr<Chunk> chunk = GetChunk({ cords.x + (Chunk::CHUNK_SIZE * i), cords.y, cords.z });
+			if (chunk != nullptr) {
+				chunk->GetFlags().ShouldGenerateMesh = true;
+			}
+
+			chunk = GetChunk({ cords.x, cords.y + (Chunk::CHUNK_SIZE * i), cords.z });
+			if (chunk != nullptr) {
+				chunk->GetFlags().ShouldGenerateMesh = true;
+			}
+
+			chunk = GetChunk({ cords.x, cords.y, cords.z + (Chunk::CHUNK_SIZE * i) });
+			if (chunk != nullptr) {
+				chunk->GetFlags().ShouldGenerateMesh = true;
+			}
+		}
 	}
+	tempCords.clear();
 }

@@ -13,10 +13,19 @@ Chunk::Chunk(glm::ivec3 worldOffset, ChunkManager& manager) : m_ChunkManager(man
 									 std::vector<std::vector<Voxel>>(CHUNK_SIZE, 
 									 std::vector<Voxel>(CHUNK_SIZE)));
 
-	//I need to make this better
+	//TODO: Make this better
 	m_Indices.resize(18432);
 	m_Vertices.resize(12288);
 
+	ReuseChunk(worldOffset);
+}
+
+//This is used for so that I don't have to keep re allocating memory for new Chunks
+void Chunk::ReuseChunk(glm::ivec3 worldOffset) {
+	//Init variables
+	m_WorldOffset = worldOffset;
+
+	//Generate new Voxels
 	for (int i = 0; i < CHUNK_SIZE; i++) {
 		for (int j = 0; j < CHUNK_SIZE; j++) {
 			for (int k = 0; k < CHUNK_SIZE; k++) {
@@ -30,27 +39,13 @@ Chunk::Chunk(glm::ivec3 worldOffset, ChunkManager& manager) : m_ChunkManager(man
 			}
 		}
 	}
-	CreateBuffers();
-	ReuseChunk(worldOffset);
-}
-
-//This is used for so that I don't have to keep re allocating memory for new Chunks
-void Chunk::ReuseChunk(glm::ivec3 worldOffset) {
-	//Init variables
-	m_WorldOffset = worldOffset;
-
-	//Generate new Voxels
-}
-
-void Chunk::UpdateMesh(float dt) {
-
 }
 
 void Chunk::CreateMesh() {
 	m_VertIndex = 0;
 	m_IndicesIndex = 0;
 
-	// Face culling algorithm
+	//Get the chunks around this chunk
 	std::shared_ptr<Chunk> neighborChunks[6] = {
 		m_ChunkManager.GetChunk({ m_WorldOffset.x - CHUNK_SIZE, m_WorldOffset.y, m_WorldOffset.z }),
 		m_ChunkManager.GetChunk({ m_WorldOffset.x + CHUNK_SIZE, m_WorldOffset.y, m_WorldOffset.z }),
@@ -59,7 +54,7 @@ void Chunk::CreateMesh() {
 		m_ChunkManager.GetChunk({ m_WorldOffset.x, m_WorldOffset.y, m_WorldOffset.z - CHUNK_SIZE }),
 		m_ChunkManager.GetChunk({ m_WorldOffset.x, m_WorldOffset.y, m_WorldOffset.z + CHUNK_SIZE })
 	};
-	
+
 	for (int x = 0; x < CHUNK_SIZE; x++) {
 		for (int y = 0; y < CHUNK_SIZE; y++) {
 			for (int z = 0; z < CHUNK_SIZE; z++) {
@@ -69,6 +64,7 @@ void Chunk::CreateMesh() {
 
 				// Check for inactive voxels around the current voxel
 				if (x == 0) {
+																		//TODO: Fix this GetVoxel function call
 					if (neighborChunks[0] == nullptr || !neighborChunks[0]->GetVoxel({ 15, y, z }).IsActive()) {
 						AddLeftFace(tempCords);
 					}
@@ -131,19 +127,28 @@ void Chunk::CreateMesh() {
 		}
 	}
 
-	//Update the data that's in the buffers
-	UpdateBuffers();
+	m_Flags.ShouldGenerateMesh = false;
+	//Why try and render if there is nothing to render
+	if (m_VertIndex != 0) {
+		m_Flags.ShouldRender = true;
+		//Update the data that's in the buffers
+		CreateBuffers();
+		UpdateBuffers();
+	}
+	else {
+		m_Flags.ShouldRender = false;
+	}
 }
 
 void Chunk::CreateBuffers() {
 	m_VertexArray = RealEngine::VertexArray::Create();
-	m_VertexBuffer = RealEngine::VertexBuffer::Create(nullptr, sizeof(VoxelBuffer) * (uint32_t)m_Vertices.size());
+	m_VertexBuffer = RealEngine::VertexBuffer::Create(nullptr, sizeof(VoxelBuffer) * m_VertIndex);
 	m_VertexBuffer->SetLayout({
 		{ RealEngine::ShaderDataType::Float3, "a_Position" }
 	});
 	m_VertexArray->AddVertexBuffer(m_VertexBuffer);
 
-	RealEngine::Ref<RealEngine::IndexBuffer> indexBuffer = RealEngine::IndexBuffer::Create(nullptr, (uint32_t)m_Indices.size());
+	RealEngine::Ref<RealEngine::IndexBuffer> indexBuffer = RealEngine::IndexBuffer::Create(nullptr, m_IndicesIndex);
 
 	m_VertexArray->SetIndexBuffer(indexBuffer);
 }
