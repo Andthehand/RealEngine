@@ -13,6 +13,7 @@ project "VoxelSandbox"
 	}
 
 	includedirs {
+		"src",
 		"%{wks.location}/RealEngine/vendor/spdlog/include",
 		"%{wks.location}/RealEngine/src",
 		"%{wks.location}/RealEngine/vendor",

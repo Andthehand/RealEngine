@@ -1,6 +1,9 @@
 #pragma once
 #include "Chunk.h"
 
+#include "Threads/JobQueue.h"
+#include "Threads/WorkerThread.h"
+
 //This is for the unordered map
 namespace std {
 	template<> struct hash<glm::ivec3> {
@@ -19,7 +22,7 @@ class ChunkManager {
 public:
 	//Base functions
 	ChunkManager(glm::ivec3& cameraPos);
-	~ChunkManager() = default;
+	~ChunkManager();
 	void Render(RealEngine::EditorCamera& editorCamera);
 	void OnImGuiRender();
 
@@ -37,17 +40,23 @@ public:
 	//This is the amount of chunks that will be rendered in one direction around the camera
 	static const int WORLD_HEIGHT = 256;
 	int m_RenderDistance = 1;
-
-	//This is global so I can freeze the frustum culling
-	glm::vec4 m_FrustumPlanes[6];
 private:
 	inline glm::ivec3 Vec3ToChunkCords(glm::ivec3 cords);
 	inline glm::ivec3 ClampToNum(glm::ivec3& cords, int num);
 	void UpdateChunkMap(glm::ivec3& cameraPos);
 
+private:
+	//This is global so I can freeze the frustum culling
+	glm::vec4 m_FrustumPlanes[6];
+
 	glm::ivec3 m_PreviousCameraPos = glm::vec3(0);
 	std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>> m_ActiveChunks;
-
+	
 	bool m_FrustumFrozen = false;
 	Statistics m_Statistics;
+
+	//All of the stuff to do with threads
+	static const int NUM_THREADS = 1;
+	std::shared_ptr<JobQueue> m_JobQueue;
+	std::vector<std::unique_ptr<WorkerThread>> m_WorkerThreads;
 };

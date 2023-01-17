@@ -19,6 +19,19 @@ ChunkManager::ChunkManager(glm::ivec3& cameraPos) : m_PreviousCameraPos(ClampToN
 			}
 		}
 	}
+	
+
+	m_JobQueue = std::make_shared<JobQueue>();
+	//Initialize all of the worker threads
+	for (int i = 0; i < NUM_THREADS; i++) {
+		m_WorkerThreads.emplace_back(std::make_unique<WorkerThread>(m_JobQueue));
+	}
+
+	m_JobQueue->~JobQueue();
+}
+
+ChunkManager::~ChunkManager() {
+	m_JobQueue->Stop();
 }
 
 //This is used to get the frustum from the camera for frustum culling
@@ -120,6 +133,7 @@ void ChunkManager::OnImGuiRender() {
 		UpdateChunkMap(currentCameraPos);
 	}
 	if (ImGui::Button("Freeze Frustum")) m_FrustumFrozen = !m_FrustumFrozen;
+	if (ImGui::Button("Add Job")) m_JobQueue->Push([] { RE_INFO("Hello Thread!"); });
 }
 
 void ChunkManager::ResetStatistics() {
