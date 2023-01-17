@@ -98,16 +98,15 @@ void ChunkManager::Render(RealEngine::EditorCamera& editorCamera) {
 	//This is used for the frustum culling
 	if(!m_FrustumFrozen) ExtractFrustum(m_FrustumPlanes, editorCamera.GetViewProjection());
 	
-	uint32_t count = 0;
 	for (auto& [pos, chunk] : m_ActiveChunks) {
 		//Calcualte the boudning box of the chunk
 		glm::vec3 min = (glm::vec3)pos;
 		glm::vec3 max = (glm::vec3)pos + glm::vec3(Chunk::CHUNK_SIZE);
 		
 		if (chunk->m_Status == Chunk::Status::UpdateMesh) {
+			//Setting the Status to Proccessing so that it doesn't get added to the JobQueue agains
 			chunk->m_Status = Chunk::Status::Proccessing;
 			m_JobQueue->Push(std::bind(&Chunk::CreateMesh, chunk.get()));
-			count++;
 		}
 		else if (chunk->m_Status == Chunk::Status::UploadBuffers) {
 			chunk->CreateBuffers();
@@ -120,7 +119,6 @@ void ChunkManager::Render(RealEngine::EditorCamera& editorCamera) {
 			m_Statistics.ChunksRendered++;
 		}
 	}
-	if (count) RE_INFO("Count: {0}", count);
 }
 
 void ChunkManager::OnImGuiRender() {
@@ -130,7 +128,7 @@ void ChunkManager::OnImGuiRender() {
 	ImGui::Text("Distance: %i, %i, %i", m_Statistics.CameraDist.x, m_Statistics.CameraDist.y, m_Statistics.CameraDist.z);
 	ImGui::Text("Num Chunks Rendered %i", m_Statistics.ChunksRendered);
 	ImGui::Text("Num Chunks %i", m_ActiveChunks.size());
-	if (ImGui::SliderInt("Render Distance", &m_RenderDistance, 1, 10)) {
+	if (ImGui::SliderInt("Render Distance", &m_RenderDistance, 1, 20)) {
 		for (auto& [key, chunk] : m_ActiveChunks) {
 			chunk->m_Status = Chunk::Status::UpdateMesh;
 		}

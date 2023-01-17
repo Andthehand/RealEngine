@@ -9,10 +9,6 @@ struct VoxelBuffer {
 std::vector<std::shared_ptr<Chunk>> Chunk::MemoryPool;
 
 Chunk::Chunk(glm::ivec3 worldOffset, ChunkManager& manager) : m_ChunkManager(manager) {
-	m_Voxels = std::vector<std::vector<std::vector<Voxel>>>(CHUNK_SIZE, 
-									 std::vector<std::vector<Voxel>>(CHUNK_SIZE, 
-									 std::vector<Voxel>(CHUNK_SIZE)));
-
 	//TODO: Make this better
 	m_Indices.resize(18432);
 	m_Vertices.resize(12288);

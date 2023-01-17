@@ -39,7 +39,7 @@ public:
 public:
 	//This is the amount of chunks that will be rendered in one direction around the camera
 	static const int WORLD_HEIGHT = 256;
-	int m_RenderDistance = 1;
+	int m_RenderDistance = 10;
 private:
 	inline glm::ivec3 Vec3ToChunkCords(glm::ivec3 cords);
 	inline glm::ivec3 ClampToNum(glm::ivec3& cords, int num);

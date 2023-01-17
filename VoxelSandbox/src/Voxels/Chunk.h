@@ -45,7 +45,7 @@ private:
 	glm::ivec3 m_WorldOffset;
 
 	// 3D array of voxels
-	std::vector<std::vector<std::vector<Voxel>>> m_Voxels;
+	Voxel m_Voxels[16][16][16];
 
 	// vectors to hold vertex and index data for rendering
 	int m_VertIndex = 0;
