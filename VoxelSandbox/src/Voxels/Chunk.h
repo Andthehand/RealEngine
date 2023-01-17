@@ -13,21 +13,23 @@ public:
 	void ReuseChunk(glm::ivec3 worldOffset);
 
 	void CreateMesh();
+	void CreateBuffers();
 	void Render();
 
 	inline Voxel& GetVoxel(glm::ivec3 pos) { return m_Voxels[pos.x][pos.y][pos.z]; }
-
-	struct Flags {
-		bool ShouldRender = false;
-		bool ShouldGenerateMesh = true;
-	};
-	Flags& GetFlags() { return m_Flags; }
 public:
 	static const int CHUNK_SIZE = 16;
 	static std::vector<std::shared_ptr<Chunk>> MemoryPool;
-	
+
+	enum Status {
+		NoData,
+		Renderable,
+		UpdateMesh,
+		UploadBuffers,
+		Proccessing
+	};
+	Status m_Status;
 private:
-	void CreateBuffers();
 	void UpdateBuffers();
 
 	void AddLeftFace(glm::ivec3& pos);
@@ -39,8 +41,6 @@ private:
 
 private:
 	ChunkManager& m_ChunkManager;
-
-	Flags m_Flags;
 
 	glm::ivec3 m_WorldOffset;
 

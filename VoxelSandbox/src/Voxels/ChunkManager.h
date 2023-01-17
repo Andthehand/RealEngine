@@ -56,7 +56,7 @@ private:
 	Statistics m_Statistics;
 
 	//All of the stuff to do with threads
-	static const int NUM_THREADS = 1;
+	static const int NUM_THREADS = 8;
 	std::shared_ptr<JobQueue> m_JobQueue;
 	std::vector<std::unique_ptr<WorkerThread>> m_WorkerThreads;
 };

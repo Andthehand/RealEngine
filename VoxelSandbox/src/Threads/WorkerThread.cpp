@@ -17,6 +17,11 @@ void WorkerThread::Stop() {
 void WorkerThread::Run(){
 	while(m_Running) {
 		std::function<void()> job = m_JobQueue->Pop();
-		if(job != nullptr) job();
+		if (job != nullptr) {
+			job();
+		}
+		else {
+			return;
+		}
 	}
 }

@@ -4,6 +4,8 @@
 #include <functional>
 #include <condition_variable>
 
+#include <RealEngine.h>
+
 class JobQueue {
 public:
 	void Stop();

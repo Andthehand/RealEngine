@@ -39,6 +39,8 @@ void Chunk::ReuseChunk(glm::ivec3 worldOffset) {
 			}
 		}
 	}
+
+	m_Status = Status::UpdateMesh;
 }
 
 void Chunk::CreateMesh() {
@@ -127,16 +129,14 @@ void Chunk::CreateMesh() {
 		}
 	}
 
-	m_Flags.ShouldGenerateMesh = false;
+	m_Status = Status::NoData;
 	//Why try and render if there is nothing to render
 	if (m_VertIndex != 0) {
-		m_Flags.ShouldRender = true;
-		//Update the data that's in the buffers
-		CreateBuffers();
-		UpdateBuffers();
+		//Tells the main thread to upload the buffers
+		m_Status = Status::UploadBuffers;
 	}
 	else {
-		m_Flags.ShouldRender = false;
+		m_Status = Status::NoData;
 	}
 }
 
@@ -151,11 +151,15 @@ void Chunk::CreateBuffers() {
 	RealEngine::Ref<RealEngine::IndexBuffer> indexBuffer = RealEngine::IndexBuffer::Create(nullptr, m_IndicesIndex);
 
 	m_VertexArray->SetIndexBuffer(indexBuffer);
+
+	UpdateBuffers();
 }
 
 void Chunk::UpdateBuffers() {
 	m_VertexArray->GetVertexBuffers()[0]->SetData((void*)std::data(m_Vertices), sizeof(glm::vec3) * m_VertIndex);
 	m_VertexArray->GetIndexBuffer()->SetData(std::data(m_Indices), m_IndicesIndex);
+
+	m_Status = Status::Renderable;
 }
 
 void Chunk::Render() {

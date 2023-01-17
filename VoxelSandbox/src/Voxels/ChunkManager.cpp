@@ -1,5 +1,7 @@
 #include "ChunkManager.h"
 
+#include <functional>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_access.hpp>
 
@@ -26,8 +28,6 @@ ChunkManager::ChunkManager(glm::ivec3& cameraPos) : m_PreviousCameraPos(ClampToN
 	for (int i = 0; i < NUM_THREADS; i++) {
 		m_WorkerThreads.emplace_back(std::make_unique<WorkerThread>(m_JobQueue));
 	}
-
-	m_JobQueue->~JobQueue();
 }
 
 ChunkManager::~ChunkManager() {
@@ -104,13 +104,17 @@ void ChunkManager::Render(RealEngine::EditorCamera& editorCamera) {
 		glm::vec3 min = (glm::vec3)pos;
 		glm::vec3 max = (glm::vec3)pos + glm::vec3(Chunk::CHUNK_SIZE);
 		
-		if (chunk->GetFlags().ShouldGenerateMesh) {
-			chunk->CreateMesh();
+		if (chunk->m_Status == Chunk::Status::UpdateMesh) {
+			chunk->m_Status = Chunk::Status::Proccessing;
+			m_JobQueue->Push(std::bind(&Chunk::CreateMesh, chunk.get()));
 			count++;
+		}
+		else if (chunk->m_Status == Chunk::Status::UploadBuffers) {
+			chunk->CreateBuffers();
 		}
 
 		//This is the frustum culling
-		if (chunk->GetFlags().ShouldRender && IntersectFrustum(m_FrustumPlanes, min, max)) {
+		if (chunk->m_Status == Chunk::Status::Renderable && IntersectFrustum(m_FrustumPlanes, min, max)) {
 			//TODO: Put this into a display list
 			chunk->Render();
 			m_Statistics.ChunksRendered++;
@@ -128,7 +132,7 @@ void ChunkManager::OnImGuiRender() {
 	ImGui::Text("Num Chunks %i", m_ActiveChunks.size());
 	if (ImGui::SliderInt("Render Distance", &m_RenderDistance, 1, 10)) {
 		for (auto& [key, chunk] : m_ActiveChunks) {
-			chunk->GetFlags().ShouldGenerateMesh = true;
+			chunk->m_Status = Chunk::Status::UpdateMesh;
 		}
 		UpdateChunkMap(currentCameraPos);
 	}
@@ -182,17 +186,17 @@ void ChunkManager::UpdateChunkMap(glm::ivec3& cameraPos) {
 		for (int i = -1; i < 2; i += 2) {
 			std::shared_ptr<Chunk> chunk = GetChunk({ cords.x + (Chunk::CHUNK_SIZE * i), cords.y, cords.z });
 			if (chunk != nullptr) {
-				chunk->GetFlags().ShouldGenerateMesh = true;
+				chunk->m_Status = Chunk::Status::UpdateMesh;
 			}
 
 			chunk = GetChunk({ cords.x, cords.y + (Chunk::CHUNK_SIZE * i), cords.z });
 			if (chunk != nullptr) {
-				chunk->GetFlags().ShouldGenerateMesh = true;
+				chunk->m_Status = Chunk::Status::UpdateMesh;
 			}
 
 			chunk = GetChunk({ cords.x, cords.y, cords.z + (Chunk::CHUNK_SIZE * i) });
 			if (chunk != nullptr) {
-				chunk->GetFlags().ShouldGenerateMesh = true;
+				chunk->m_Status = Chunk::Status::UpdateMesh;
 			}
 		}
 	}
@@ -221,21 +225,22 @@ void ChunkManager::UpdateChunkMap(glm::ivec3& cameraPos) {
 		}
 	}
 
+	//ReLoad
 	for (auto& cords : tempCords) {
 		for (int i = -1; i < 2; i += 2) {
 			std::shared_ptr<Chunk> chunk = GetChunk({ cords.x + (Chunk::CHUNK_SIZE * i), cords.y, cords.z });
 			if (chunk != nullptr) {
-				chunk->GetFlags().ShouldGenerateMesh = true;
+				chunk->m_Status = Chunk::Status::UpdateMesh;
 			}
 
 			chunk = GetChunk({ cords.x, cords.y + (Chunk::CHUNK_SIZE * i), cords.z });
 			if (chunk != nullptr) {
-				chunk->GetFlags().ShouldGenerateMesh = true;
+				chunk->m_Status = Chunk::Status::UpdateMesh;
 			}
 
 			chunk = GetChunk({ cords.x, cords.y, cords.z + (Chunk::CHUNK_SIZE * i) });
 			if (chunk != nullptr) {
-				chunk->GetFlags().ShouldGenerateMesh = true;
+				chunk->m_Status = Chunk::Status::UpdateMesh;
 			}
 		}
 	}
