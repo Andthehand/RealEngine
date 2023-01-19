@@ -1,8 +1,7 @@
 #pragma once
 #include "Chunk.h"
 
-#include "Threads/JobQueue.h"
-#include "Threads/WorkerThread.h"
+#include <RealEngine/Utils/Threads/JobQueue.h>
 
 //This is for the unordered map
 namespace std {
@@ -39,7 +38,7 @@ public:
 public:
 	//This is the amount of chunks that will be rendered in one direction around the camera
 	static const int WORLD_HEIGHT = 256;
-	int m_RenderDistance = 10;
+	int m_RenderDistance = 5;
 private:
 	inline glm::ivec3 Vec3ToChunkCords(glm::ivec3 cords);
 	inline glm::ivec3 ClampToNum(glm::ivec3& cords, int num);
@@ -57,5 +56,5 @@ private:
 
 	//All of the stuff to do with threads
 	static const uint32_t NUM_MAX_THREADS = 6;
-	JobQueue m_JobQueue;
+	RealEngine::JobQueue m_JobQueue;
 };
