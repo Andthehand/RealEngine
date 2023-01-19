@@ -10,11 +10,14 @@ public:
 	Chunk(glm::ivec3 worldOffset, ChunkManager& manager);
 	~Chunk() = default;
 
-	void ReuseChunk(glm::ivec3 worldOffset);
+	void LoadVoxels();
 
 	void CreateMesh();
 	void CreateBuffers();
 	void Render();
+
+	glm::ivec3& GetPostition() { return m_WorldOffset; }
+	void SetPostition(glm::ivec3& position) { m_WorldOffset = position; }
 
 	inline Voxel& GetVoxel(glm::ivec3 pos) { return m_Voxels[pos.x][pos.y][pos.z]; }
 public:
@@ -22,13 +25,18 @@ public:
 	static std::vector<std::shared_ptr<Chunk>> MemoryPool;
 
 	enum Status {
+		//Load all of the Voxel data
+		Load,
+		//There is no Data to render
 		NoData,
 		Renderable,
+		//Mesh needs to be recreated
 		UpdateMesh,
-		UploadBuffers,
+		//Only the main thread can upload stuff to gpu
+		UploadBuffers,	
 		Proccessing
 	};
-	Status m_Status;
+	Status m_Status = Status::Load;
 private:
 	void UpdateBuffers();
 

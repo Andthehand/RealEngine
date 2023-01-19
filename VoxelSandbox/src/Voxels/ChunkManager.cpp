@@ -18,10 +18,10 @@ ChunkManager::ChunkManager(glm::ivec3& cameraPos) : m_PreviousCameraPos(ClampToN
 			for (int z = -m_RenderDistance; z <= m_RenderDistance; z++) {
 				glm::vec3 chunkPos = (ClampToNum(cameraPos, Chunk::CHUNK_SIZE)) - (glm::ivec3(x, y, z) * Chunk::CHUNK_SIZE);
 				m_ActiveChunks.insert({ chunkPos, std::make_shared<Chunk>(chunkPos, *this) });
+
 			}
 		}
 	}
-	
 
 	m_JobQueue = std::make_shared<JobQueue>();
 	//Initialize all of the worker threads
@@ -103,13 +103,21 @@ void ChunkManager::Render(RealEngine::EditorCamera& editorCamera) {
 		glm::vec3 min = (glm::vec3)pos;
 		glm::vec3 max = (glm::vec3)pos + glm::vec3(Chunk::CHUNK_SIZE);
 		
-		if (chunk->m_Status == Chunk::Status::UpdateMesh) {
-			//Setting the Status to Proccessing so that it doesn't get added to the JobQueue agains
-			chunk->m_Status = Chunk::Status::Proccessing;
-			m_JobQueue->Push(std::bind(&Chunk::CreateMesh, chunk.get()));
-		}
-		else if (chunk->m_Status == Chunk::Status::UploadBuffers) {
-			chunk->CreateBuffers();
+		switch (chunk->m_Status) {
+			case Chunk::Status::Load:
+				chunk->m_Status = Chunk::Status::Proccessing;
+				m_JobQueue->Push(std::bind(&Chunk::LoadVoxels, chunk.get()));
+				break;
+			
+			case Chunk::Status::UpdateMesh:
+				//Setting the Status to Proccessing so that it doesn't get added to the JobQueue agains
+				chunk->m_Status = Chunk::Status::Proccessing;
+				m_JobQueue->Push(std::bind(&Chunk::CreateMesh, chunk.get()));
+				break;
+			
+			case Chunk::Status::UploadBuffers:
+				chunk->CreateBuffers();
+				break;
 		}
 
 		//This is the frustum culling
@@ -212,7 +220,7 @@ void ChunkManager::UpdateChunkMap(glm::ivec3& cameraPos) {
 						m_ActiveChunks.insert({ newChunkPos, std::make_shared<Chunk>(newChunkPos, *this) });
 					}
 					else {
-						Chunk::MemoryPool.back()->ReuseChunk(newChunkPos);
+						Chunk::MemoryPool.back()->SetPostition(newChunkPos);
 						m_ActiveChunks.insert({ newChunkPos, Chunk::MemoryPool.back()});
 						Chunk::MemoryPool.pop_back();
 
@@ -223,7 +231,7 @@ void ChunkManager::UpdateChunkMap(glm::ivec3& cameraPos) {
 		}
 	}
 
-	//ReLoad
+	//TODO: Make this way better
 	for (auto& cords : tempCords) {
 		for (int i = -1; i < 2; i += 2) {
 			std::shared_ptr<Chunk> chunk = GetChunk({ cords.x + (Chunk::CHUNK_SIZE * i), cords.y, cords.z });
@@ -242,5 +250,11 @@ void ChunkManager::UpdateChunkMap(glm::ivec3& cameraPos) {
 			}
 		}
 	}
+
+	for (auto& cords : tempCords) {
+		std::shared_ptr<Chunk> chunk = GetChunk(cords);
+		chunk->m_Status = Chunk::Status::Load;
+	}
+
 	tempCords.clear();
 }

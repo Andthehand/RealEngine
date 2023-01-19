@@ -8,30 +8,25 @@ struct VoxelBuffer {
 
 std::vector<std::shared_ptr<Chunk>> Chunk::MemoryPool;
 
-Chunk::Chunk(glm::ivec3 worldOffset, ChunkManager& manager) : m_ChunkManager(manager) {
+Chunk::Chunk(glm::ivec3 worldOffset, ChunkManager& manager) : m_WorldOffset(worldOffset), m_ChunkManager(manager) {
 	//TODO: Make this better
 	m_Indices.resize(18432);
 	m_Vertices.resize(12288);
-
-	ReuseChunk(worldOffset);
 }
 
 //This is used for so that I don't have to keep re allocating memory for new Chunks
-void Chunk::ReuseChunk(glm::ivec3 worldOffset) {
-	//Init variables
-	m_WorldOffset = worldOffset;
-
+void Chunk::LoadVoxels() {
 	//Generate new Voxels
 	for (int i = 0; i < CHUNK_SIZE; i++) {
 		for (int j = 0; j < CHUNK_SIZE; j++) {
 			for (int k = 0; k < CHUNK_SIZE; k++) {
-				m_Voxels[i][j][k].SetActive(true);
-				//if (k % 2 == 0 && j % 2 == 0 && i % 2 == 0) {
-				//	m_Voxels[i][j][k].SetActive(true);
-				//}
-				//else {
-				//	m_Voxels[i][j][k].SetActive(false);
-				//}
+				//m_Voxels[i][j][k].SetActive(true);
+				if (k % 2 == 0 && j % 2 == 0 && i % 2 == 0) {
+					m_Voxels[i][j][k].SetActive(true);
+				}
+				else {
+					m_Voxels[i][j][k].SetActive(false);
+				}
 			}
 		}
 	}
