@@ -20,13 +20,13 @@ void Chunk::LoadVoxels() {
 	for (int i = 0; i < CHUNK_SIZE; i++) {
 		for (int j = 0; j < CHUNK_SIZE; j++) {
 			for (int k = 0; k < CHUNK_SIZE; k++) {
-				//m_Voxels[i][j][k].SetActive(true);
-				if (k % 2 == 0 && j % 2 == 0 && i % 2 == 0) {
-					m_Voxels[i][j][k].SetActive(true);
-				}
-				else {
-					m_Voxels[i][j][k].SetActive(false);
-				}
+				m_Voxels[i][j][k].SetActive(true);
+				//if (k % 2 == 0 && j % 2 == 0 && i % 2 == 0) {
+				//	m_Voxels[i][j][k].SetActive(true);
+				//}
+				//else {
+				//	m_Voxels[i][j][k].SetActive(false);
+				//}
 			}
 		}
 	}

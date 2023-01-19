@@ -7,7 +7,7 @@
 
 #include "imgui/imgui.h"
 
-ChunkManager::ChunkManager(glm::ivec3& cameraPos) : m_PreviousCameraPos(ClampToNum(cameraPos, Chunk::CHUNK_SIZE)) {
+ChunkManager::ChunkManager(glm::ivec3& cameraPos) : m_PreviousCameraPos(ClampToNum(cameraPos, Chunk::CHUNK_SIZE)), m_JobQueue(NUM_MAX_THREADS) {
 	m_ActiveChunks.reserve((2 * m_RenderDistance + 1) ^ 3);
 	Chunk::MemoryPool.reserve((2 * m_RenderDistance + 1) ^ 3);
 
@@ -22,16 +22,10 @@ ChunkManager::ChunkManager(glm::ivec3& cameraPos) : m_PreviousCameraPos(ClampToN
 			}
 		}
 	}
-
-	m_JobQueue = std::make_shared<JobQueue>();
-	//Initialize all of the worker threads
-	for (int i = 0; i < NUM_THREADS; i++) {
-		m_WorkerThreads.emplace_back(std::make_unique<WorkerThread>(m_JobQueue));
-	}
 }
 
 ChunkManager::~ChunkManager() {
-	m_JobQueue->Stop();
+	m_JobQueue.Stop();
 }
 
 //This is used to get the frustum from the camera for frustum culling
@@ -106,13 +100,13 @@ void ChunkManager::Render(RealEngine::EditorCamera& editorCamera) {
 		switch (chunk->m_Status) {
 			case Chunk::Status::Load:
 				chunk->m_Status = Chunk::Status::Proccessing;
-				m_JobQueue->Push(std::bind(&Chunk::LoadVoxels, chunk.get()));
+				m_JobQueue.Push(std::bind(&Chunk::LoadVoxels, chunk.get()));
 				break;
 			
 			case Chunk::Status::UpdateMesh:
 				//Setting the Status to Proccessing so that it doesn't get added to the JobQueue agains
 				chunk->m_Status = Chunk::Status::Proccessing;
-				m_JobQueue->Push(std::bind(&Chunk::CreateMesh, chunk.get()));
+				m_JobQueue.Push(std::bind(&Chunk::CreateMesh, chunk.get()));
 				break;
 			
 			case Chunk::Status::UploadBuffers:
@@ -143,7 +137,7 @@ void ChunkManager::OnImGuiRender() {
 		UpdateChunkMap(currentCameraPos);
 	}
 	if (ImGui::Button("Freeze Frustum")) m_FrustumFrozen = !m_FrustumFrozen;
-	if (ImGui::Button("Add Job")) m_JobQueue->Push([] { RE_INFO("Hello Thread!"); });
+	if (ImGui::Button("Add Job")) m_JobQueue.Push([] { RE_INFO("Hello Thread!"); });
 }
 
 void ChunkManager::ResetStatistics() {

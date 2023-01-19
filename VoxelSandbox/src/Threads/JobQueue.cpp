@@ -1,5 +1,11 @@
 #include "JobQueue.h"
 
+JobQueue::JobQueue(uint32_t numThreads) {
+	for (uint32_t i = 0; i < numThreads; i++) {
+		m_WorkerThreads.emplace_back(std::make_unique<WorkerThread>(*this));
+	}
+}
+
 void JobQueue::Stop() {
 	m_Running = false;
 	m_CV.notify_all();

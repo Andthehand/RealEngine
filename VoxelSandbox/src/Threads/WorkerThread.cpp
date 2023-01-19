@@ -1,7 +1,8 @@
 #include "WorkerThread.h"
 
+#include "JobQueue.h"
 
-WorkerThread::WorkerThread(std::shared_ptr<JobQueue> queue) : m_JobQueue(queue) {
+WorkerThread::WorkerThread(JobQueue& queue) : m_JobQueue(queue) {
 	m_Thread = std::thread(&WorkerThread::Run, this);
 }
 
@@ -16,7 +17,7 @@ void WorkerThread::Stop() {
 
 void WorkerThread::Run(){
 	while(m_Running) {
-		std::function<void()> job = m_JobQueue->Pop();
+		std::function<void()> job = m_JobQueue.Pop();
 		if (job != nullptr) {
 			job();
 		}

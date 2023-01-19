@@ -39,7 +39,7 @@ public:
 public:
 	//This is the amount of chunks that will be rendered in one direction around the camera
 	static const int WORLD_HEIGHT = 256;
-	int m_RenderDistance = 1;
+	int m_RenderDistance = 10;
 private:
 	inline glm::ivec3 Vec3ToChunkCords(glm::ivec3 cords);
 	inline glm::ivec3 ClampToNum(glm::ivec3& cords, int num);
@@ -56,7 +56,6 @@ private:
 	Statistics m_Statistics;
 
 	//All of the stuff to do with threads
-	static const int NUM_THREADS = 8;
-	std::shared_ptr<JobQueue> m_JobQueue;
-	std::vector<std::unique_ptr<WorkerThread>> m_WorkerThreads;
+	static const uint32_t NUM_MAX_THREADS = 6;
+	JobQueue m_JobQueue;
 };

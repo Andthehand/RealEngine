@@ -6,8 +6,12 @@
 
 #include <RealEngine.h>
 
+#include "WorkerThread.h"
+
 class JobQueue {
 public:
+	JobQueue(uint32_t numThreads);
+
 	void Stop();
 
 	void Push(std::function<void()> job);
@@ -21,4 +25,6 @@ private:
 
 	//This is used to notify the worker threads when a job is added
 	std::condition_variable m_CV;
+
+	std::vector<std::unique_ptr<WorkerThread>> m_WorkerThreads;
 };
