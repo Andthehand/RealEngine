@@ -55,6 +55,6 @@ private:
 	Statistics m_Statistics;
 
 	//All of the stuff to do with threads
-	static const uint32_t NUM_MAX_THREADS = 6;
+	static const uint32_t NUM_MAX_THREADS = 1;
 	RealEngine::JobQueue m_JobQueue;
 };

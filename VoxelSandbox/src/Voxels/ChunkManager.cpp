@@ -112,13 +112,14 @@ void ChunkManager::Render(RealEngine::EditorCamera& editorCamera) {
 			case Chunk::Status::UploadBuffers:
 				chunk->CreateBuffers();
 				break;
-		}
 
-		//This is the frustum culling
-		if (chunk->m_Status == Chunk::Status::Renderable && IntersectFrustum(m_FrustumPlanes, min, max)) {
-			//TODO: Put this into a display list
-			chunk->Render();
-			m_Statistics.ChunksRendered++;
+			case Chunk::Status::Renderable:
+				//This is the frustum culling
+				if(IntersectFrustum(m_FrustumPlanes, min, max))
+				//TODO: Put this into a display list
+				chunk->Render();
+				m_Statistics.ChunksRendered++;
+				break;
 		}
 	}
 }
