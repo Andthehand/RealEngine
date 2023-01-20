@@ -8,8 +8,8 @@
 
 namespace RealEngine {
 	static GLenum ShaderTypeFromString(const std::string& type) {
-		//if (type == "geometry")
-		//	return GL_GEOMETRY_SHADER; 
+		if (type == "geometry")
+			return GL_GEOMETRY_SHADER; 
 		if (type == "vertex")
 			return GL_VERTEX_SHADER;
 		if (type == "fragment" || type == "pixel")
@@ -104,7 +104,7 @@ namespace RealEngine {
 
 		GLuint program = glCreateProgram();
 		RE_CORE_ASSERT(shaderSources.size() <= 2, "We only support 2 shaders for now");
-		std::array<GLenum, 2> glShaderIDs;
+		std::array<GLenum, 3> glShaderIDs;
 		int glShaderIDIndex = 0;
 		for (auto& kv : shaderSources) {
 			GLenum type = kv.first;
