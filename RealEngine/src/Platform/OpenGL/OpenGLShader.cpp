@@ -8,6 +8,8 @@
 
 namespace RealEngine {
 	static GLenum ShaderTypeFromString(const std::string& type) {
+		//if (type == "geometry")
+		//	return GL_GEOMETRY_SHADER; 
 		if (type == "vertex")
 			return GL_VERTEX_SHADER;
 		if (type == "fragment" || type == "pixel")

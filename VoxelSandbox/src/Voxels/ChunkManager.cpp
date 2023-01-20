@@ -18,7 +18,6 @@ ChunkManager::ChunkManager(glm::ivec3& cameraPos) : m_PreviousCameraPos(ClampToN
 			for (int z = -m_RenderDistance; z <= m_RenderDistance; z++) {
 				glm::vec3 chunkPos = (ClampToNum(cameraPos, Chunk::CHUNK_SIZE)) - (glm::ivec3(x, y, z) * Chunk::CHUNK_SIZE);
 				m_ActiveChunks.insert({ chunkPos, std::make_shared<Chunk>(chunkPos, *this) });
-
 			}
 		}
 	}
@@ -86,7 +85,7 @@ void ChunkManager::Render(RealEngine::EditorCamera& editorCamera) {
 		cameraDist.y >= Chunk::CHUNK_SIZE || 
 		cameraDist.z >= Chunk::CHUNK_SIZE) {
 		m_PreviousCameraPos = ClampToNum(currentCameraPos, Chunk::CHUNK_SIZE);
-		UpdateChunkMap(currentCameraPos);
+		m_JobQueue.Push(std::bind(&ChunkManager::UpdateChunks, this));
 	}
 
 	//This is used for the frustum culling
@@ -135,7 +134,7 @@ void ChunkManager::OnImGuiRender() {
 		for (auto& [key, chunk] : m_ActiveChunks) {
 			chunk->m_Status = Chunk::Status::UpdateMesh;
 		}
-		UpdateChunkMap(currentCameraPos);
+		m_JobQueue.Push(std::bind(&ChunkManager::UpdateChunks, this));
 	}
 	if (ImGui::Button("Freeze Frustum")) m_FrustumFrozen = !m_FrustumFrozen;
 	if (ImGui::Button("Add Job")) m_JobQueue.Push([] { RE_INFO("Hello Thread!"); });
@@ -160,7 +159,7 @@ inline glm::ivec3 ChunkManager::ClampToNum(glm::ivec3& cords, int num) {
 }
 
 //This checks the m_ActiveChunks to discard chunks to far away and add chunks that are in render distance
-void ChunkManager::UpdateChunkMap(glm::ivec3& cameraPos) {
+void ChunkManager::UpdateChunks() {
 	static std::vector<glm::ivec3> tempCords;
 	for (auto& chunk : m_ActiveChunks) {
 		glm::ivec3 chunkCameraDist;
@@ -212,6 +211,7 @@ void ChunkManager::UpdateChunkMap(glm::ivec3& cameraPos) {
 				if (m_ActiveChunks.find(newChunkPos) == m_ActiveChunks.end()) {
 					// See if the MemoryPool already has a chunk or else loads a new one
 					if (Chunk::MemoryPool.empty()) {
+						//m_JobQueue.Push([&] {m_ActiveChunks.insert({ newChunkPos, std::make_shared<Chunk>(newChunkPos, *this) }); });
 						m_ActiveChunks.insert({ newChunkPos, std::make_shared<Chunk>(newChunkPos, *this) });
 					}
 					else {
