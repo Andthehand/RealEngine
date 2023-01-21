@@ -56,6 +56,15 @@ namespace RealEngine {
 	//------------------------------------
 	// IndexBuffer -----------------------
 	//------------------------------------
+	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t count) {
+		RE_PROFILE_FUNCTION();
+
+		//Create and bind EBO to VAO
+		glCreateBuffers(1, &m_RendererID);
+		glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
+		glBufferData(GL_ARRAY_BUFFER, count * sizeof(uint32_t), nullptr, GL_STATIC_DRAW);
+	}
+
 	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count) : m_Count(count) {
 		RE_PROFILE_FUNCTION();
 

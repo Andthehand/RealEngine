@@ -36,18 +36,17 @@ public:
 
 	//If you can't find the chunk then return a nullptr
 	std::shared_ptr<Chunk> GetChunk(glm::ivec3 chunkPos) { return (m_ActiveChunks.find(chunkPos) != m_ActiveChunks.end()) ? m_ActiveChunks.find(chunkPos)->second : nullptr; }
-
-public:
-	//This is the amount of chunks that will be rendered in one direction around the camera
-	static const int WORLD_HEIGHT = 256;
-	//TODO: Make a Seperate load distance that should be at least 1 larger than the rendender distance
-	int m_RenderDistance = 5;
 private:
 	inline glm::ivec3 Vec3ToChunkCords(glm::ivec3 cords);
 	inline glm::ivec3 ClampToNum(glm::ivec3& cords, int num);
 	void UpdateChunks();
 
 private:
+	//This is the amount of chunks that will be rendered in one direction around the camera
+	static const int WORLD_HEIGHT = 256;
+	//TODO: Make a Seperate load distance that should be at least 1 larger than the rendender distance
+	int m_RenderDistance = 1;
+	
 	//This is global so I can freeze the frustum culling
 	glm::vec4 m_FrustumPlanes[6];
 

@@ -12,7 +12,8 @@ namespace RealEngine {
 
 		virtual void SetClearColor(const glm::vec4& color) override;
 		virtual void Clear() override;
-
+		
+		virtual void DrawArrays(const Ref<VertexArray>&vertexArray, uint32_t mode, int count, int start = 0) override;
 		virtual void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount = 0) override;
 	};
 }

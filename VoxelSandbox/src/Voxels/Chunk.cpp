@@ -133,13 +133,13 @@ void Chunk::CreateMesh() {
 
 void Chunk::CreateBuffers() {
 	m_VertexArray = RealEngine::VertexArray::Create();
-	m_VertexBuffer = RealEngine::VertexBuffer::Create(nullptr, sizeof(VoxelBuffer) * m_VertIndex);
+	m_VertexBuffer = RealEngine::VertexBuffer::Create(sizeof(VoxelBuffer) * m_VertIndex);
 	m_VertexBuffer->SetLayout({
 		{ RealEngine::ShaderDataType::Float3, "a_Position" }
 	});
 	m_VertexArray->AddVertexBuffer(m_VertexBuffer);
 
-	RealEngine::Ref<RealEngine::IndexBuffer> indexBuffer = RealEngine::IndexBuffer::Create(nullptr, m_IndicesIndex);
+	RealEngine::Ref<RealEngine::IndexBuffer> indexBuffer = RealEngine::IndexBuffer::Create(m_IndicesIndex);
 
 	m_VertexArray->SetIndexBuffer(indexBuffer);
 
@@ -162,8 +162,8 @@ void Chunk::Render() {
 void Chunk::AddLeftFace(glm::ivec3& pos) {
 	m_Vertices[m_VertIndex++] = pos;
 	m_Vertices[m_VertIndex++] = glm::vec3(pos.x,pos. y, pos.z + 1);
-	m_Vertices[m_VertIndex++] = glm::vec3(pos.x ,pos. y + 1, pos.z + 1);;
-	m_Vertices[m_VertIndex++] = glm::vec3(pos.x ,pos. y + 1, pos.z);;
+	m_Vertices[m_VertIndex++] = glm::vec3(pos.x ,pos. y + 1, pos.z + 1);
+	m_Vertices[m_VertIndex++] = glm::vec3(pos.x ,pos. y + 1, pos.z);
 	// Add the indices for the vertices of the left face
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 4;
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 3;
@@ -176,8 +176,8 @@ void Chunk::AddLeftFace(glm::ivec3& pos) {
 // Helper function to add a face to the right side of the current voxel
 void Chunk::AddRightFace(glm::ivec3& pos) {
 	m_Vertices[m_VertIndex++] = glm::vec3(pos.x + 1,pos. y, pos.z);
-	m_Vertices[m_VertIndex++] = glm::vec3(pos.x + 1,pos. y + 1, pos.z);;
-	m_Vertices[m_VertIndex++] = glm::vec3(pos.x  + 1,pos. y + 1, pos.z + 1);;
+	m_Vertices[m_VertIndex++] = glm::vec3(pos.x + 1,pos. y + 1, pos.z);
+	m_Vertices[m_VertIndex++] = glm::vec3(pos.x  + 1,pos. y + 1, pos.z + 1);
 	m_Vertices[m_VertIndex++] = glm::vec3(pos.x + 1,pos. y, pos.z + 1);
 	// Add the indices for the vertices of the right face
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 4;
@@ -205,10 +205,10 @@ void Chunk::AddBottomFace(glm::ivec3& pos) {
 
 // Helper function to add a face to the top side of the current voxel
 void Chunk::AddTopFace(glm::ivec3& pos) {
-	m_Vertices[m_VertIndex++] = glm::vec3(pos.x ,pos. y + 1, pos.z);;
-	m_Vertices[m_VertIndex++] = glm::vec3(pos.x ,pos. y + 1, pos.z + 1);;
-	m_Vertices[m_VertIndex++] = glm::vec3(pos.x  + 1,pos. y + 1, pos.z + 1);;
-	m_Vertices[m_VertIndex++] = glm::vec3(pos.x + 1,pos. y + 1, pos.z);;
+	m_Vertices[m_VertIndex++] = glm::vec3(pos.x ,pos. y + 1, pos.z);
+	m_Vertices[m_VertIndex++] = glm::vec3(pos.x ,pos. y + 1, pos.z + 1);
+	m_Vertices[m_VertIndex++] = glm::vec3(pos.x  + 1,pos. y + 1, pos.z + 1);
+	m_Vertices[m_VertIndex++] = glm::vec3(pos.x + 1,pos. y + 1, pos.z);
 	// Add the indices for the vertices of the top face
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 4;
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 3;
@@ -221,8 +221,8 @@ void Chunk::AddTopFace(glm::ivec3& pos) {
 // Helper function to add a face to the back side of the current voxel
 void Chunk::AddBackFace(glm::ivec3& pos) {
 	m_Vertices[m_VertIndex++] = pos;
-	m_Vertices[m_VertIndex++] = glm::vec3(pos.x ,pos. y + 1, pos.z);;
-	m_Vertices[m_VertIndex++] = glm::vec3(pos.x + 1,pos. y + 1, pos.z);;
+	m_Vertices[m_VertIndex++] = glm::vec3(pos.x ,pos. y + 1, pos.z);
+	m_Vertices[m_VertIndex++] = glm::vec3(pos.x + 1,pos. y + 1, pos.z);
 	m_Vertices[m_VertIndex++] = glm::vec3(pos.x + 1,pos. y, pos.z);
 	// Add the indices for the vertices of the back face
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 4;
@@ -237,8 +237,8 @@ void Chunk::AddBackFace(glm::ivec3& pos) {
 void Chunk::AddFrontFace(glm::ivec3& pos) {
 	m_Vertices[m_VertIndex++] = glm::vec3(pos.x,pos. y, pos.z + 1);
 	m_Vertices[m_VertIndex++] = glm::vec3(pos.x + 1,pos. y, pos.z + 1);
-	m_Vertices[m_VertIndex++] = glm::vec3(pos.x  + 1,pos. y + 1, pos.z + 1);;
-	m_Vertices[m_VertIndex++] = glm::vec3(pos.x ,pos. y + 1, pos.z + 1);;
+	m_Vertices[m_VertIndex++] = glm::vec3(pos.x  + 1,pos. y + 1, pos.z + 1);
+	m_Vertices[m_VertIndex++] = glm::vec3(pos.x ,pos. y + 1, pos.z + 1);
 	// Add the indices for the vertices of the front face
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 4;
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 3;

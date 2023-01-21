@@ -103,8 +103,8 @@ namespace RealEngine {
 		RE_PROFILE_FUNCTION();
 
 		GLuint program = glCreateProgram();
-		RE_CORE_ASSERT(shaderSources.size() <= 2, "We only support 2 shaders for now");
-		std::array<GLenum, 3> glShaderIDs;
+		RE_CORE_ASSERT(shaderSources.size() <= 3, "We only support 3 shaders for now");
+		std::array<GLenum, 3> glShaderIDs = { 0xffff, 0xffff, 0xffff };
 		int glShaderIDIndex = 0;
 		for (auto& kv : shaderSources) {
 			GLenum type = kv.first;
@@ -160,8 +160,9 @@ namespace RealEngine {
 			// We don't need the program anymore.
 			glDeleteProgram(program);
 			for (GLenum glShaderID : glShaderIDs) {
-				// Don't leak shaders either.
-				glDeleteShader(glShaderID);
+				if(glShaderID != 0xffff)
+					// Don't leak shaders either.
+					glDeleteShader(glShaderID);
 			}
 
 			RE_CORE_ERROR("{0}", infoLog.data());
@@ -171,8 +172,10 @@ namespace RealEngine {
 
 		// Always detach shaders after a successful link.
 		for (GLenum glShaderID : glShaderIDs) {
-			glDetachShader(program, glShaderID);
-			glDeleteShader(glShaderID);
+			if (glShaderID != 0xffff) {
+				glDetachShader(program, glShaderID);
+				glDeleteShader(glShaderID);
+			}
 		}
 		m_RendererID = program;
 	}

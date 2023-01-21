@@ -25,6 +25,17 @@ namespace RealEngine {
 		return nullptr;
 	}
 
+	Ref<IndexBuffer> IndexBuffer::Create(uint32_t count)
+	{
+		switch (Renderer::GetAPI()) {
+			case RendererAPI::API::None:    RE_CORE_ASSERT(false, "RenderAPI::None is currently not supported!"); return nullptr;
+			case RendererAPI::API::OpenGL:  return CreateRef<OpenGLIndexBuffer>(count);
+		}
+
+		RE_CORE_ASSERT(false, "Unkown RendererAPI!");
+		return nullptr;
+	}
+
 	Ref<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t count) {
 		switch (Renderer::GetAPI()) {
 			case RendererAPI::API::None:    RE_CORE_ASSERT(false, "RenderAPI::None is currently not supported!"); return nullptr;
