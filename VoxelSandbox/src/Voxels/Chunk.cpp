@@ -8,11 +8,8 @@ struct VoxelBuffer {
 
 std::vector<std::shared_ptr<Chunk>> Chunk::MemoryPool;
 
-Chunk::Chunk(glm::ivec3 worldOffset, ChunkManager& manager) : m_WorldOffset(worldOffset), m_ChunkManager(manager) {
-	//TODO: Make this better
-	m_Indices.resize(18432);
-	m_Vertices.resize(12288);
-}
+Chunk::Chunk(glm::ivec3 worldOffset, ChunkManager& manager) 
+	: m_WorldOffset(worldOffset), m_ChunkManager(manager) { }
 
 //This is used for so that I don't have to keep re allocating memory for new Chunks
 void Chunk::LoadVoxels() {
@@ -52,6 +49,15 @@ void Chunk::CreateMesh() {
 		for (int y = 0; y < CHUNK_SIZE; y++) {
 			for (int z = 0; z < CHUNK_SIZE; z++) {
 				if (!m_Voxels[x][y][z].IsActive()) continue;
+
+				if (m_VertIndex + 24 > m_Vertices.size()) {
+					m_Vertices.resize(m_VertIndex + 24);
+				}
+				if (m_IndicesIndex + 36 > m_Indices.size()) {
+					m_Indices.resize(m_IndicesIndex + 36);
+				}
+
+
 
 				glm::ivec3 tempCords = { x + m_WorldOffset.x, y + m_WorldOffset.y, z + m_WorldOffset.z };
 
@@ -128,6 +134,9 @@ void Chunk::CreateMesh() {
 	}
 	else {
 		m_Status = Status::NoData;
+		//Set the vectors to no size or capacity to save memory
+		std::vector<glm::vec3>().swap(m_Vertices);
+		std::vector<uint32_t>().swap(m_Indices);
 	}
 }
 
