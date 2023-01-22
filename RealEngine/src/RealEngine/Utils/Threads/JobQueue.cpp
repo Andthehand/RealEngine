@@ -35,4 +35,9 @@ namespace RealEngine {
 		m_Jobs.pop();
 		return job;
 	}
+
+	void JobQueue::Clear() {
+		std::queue<std::function<void()>>().swap(m_Jobs);
+	}
+
 }

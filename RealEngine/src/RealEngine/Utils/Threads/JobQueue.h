@@ -16,7 +16,7 @@ namespace RealEngine {
 
 		void Push(std::function<void()> job);
 		std::function<void()> Pop();
-
+		void Clear();
 	private:
 		std::queue<std::function<void()>> m_Jobs;
 		std::mutex m_Mtx;

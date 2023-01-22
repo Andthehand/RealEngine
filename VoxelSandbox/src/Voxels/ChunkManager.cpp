@@ -85,12 +85,12 @@ void ChunkManager::Render(RealEngine::EditorCamera& editorCamera) {
 		cameraDist.y >= Chunk::CHUNK_SIZE || 
 		cameraDist.z >= Chunk::CHUNK_SIZE) {
 		m_PreviousCameraPos = ClampToNum(currentCameraPos, Chunk::CHUNK_SIZE);
-		m_JobQueue.Push(std::bind(&ChunkManager::UpdateChunks, this));
+		//m_JobQueue.Push(std::bind(&ChunkManager::UpdateChunks, this));
+		UpdateChunks();
 	}
 
 	//This is used for the frustum culling
 	if(!m_FrustumFrozen) ExtractFrustum(m_FrustumPlanes, editorCamera.GetViewProjection());
-	
 	for (auto& [pos, chunk] : m_ActiveChunks) {
 		//Calcualte the boudning box of the chunk
 		glm::vec3 min = (glm::vec3)pos;
@@ -134,7 +134,9 @@ void ChunkManager::OnImGuiRender() {
 		for (auto& [key, chunk] : m_ActiveChunks) {
 			chunk->m_Status = Chunk::Status::UpdateMesh;
 		}
-		m_JobQueue.Push(std::bind(&ChunkManager::UpdateChunks, this));
+		m_JobQueue.Clear();
+		//m_JobQueue.Push(std::bind(&ChunkManager::UpdateChunks, this));
+		UpdateChunks();
 	}
 	if (ImGui::Button("Freeze Frustum")) m_FrustumFrozen = !m_FrustumFrozen;
 	if (ImGui::Button("Add Job")) m_JobQueue.Push([] { RE_INFO("Hello Thread!"); });
@@ -215,8 +217,7 @@ void ChunkManager::UpdateChunks() {
 						m_ActiveChunks.insert({ newChunkPos, std::make_shared<Chunk>(newChunkPos, *this) });
 					}
 					else {
-						Chunk::MemoryPool.back()->SetPostition(newChunkPos);
-						m_ActiveChunks.insert({ newChunkPos, Chunk::MemoryPool.back()});
+						m_ActiveChunks.insert({ newChunkPos, Chunk::MemoryPool.back()}).first->second->SetPostition(newChunkPos);
 						Chunk::MemoryPool.pop_back();
 
 						tempCords.push_back(newChunkPos);

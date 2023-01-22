@@ -2,6 +2,7 @@
 #include "Chunk.h"
 
 #include <RealEngine/Utils/Threads/JobQueue.h>
+#include <shared_mutex>
 
 //This is for the unordered map
 namespace std {
@@ -57,6 +58,6 @@ private:
 	Statistics m_Statistics;
 
 	//All of the stuff to do with threads
-	static const uint32_t NUM_MAX_THREADS = 1;
+	static const uint32_t NUM_MAX_THREADS = 8;
 	RealEngine::JobQueue m_JobQueue;
 };
