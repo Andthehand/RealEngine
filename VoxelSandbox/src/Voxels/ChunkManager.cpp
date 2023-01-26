@@ -7,16 +7,22 @@
 
 #include "imgui/imgui.h"
 
-ChunkManager::ChunkManager(glm::ivec3& cameraPos) : m_PreviousCameraPos(ClampToNum(cameraPos, Chunk::CHUNK_SIZE)), m_JobQueue(NUM_MAX_THREADS) {
+#include "Constants.h"
+
+ChunkManager::ChunkManager(glm::ivec3& cameraPos) 
+	: m_PreviousCameraPos(ClampToNum(cameraPos, Constants::CHUNK_SIZE)), m_JobQueue(Constants::NUM_MAX_THREADS) {
 	m_ActiveChunks.reserve((2 * m_RenderDistance + 1) ^ 3);
 	Chunk::MemoryPool.reserve((2 * m_RenderDistance + 1) ^ 3);
+
+	//m_Texture = RealEngine::Texture2D::Create("assets/textures/awesomeface.png");
+	m_Texture = RealEngine::Texture2D::Create("assets/textures/container.jpg");
 
 	//TODO: Move this to a seperate  function?
 	//Populate m_ActiveChunks with actaul chunks
 	for (int x = -m_RenderDistance; x <= m_RenderDistance; x++) {
 		for (int y = -m_RenderDistance; y <= m_RenderDistance; y++) {
 			for (int z = -m_RenderDistance; z <= m_RenderDistance; z++) {
-				glm::vec3 chunkPos = (ClampToNum(cameraPos, Chunk::CHUNK_SIZE)) - (glm::ivec3(x, y, z) * Chunk::CHUNK_SIZE);
+				glm::vec3 chunkPos = (ClampToNum(cameraPos, Constants::CHUNK_SIZE)) - (glm::ivec3(x, y, z) * Constants::CHUNK_SIZE);
 				m_ActiveChunks.insert({ chunkPos, std::make_shared<Chunk>(chunkPos, *this) });
 			}
 		}
@@ -70,7 +76,7 @@ bool IntersectFrustum(const glm::vec4* frustumPlanes, const glm::vec3& min, cons
 	return true;
 }
 
-glm::ivec3 currentCameraPos;
+glm::ivec3 currentCameraPos = {0, 0, 0};
 void ChunkManager::Render(RealEngine::EditorCamera& editorCamera) {
 	ResetStatistics();
 
@@ -81,10 +87,10 @@ void ChunkManager::Render(RealEngine::EditorCamera& editorCamera) {
 	cameraDist.y = std::abs(currentCameraPos.y - m_PreviousCameraPos.y);
 	cameraDist.z = std::abs(currentCameraPos.z - m_PreviousCameraPos.z);
 	m_Statistics.CameraDist = cameraDist;
-	if (cameraDist.x >= Chunk::CHUNK_SIZE || 
-		cameraDist.y >= Chunk::CHUNK_SIZE || 
-		cameraDist.z >= Chunk::CHUNK_SIZE) {
-		m_PreviousCameraPos = ClampToNum(currentCameraPos, Chunk::CHUNK_SIZE);
+	if (cameraDist.x >= Constants::CHUNK_SIZE || 
+		cameraDist.y >= Constants::CHUNK_SIZE || 
+		cameraDist.z >= Constants::CHUNK_SIZE) {
+		m_PreviousCameraPos = ClampToNum(currentCameraPos, Constants::CHUNK_SIZE);
 		//m_JobQueue.Push(std::bind(&ChunkManager::UpdateChunks, this));
 		UpdateChunks();
 	}
@@ -94,7 +100,7 @@ void ChunkManager::Render(RealEngine::EditorCamera& editorCamera) {
 	for (auto& [pos, chunk] : m_ActiveChunks) {
 		//Calcualte the boudning box of the chunk
 		glm::vec3 min = (glm::vec3)pos;
-		glm::vec3 max = (glm::vec3)pos + glm::vec3(Chunk::CHUNK_SIZE);
+		glm::vec3 max = (glm::vec3)pos + glm::vec3(Constants::CHUNK_SIZE);
 		
 		switch (chunk->m_Status) {
 			case Chunk::Status::Load:
@@ -114,8 +120,9 @@ void ChunkManager::Render(RealEngine::EditorCamera& editorCamera) {
 
 			case Chunk::Status::Renderable:
 				//This is the frustum culling
-				if(IntersectFrustum(m_FrustumPlanes, min, max))
+				if (IntersectFrustum(m_FrustumPlanes, min, max))
 				//TODO: Put this into a display list
+				m_Texture->Bind();
 				chunk->Render();
 				m_Statistics.ChunksRendered++;
 				break;
@@ -149,9 +156,9 @@ void ChunkManager::ResetStatistics() {
 //Formats { 15, 32, -16 } to { 0, 2, -1 }
 inline glm::ivec3 ChunkManager::Vec3ToChunkCords(glm::ivec3 cords) {
 	//Floor only returns a float and cast to float so that the divide is a float divide not an int divide
-	int x = (int)std::floor((float)cords.x / Chunk::CHUNK_SIZE);
-	int y = (int)std::floor((float)cords.y / Chunk::CHUNK_SIZE);
-	int z = (int)std::floor((float)cords.z / Chunk::CHUNK_SIZE);
+	int x = (int)std::floor((float)cords.x / Constants::CHUNK_SIZE);
+	int y = (int)std::floor((float)cords.y / Constants::CHUNK_SIZE);
+	int z = (int)std::floor((float)cords.z / Constants::CHUNK_SIZE);
 	return glm::ivec3(x, y, z);
 }
 
@@ -170,9 +177,9 @@ void ChunkManager::UpdateChunks() {
 		chunkCameraDist.z = std::abs(m_PreviousCameraPos.z - chunk.first.z);
 
 		//Is the current chunk within the render distance
-		if (chunkCameraDist.x > Chunk::CHUNK_SIZE * m_RenderDistance ||
-			chunkCameraDist.y > Chunk::CHUNK_SIZE * m_RenderDistance ||
-			chunkCameraDist.z > Chunk::CHUNK_SIZE * m_RenderDistance) {
+		if (chunkCameraDist.x > Constants::CHUNK_SIZE * m_RenderDistance ||
+			chunkCameraDist.y > Constants::CHUNK_SIZE * m_RenderDistance ||
+			chunkCameraDist.z > Constants::CHUNK_SIZE * m_RenderDistance) {
 			Chunk::MemoryPool.push_back(chunk.second);
 			tempCords.push_back(chunk.first);
 		}
@@ -186,17 +193,17 @@ void ChunkManager::UpdateChunks() {
 	for(auto& cords : tempCords) {
 		//This bool is because a deleted chunk shouldn't have more than one neighbor maybe
 		for (int i = -1; i < 2; i += 2) {
-			std::shared_ptr<Chunk> chunk = GetChunk({ cords.x + (Chunk::CHUNK_SIZE * i), cords.y, cords.z });
+			std::shared_ptr<Chunk> chunk = GetChunk({ cords.x + (Constants::CHUNK_SIZE * i), cords.y, cords.z });
 			if (chunk != nullptr) {
 				chunk->m_Status = Chunk::Status::UpdateMesh;
 			}
 
-			chunk = GetChunk({ cords.x, cords.y + (Chunk::CHUNK_SIZE * i), cords.z });
+			chunk = GetChunk({ cords.x, cords.y + (Constants::CHUNK_SIZE * i), cords.z });
 			if (chunk != nullptr) {
 				chunk->m_Status = Chunk::Status::UpdateMesh;
 			}
 
-			chunk = GetChunk({ cords.x, cords.y, cords.z + (Chunk::CHUNK_SIZE * i) });
+			chunk = GetChunk({ cords.x, cords.y, cords.z + (Constants::CHUNK_SIZE * i) });
 			if (chunk != nullptr) {
 				chunk->m_Status = Chunk::Status::UpdateMesh;
 			}
@@ -208,7 +215,7 @@ void ChunkManager::UpdateChunks() {
 	for (int x = -m_RenderDistance; x <= m_RenderDistance; x++) {
 		for (int y = -m_RenderDistance; y <= m_RenderDistance; y++) {
 			for (int z = -m_RenderDistance; z <= m_RenderDistance; z++) {
-				glm::ivec3 newChunkPos = m_PreviousCameraPos - (glm::ivec3(x, y, z) * Chunk::CHUNK_SIZE);
+				glm::ivec3 newChunkPos = m_PreviousCameraPos - (glm::ivec3(x, y, z) * Constants::CHUNK_SIZE);
 				//Check if the chunkpos is already in the unordered_map
 				if (m_ActiveChunks.find(newChunkPos) == m_ActiveChunks.end()) {
 					// See if the MemoryPool already has a chunk or else loads a new one
@@ -230,17 +237,17 @@ void ChunkManager::UpdateChunks() {
 	//TODO: Make this way better
 	for (auto& cords : tempCords) {
 		for (int i = -1; i < 2; i += 2) {
-			std::shared_ptr<Chunk> chunk = GetChunk({ cords.x + (Chunk::CHUNK_SIZE * i), cords.y, cords.z });
+			std::shared_ptr<Chunk> chunk = GetChunk({ cords.x + (Constants::CHUNK_SIZE * i), cords.y, cords.z });
 			if (chunk != nullptr) {
 				chunk->m_Status = Chunk::Status::UpdateMesh;
 			}
 
-			chunk = GetChunk({ cords.x, cords.y + (Chunk::CHUNK_SIZE * i), cords.z });
+			chunk = GetChunk({ cords.x, cords.y + (Constants::CHUNK_SIZE * i), cords.z });
 			if (chunk != nullptr) {
 				chunk->m_Status = Chunk::Status::UpdateMesh;
 			}
 
-			chunk = GetChunk({ cords.x, cords.y, cords.z + (Chunk::CHUNK_SIZE * i) });
+			chunk = GetChunk({ cords.x, cords.y, cords.z + (Constants::CHUNK_SIZE * i) });
 			if (chunk != nullptr) {
 				chunk->m_Status = Chunk::Status::UpdateMesh;
 			}

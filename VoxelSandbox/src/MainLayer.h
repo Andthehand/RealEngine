@@ -2,6 +2,8 @@
 #include <RealEngine.h>
 
 #include "Voxels/ChunkManager.h"
+#include "PerlinTexture.h"
+#include "Constants.h"
 
 class MainLayer : public RealEngine::Layer {
 public:
@@ -22,6 +24,13 @@ private:
 	RealEngine::Ref<RealEngine::Shader> m_ChunkShader;
 	RealEngine::EditorCamera m_EditorCamera;
 	ChunkManager m_ChunkManager;
+
+	int m_Width = 500;
+	int m_Height = 500;
+	float m_Precition = Constants::NOISE_STEP;
+	PerlinTexture m_Texture;
+
+	bool m_Wireframe = false;
 
 	//FPS counter
 	float deltaTime = 0.0f;

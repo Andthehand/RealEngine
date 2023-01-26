@@ -21,7 +21,6 @@ public:
 
 	inline Voxel& GetVoxel(glm::ivec3 pos) { return m_Voxels[pos.x][pos.y][pos.z]; }
 public:
-	static const int CHUNK_SIZE = 16;
 	static std::vector<std::shared_ptr<Chunk>> MemoryPool;
 
 	enum Status {
@@ -56,8 +55,12 @@ private:
 	Voxel m_Voxels[16][16][16];
 
 	// vectors to hold vertex and index data for rendering
+	struct VoxelBuffer {
+		glm::vec3 Position;
+		glm::vec2 TexCords;
+	};
 	int m_VertIndex = 0;
-	std::vector<glm::vec3> m_Vertices;
+	std::vector<VoxelBuffer> m_Vertices;
 	int m_IndicesIndex = 0;
 	std::vector<uint32_t> m_Indices;
 

@@ -1,12 +1,11 @@
 #include "MainLayer.h"
 
-#include "imgui/imgui.h"
+#include <imgui/imgui.h>
+
 
 MainLayer::MainLayer() : m_EditorCamera(90.0f, (float)(RealEngine::Application::Get().GetWindow().GetWidth() / RealEngine::Application::Get().GetWindow().GetHeight()), 0.1f, 1000.0f),
-						m_ChunkManager((glm::ivec3)m_EditorCamera.GetPosition()) {
+						m_ChunkManager((glm::ivec3)m_EditorCamera.GetPosition()), m_Texture(m_Width, m_Height){
 	m_ChunkShader = RealEngine::Shader::Create("assets/shaders/Chunk.glsl");
-	
-	RealEngine::RenderCommand::SetWireFrame(true);
 }
 
 void MainLayer::OnUpdate(RealEngine::Timestep ts) {
@@ -27,8 +26,21 @@ void MainLayer::OnImGuiRender() {
 
 	ImGui::Text("FPS: %f", fps);
 
-	ImGui::Text("Camera Pos: %f, %f, %f", m_EditorCamera.GetPosition().x, m_EditorCamera.GetPosition().z, m_EditorCamera.GetPosition().y);
+	ImGui::Text("Camera Facing: %f, %f, %f", m_EditorCamera.GetForwardDirection().x, m_EditorCamera.GetForwardDirection().y, m_EditorCamera.GetForwardDirection().z);
+	ImGui::Text("Camera Pos: %f, %f, %f", m_EditorCamera.GetPosition().x, m_EditorCamera.GetPosition().y, m_EditorCamera.GetPosition().z);
 	m_ChunkManager.OnImGuiRender();
+	if(ImGui::Button("Wireframe")) { 
+		m_Wireframe = !m_Wireframe;
+		RealEngine::RenderCommand::SetWireFrame(m_Wireframe); 
+	}
+	ImGui::End();
+
+	ImGui::Begin("Perlin Noise");
+	if (ImGui::InputInt("Width", &m_Width)) { m_Texture.Regenerate((uint32_t)m_Width, (uint32_t)m_Height, m_Precition); }
+	ImGui::SameLine();
+	if (ImGui::InputInt("Height", &m_Height)) { m_Texture.Regenerate((uint32_t)m_Width, (uint32_t)m_Height, m_Precition); }
+	if (ImGui::InputFloat("Precition", &m_Precition)) { m_Texture.Regenerate(m_Width, m_Height, m_Precition); }
+	ImGui::Image((void*)(intptr_t)m_Texture.GetTexture()->GetRendererID(), ImVec2((float)m_Width, (float)m_Height));
 
 	ImGui::End();
 }

@@ -19,6 +19,7 @@
 #include "RealEngine/Scene/Components.h"
 
 #include "RealEngine/Utils/Threads/JobQueue.h"
+#include "RealEngine/Utils/PerlinNoise.h"
 
 // ---Renderer------------------------
 #include "RealEngine/Renderer/Renderer.h"

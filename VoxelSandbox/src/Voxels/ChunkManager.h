@@ -43,13 +43,13 @@ private:
 	void UpdateChunks();
 
 private:
-	//This is the amount of chunks that will be rendered in one direction around the camera
-	static const int WORLD_HEIGHT = 256;
 	//TODO: Make a Seperate load distance that should be at least 1 larger than the rendender distance
-	int m_RenderDistance = 1;
+	int m_RenderDistance = 10;
 	
 	//This is global so I can freeze the frustum culling
 	glm::vec4 m_FrustumPlanes[6];
+
+	RealEngine::Ref<RealEngine::Texture2D> m_Texture;
 
 	glm::ivec3 m_PreviousCameraPos = glm::vec3(0);
 	std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>> m_ActiveChunks;
@@ -57,7 +57,5 @@ private:
 	bool m_FrustumFrozen = false;
 	Statistics m_Statistics;
 
-	//All of the stuff to do with threads
-	static const uint32_t NUM_MAX_THREADS = 8;
 	RealEngine::JobQueue m_JobQueue;
 };
