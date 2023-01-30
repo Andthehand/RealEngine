@@ -19,9 +19,9 @@ void MainLayer::OnUpdate(RealEngine::Timestep ts) {
 	m_ChunkShader->Bind();
 	m_ChunkShader->SetMat4("u_ViewProjection", m_EditorCamera.GetViewProjection());
 	
-	//m_ChunkManager.Render(m_EditorCamera);
+	m_ChunkManager.Render(m_EditorCamera);
 
-	TestFunction();
+	//TestFunction();
 }
 
 void MainLayer::OnImGuiRender() {

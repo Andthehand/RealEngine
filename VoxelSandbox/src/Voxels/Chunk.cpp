@@ -47,66 +47,70 @@ void Chunk::CreateMesh() {
 
 				glm::ivec3 tempCords = { x + m_WorldOffset.x, y + m_WorldOffset.y, z + m_WorldOffset.z };
 
+				const glm::vec2* voxelSideTexCords = m_Voxels[x][y][z].GetTexCord(VoxelSide::Side);
+				const glm::vec2* voxelTopTexCords = m_Voxels[x][y][z].GetTexCord(VoxelSide::Top);
+				const glm::vec2* voxelBottomTexCords = m_Voxels[x][y][z].GetTexCord(VoxelSide::Bottom);
+
 				/// Check for inactive voxels around the current voxel
 				if (x == 0) {
 																	//TODO: Fix this GetVoxel function call
 					if (neighborChunks[0] == nullptr || !neighborChunks[0]->GetVoxel({ 15, y, z }).IsActive()) {
-						AddLeftFace(tempCords);
+						AddLeftFace(tempCords, voxelSideTexCords);
 					}
 				}
 				else if (!m_Voxels[x - 1][y][z].IsActive()) {
 					// Add a face to the vertices and indices for the left side
-					AddLeftFace(tempCords);
+					AddLeftFace(tempCords, voxelSideTexCords);
 				}
 
 				if (x == Constants::CHUNK_SIZE - 1) {
 					if (neighborChunks[1] == nullptr || !neighborChunks[1]->GetVoxel({ 0, y, z }).IsActive()) {
-						AddRightFace(tempCords);
+						AddRightFace(tempCords, voxelSideTexCords);
 					}
 				}
 				else if (!m_Voxels[x + 1][y][z].IsActive()) {
 					// Add a face to the vertices and indices for the right side
-					AddRightFace(tempCords);
+					AddRightFace(tempCords, voxelSideTexCords);
 				}
 
 				if (y == 0) {
 					if (neighborChunks[2] == nullptr || !neighborChunks[2]->GetVoxel({ x, 15, z }).IsActive()) {
-						AddBottomFace(tempCords);
+						AddBottomFace(tempCords, voxelBottomTexCords);
 					}
 				}
 				else if (!m_Voxels[x][y - 1][z].IsActive()) {
 					// Add a face to the vertices and indices for the bottom side
-					AddBottomFace(tempCords);
+					AddBottomFace(tempCords, voxelBottomTexCords);
 				}
 
 				if (y == Constants::CHUNK_SIZE - 1) {
 					if (neighborChunks[3] == nullptr || !neighborChunks[3]->GetVoxel({ x, 0, z }).IsActive()) {
-						AddTopFace(tempCords);
+						AddTopFace(tempCords, voxelTopTexCords);
 					}
 				}
 				else if (!m_Voxels[x][y + 1][z].IsActive()) {
 					// Add a face to the vertices and indices for the top side
-					AddTopFace(tempCords);
+					AddTopFace(tempCords, voxelTopTexCords);
 				}
 
 				if (z == 0) {
 					if (neighborChunks[4] == nullptr || !neighborChunks[4]->GetVoxel({ x, y, 15 }).IsActive()) {
-						AddBackFace(tempCords);
+						AddBackFace(tempCords, voxelSideTexCords);
 					}
 				}
 				else if (!m_Voxels[x][y][z - 1].IsActive()) {
 					// Add a face to the vertices and indices for the back side
-					AddBackFace(tempCords);
+					AddBackFace(tempCords, voxelSideTexCords);
 				}
 				
 				if (z == Constants::CHUNK_SIZE - 1) {
 					if (neighborChunks[5] == nullptr || !neighborChunks[5]->GetVoxel({ x , y, 0 }).IsActive()) {
-						AddFrontFace(tempCords);
+						AddFrontFace(tempCords, voxelSideTexCords);
 					}
 				}
 				else if (!m_Voxels[x][y][z + 1].IsActive()) {
 					// Add a face to the vertices and indices for the front side
-					AddFrontFace(tempCords);
+					AddFrontFace(tempCords, voxelSideTexCords);
 				}
 			}
 		}
@@ -155,11 +159,11 @@ void Chunk::Render() {
 }
 
 // Helper function to add a face to the left side of the current voxel
-void Chunk::AddLeftFace(glm::ivec3& pos) {
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos), { 0.0f, 0.0f } };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x,pos.y, pos.z + 1), { 1.0f, 0.0f } };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x ,pos.y + 1, pos.z + 1), { 1.0f, 1.0f } };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x ,pos.y + 1, pos.z), { 0.0f, 1.0f } };
+void Chunk::AddLeftFace(glm::ivec3& pos, const glm::vec2* texCords) {
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos), texCords[0] };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x,pos.y, pos.z + 1), texCords[1] };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x ,pos.y + 1, pos.z + 1), texCords[2] };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x ,pos.y + 1, pos.z), texCords[3] };
 	// Add the indices for the vertices of the left face
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 4;
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 3;
@@ -170,11 +174,11 @@ void Chunk::AddLeftFace(glm::ivec3& pos) {
 }
 
 // Helper function to add a face to the right side of the current voxel
-void Chunk::AddRightFace(glm::ivec3& pos) {
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1,pos.y, pos.z), { 1.0f, 0.0f } };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1,pos.y + 1, pos.z), { 1.0f, 1.0f } };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1,pos. y + 1, pos.z + 1), { 0.0f, 1.0f } };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1,pos. y, pos.z + 1), { 0.0f, 0.0f } };
+void Chunk::AddRightFace(glm::ivec3& pos, const glm::vec2* texCords) {
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1,pos.y, pos.z), texCords[1] };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1,pos.y + 1, pos.z), texCords[2] };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1,pos. y + 1, pos.z + 1), texCords[3] };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1,pos. y, pos.z + 1), texCords[0] };
 	// Add the indices for the vertices of the right face
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 4;
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 3;
@@ -185,11 +189,11 @@ void Chunk::AddRightFace(glm::ivec3& pos) {
 }
 
 // Helper function to add a face to the bottom side of the current voxel
-void Chunk::AddBottomFace(glm::ivec3& pos) {
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos), { 1.0f, 0.0f } };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y, pos.z), { 1.0f, 1.0f } };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y, pos.z + 1), { 0.0f, 1.0f } };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x, pos.y, pos.z + 1), { 0.0f, 0.0f } };
+void Chunk::AddBottomFace(glm::ivec3& pos, const glm::vec2* texCords) {
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos), texCords[1] };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y, pos.z), texCords[2] };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y, pos.z + 1), texCords[3] };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x, pos.y, pos.z + 1), texCords[0] };
 	// Add the indices for the vertices of the bottom face
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 4;
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 3;
@@ -200,11 +204,11 @@ void Chunk::AddBottomFace(glm::ivec3& pos) {
 }
 
 // Helper function to add a face to the top side of the current voxel
-void Chunk::AddTopFace(glm::ivec3& pos) {
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x , pos.y + 1, pos.z), { 0.0f, 0.0f } };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x , pos.y + 1, pos.z + 1), { 1.0f, 0.0f } };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y + 1, pos.z + 1), { 1.0f, 1.0f } };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y + 1, pos.z), { 0.0f, 1.0f } };
+void Chunk::AddTopFace(glm::ivec3& pos, const glm::vec2* texCords) {
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x , pos.y + 1, pos.z), texCords[0] };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x , pos.y + 1, pos.z + 1), texCords[1] };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y + 1, pos.z + 1), texCords[2] };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y + 1, pos.z), texCords[3] };
 	// Add the indices for the vertices of the top face
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 4;
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 3;
@@ -215,11 +219,11 @@ void Chunk::AddTopFace(glm::ivec3& pos) {
 }
 
 // Helper function to add a face to the back side of the current voxel
-void Chunk::AddBackFace(glm::ivec3& pos) {
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos), { 1.0f, 0.0f } };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x ,pos.y + 1, pos.z), { 1.0f, 1.0f } };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y + 1, pos.z), { 0.0f, 1.0f } };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y, pos.z), { 0.0f, 0.0f } };
+void Chunk::AddBackFace(glm::ivec3& pos, const glm::vec2* texCords) {
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos), texCords[1] };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x ,pos.y + 1, pos.z), texCords[2] };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y + 1, pos.z), texCords[3] };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y, pos.z), texCords[0] };
 	// Add the indices for the vertices of the back face
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 4;
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 3;
@@ -230,12 +234,12 @@ void Chunk::AddBackFace(glm::ivec3& pos) {
 }
 
 // Helper function to add a face to the front side of the current voxel
-void Chunk::AddFrontFace(glm::ivec3& pos) {
+void Chunk::AddFrontFace(glm::ivec3& pos, const glm::vec2* texCords) {
 	
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y + 1, pos.z + 1), { 1.0f, 1.0f } };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x , pos.y + 1, pos.z + 1), { 0.0f, 1.0f } };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x, pos.y, pos.z + 1), { 0.0f, 0.0f } };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y, pos.z + 1), { 1.0f, 0.0f } };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y + 1, pos.z + 1), texCords[2] };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x , pos.y + 1, pos.z + 1), texCords[3] };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x, pos.y, pos.z + 1), texCords[0] };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y, pos.z + 1), texCords[1] };
 	
 	// Add the indices for the vertices of the front face
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 4;

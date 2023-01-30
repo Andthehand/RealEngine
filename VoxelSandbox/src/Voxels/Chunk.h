@@ -21,6 +21,7 @@ public:
 
 	inline Voxel& GetVoxel(glm::ivec3 pos) { return m_Voxels[pos.x][pos.y][pos.z]; }
 public:
+	//This is used by the Chunk manager for better memory manigment
 	static std::vector<std::shared_ptr<Chunk>> MemoryPool;
 
 	enum Status {
@@ -39,12 +40,12 @@ public:
 private:
 	void UpdateBuffers();
 
-	void AddLeftFace(glm::ivec3& pos);
-	void AddRightFace(glm::ivec3& pos);
-	void AddBottomFace(glm::ivec3& pos);
-	void AddTopFace(glm::ivec3& pos);
-	void AddBackFace(glm::ivec3& pos);
-	void AddFrontFace(glm::ivec3& pos);
+	void AddLeftFace(glm::ivec3& pos, const glm::vec2* texCords);
+	void AddRightFace(glm::ivec3& pos, const glm::vec2* texCords);
+	void AddBottomFace(glm::ivec3& pos, const glm::vec2* texCords);
+	void AddTopFace(glm::ivec3& pos, const glm::vec2* texCords);
+	void AddBackFace(glm::ivec3& pos, const glm::vec2* texCords);
+	void AddFrontFace(glm::ivec3& pos, const glm::vec2* texCords);
 
 private:
 	ChunkManager& m_ChunkManager;

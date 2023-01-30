@@ -20,6 +20,7 @@ public:
 				for (uint32_t y = 0; y < Constants::CHUNK_SIZE; y++) {
 					int voxelWorldHeight = y + worldPos.y;
 					m_Voxels[x][y][z].SetActive(voxelWorldHeight < height);
+					m_Voxels[x][y][z].SetBlockType(VoxelType::BlockType_Grass);
 				}
 			}
 		}

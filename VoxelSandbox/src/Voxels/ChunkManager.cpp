@@ -15,7 +15,8 @@ ChunkManager::ChunkManager(glm::ivec3& cameraPos)
 	Chunk::MemoryPool.reserve((2 * m_RenderDistance + 1) ^ 3);
 
 	//m_Texture = RealEngine::Texture2D::Create("assets/textures/awesomeface.png");
-	m_Texture = RealEngine::Texture2D::Create("assets/textures/container.jpg");
+	m_Texture = RealEngine::Texture2D::Create("assets/textures/Spritesheet.png");
+	Voxel::CreateTextureCords(m_Texture);
 
 	//TODO: Move this to a seperate  function?
 	//Populate m_ActiveChunks with actaul chunks
@@ -80,7 +81,8 @@ glm::ivec3 currentCameraPos = {0, 0, 0};
 void ChunkManager::Render(RealEngine::EditorCamera& editorCamera) {
 	ResetStatistics();
 
-	currentCameraPos = editorCamera.GetPosition();
+	if(!m_FreezePos)
+		currentCameraPos = editorCamera.GetPosition();
 	
 	glm::ivec3 cameraDist;
 	cameraDist.x = std::abs(currentCameraPos.x - m_PreviousCameraPos.x);
@@ -97,11 +99,7 @@ void ChunkManager::Render(RealEngine::EditorCamera& editorCamera) {
 
 	//This is used for the frustum culling
 	if(!m_FrustumFrozen) ExtractFrustum(m_FrustumPlanes, editorCamera.GetViewProjection());
-	for (auto& [pos, chunk] : m_ActiveChunks) {
-		//Calcualte the boudning box of the chunk
-		glm::vec3 min = (glm::vec3)pos;
-		glm::vec3 max = (glm::vec3)pos + glm::vec3(Constants::CHUNK_SIZE);
-		
+	for (auto& [pos, chunk] : m_ActiveChunks) {		
 		switch (chunk->m_Status) {
 			case Chunk::Status::Load:
 				chunk->m_Status = Chunk::Status::Proccessing;
@@ -119,12 +117,17 @@ void ChunkManager::Render(RealEngine::EditorCamera& editorCamera) {
 				break;
 
 			case Chunk::Status::Renderable:
-				//This is the frustum culling
-				if (IntersectFrustum(m_FrustumPlanes, min, max))
-				//TODO: Put this into a display list
-				m_Texture->Bind();
-				chunk->Render();
-				m_Statistics.ChunksRendered++;
+				//Calcualte the boudning box of the chunk
+				glm::vec3 min = (glm::vec3)pos;
+				glm::vec3 max = (glm::vec3)pos + glm::vec3(Constants::CHUNK_SIZE);
+
+				//Check if the chunk is intersecting
+				if (IntersectFrustum(m_FrustumPlanes, min, max)) {
+					//TODO: Put this into a display list
+					m_Texture->Bind();
+					chunk->Render();
+					m_Statistics.ChunksRendered++;
+				}
 				break;
 		}
 	}
@@ -142,11 +145,15 @@ void ChunkManager::OnImGuiRender() {
 			chunk->m_Status = Chunk::Status::UpdateMesh;
 		}
 		m_JobQueue.Clear();
-		//m_JobQueue.Push(std::bind(&ChunkManager::UpdateChunks, this));
 		UpdateChunks();
 	}
+	if (ImGui::Button("Regenerate Terrain")) {
+		for (auto& [key, chunk] : m_ActiveChunks) {
+			chunk->m_Status = Chunk::Status::UpdateMesh;
+		}
+	}
 	if (ImGui::Button("Freeze Frustum")) m_FrustumFrozen = !m_FrustumFrozen;
-	if (ImGui::Button("Add Job")) m_JobQueue.Push([] { RE_INFO("Hello Thread!"); });
+	if (ImGui::Button("Freeze Position")) m_FreezePos = !m_FreezePos;
 }
 
 void ChunkManager::ResetStatistics() {

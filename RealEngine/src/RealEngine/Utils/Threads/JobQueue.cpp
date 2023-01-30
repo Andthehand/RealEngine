@@ -16,6 +16,7 @@ namespace RealEngine {
 
 	void JobQueue::Stop() {
 		m_Running = false;
+		Clear();
 		m_CV.notify_all();
 	}
 
