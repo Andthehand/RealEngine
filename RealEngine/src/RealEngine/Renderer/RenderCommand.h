@@ -32,6 +32,14 @@ namespace RealEngine {
 		inline static void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount = 0) {
 			s_RendererAPI->DrawIndexed(vertexArray, indexCount);
 		}
+
+		inline static void DrawArrays(const Ref<VertexArray>& vertexArray, uint32_t mode, uint32_t verticeCount, uint32_t instanceCount, uint32_t start = 0) {
+			s_RendererAPI->DrawArraysInstanced(vertexArray, mode, verticeCount, instanceCount, start);
+		}
+
+		inline static void DrawIndexedInstanced(const Ref<VertexArray>& vertexArray, uint32_t instanceCount, uint32_t indexCount = 0) {
+			s_RendererAPI->DrawIndexedInstanced(vertexArray, instanceCount, indexCount);
+		}
 	private:
 		static Scope<RendererAPI> s_RendererAPI;
 	};

@@ -58,15 +58,24 @@ namespace RealEngine {
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	}
 
-	void OpenGLRendererAPI::DrawArrays(const Ref<VertexArray>& vertexArray, uint32_t mode, int count, int start) {
-		vertexArray->Bind();
-		glDrawArrays(mode, count, count);
+	void OpenGLRendererAPI::DrawArrays(const Ref<VertexArray>& vertexArray, uint32_t mode, uint32_t count, uint32_t start) {
+		glDrawArrays(mode, start, count);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount) {
 		uint32_t count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();
 		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+	void OpenGLRendererAPI::DrawArraysInstanced(const Ref<VertexArray>& vertexArray, uint32_t mode, uint32_t verticeCount, uint32_t instanceCount, uint32_t start) {
+		glDrawArraysInstanced(mode, start, verticeCount, instanceCount);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+	void OpenGLRendererAPI::DrawIndexedInstanced(const Ref<VertexArray>& vertexArray, uint32_t instanceCount, uint32_t indexCount) {
+		uint32_t count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();
+		glDrawElementsInstanced(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr, instanceCount);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 }

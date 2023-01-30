@@ -17,7 +17,7 @@ glm::vec3 cube_vertices[] = {
 	{ -1.0,  1.0, -1.0 }
 };
 
-uint32_t cube_elements[] = {
+uint32_t cube_elements[36] = {
 	// front
 	0, 1, 2,
 	2, 3, 0,
@@ -38,22 +38,39 @@ uint32_t cube_elements[] = {
 	6, 7, 3
 };
 
+const uint32_t numPoints = 5;
+
 Test::Test() {
-	const uint32_t numPoints = 2;
 	glm::vec3 points[numPoints] = {
 		{ 0.0f, 0.0f, 0.0f },
-		{ 2.0f, 0.0f, 0.0f }
+		{ 5.0f, 0.0f, 0.0f },
+		{ 5.0f, 5.0f, 0.0f },
+		{ 5.0f, 5.0f, 5.0f },
+		{ 5.0f, 0.0f, 5.0f }
 	};
 
+	RealEngine::Ref<RealEngine::VertexBuffer> vertexBuffer, instanceBuffer;
+
 	m_VertexArray = RealEngine::VertexArray::Create();
-	m_VertexBuffer = RealEngine::VertexBuffer::Create((float*)points, sizeof(VoxelBuffer) * numPoints);
-	m_VertexBuffer->SetLayout({
-		{ RealEngine::ShaderDataType::Float3, "a_Position" }
+	
+	vertexBuffer = RealEngine::VertexBuffer::Create((float*)cube_vertices, sizeof(VoxelBuffer) * 8);
+	vertexBuffer->SetLayout({
+		{ RealEngine::ShaderDataType::Float3, "a_Vert" },
 	});
-	m_VertexArray->AddVertexBuffer(m_VertexBuffer);
+	m_VertexArray->AddVertexBuffer(vertexBuffer);
+
+	instanceBuffer = RealEngine::VertexBuffer::Create((float*)points, sizeof(VoxelBuffer) * numPoints);
+	instanceBuffer->SetLayout({
+		{ RealEngine::ShaderDataType::Float3, "a_Position", 1 }
+	});
+	m_VertexArray->AddVertexBuffer(instanceBuffer);
+
+	RealEngine::Ref<RealEngine::IndexBuffer> indexBuffer = RealEngine::IndexBuffer::Create(cube_elements, 36);
+
+	m_VertexArray->SetIndexBuffer(indexBuffer);
 }
 
 void Test::Render() {
 	//0 for the mode means GL_POINTS
-	RealEngine::RenderCommand::DrawArrays(m_VertexArray, 0, 2);
+	RealEngine::RenderCommand::DrawIndexedInstanced(m_VertexArray, numPoints, 36);
 }
