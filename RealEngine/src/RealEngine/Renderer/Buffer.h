@@ -29,12 +29,13 @@ namespace RealEngine {
 		ShaderDataType Type;
 		uint32_t Size;
 		size_t Offset;
+		uint32_t InstancedDivisor;
 		bool Normalized;
 
 		BufferElement() = default;
 
-		BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
-			: Name(name), Type(type), Size(ShaderDataTypeSize(type)), Offset(0), Normalized(normalized) { }
+		BufferElement(ShaderDataType type, const std::string& name, uint32_t instancedDivisor = 0, bool normalized = false)
+			: Name(name), Type(type), Size(ShaderDataTypeSize(type)), Offset(0), InstancedDivisor(instancedDivisor), Normalized(normalized) { }
 	
 		uint32_t GetComponentCount() const {
 			switch (Type) {

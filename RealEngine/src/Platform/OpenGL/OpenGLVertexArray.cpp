@@ -77,6 +77,8 @@ namespace RealEngine {
 					element.Normalized ? GL_TRUE : GL_FALSE,
 					layout.GetStride(),
 					(const void*)element.Offset);
+				//This is for instancing
+				glVertexAttribDivisor(m_VertexBufferIndex, element.InstancedDivisor);
 				m_VertexBufferIndex++;
 				break;
 			}
@@ -92,6 +94,8 @@ namespace RealEngine {
 						layout.GetStride(),
 						(const void*)(element.Offset + sizeof(float) * count * i));
 					glVertexAttribDivisor(m_VertexBufferIndex, 1);
+					//This is for instancing
+					glVertexAttribDivisor(m_VertexBufferIndex, element.InstancedDivisor);
 					m_VertexBufferIndex++;
 				}
 				break;
