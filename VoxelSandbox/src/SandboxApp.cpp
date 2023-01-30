@@ -6,7 +6,7 @@
 class Sandbox : public RealEngine::Application {
 public:
 	Sandbox() 
-		: Application("Voxel Engine") {
+		: Application("Voxel Game") {
 		PushLayer(new MainLayer());
 	}
 
