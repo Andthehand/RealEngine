@@ -25,6 +25,7 @@ public:
 	inline void SetBlockType(VoxelType blockType) { m_BlockType = blockType; }
 
 	static struct VoxelTextureCord {
+		glm::vec2 Empty_Cords[4] = { {0, 0}, {0, 0}, {0, 0}, {0, 0} };
 		std::array<RealEngine::Ref<RealEngine::SubTexture2D>, 3> Grass_Cords;
 		RealEngine::Ref<RealEngine::SubTexture2D> Dirt_Cords;
 		RealEngine::Ref<RealEngine::SubTexture2D> Water_Cords;
@@ -36,7 +37,7 @@ public:
 	inline const glm::vec2* GetTexCord(VoxelSide side) {
 		switch (m_BlockType) {
 			case BlockType_Default:
-				return nullptr;
+				return s_VoxelTextureCord.Empty_Cords;
 			case BlockType_Grass:
 				return Voxel::s_VoxelTextureCord.Grass_Cords[side]->GetTexCoords();
 			case BlockType_Dirt:
@@ -50,8 +51,8 @@ public:
 			case BlockType_Sand:
 				return Voxel::s_VoxelTextureCord.Sand_Cords->GetTexCoords();
 			default:
-				RE_ASSERT(false, "Block type not implemented yet")
-				return nullptr;
+				RE_WARN("Block type not implemented yet or block not loaded");
+				return s_VoxelTextureCord.Empty_Cords;
 		}
 	}
 

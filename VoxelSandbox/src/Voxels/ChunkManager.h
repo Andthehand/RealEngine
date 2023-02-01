@@ -21,37 +21,42 @@ namespace std {
 class ChunkManager {
 public:
 	//Base functions
-	ChunkManager(glm::ivec3& cameraPos);
+	ChunkManager(const glm::vec3& cameraPos);
 	~ChunkManager();
 
-	void Render(RealEngine::EditorCamera& editorCamera);
+	void Render(const RealEngine::EditorCamera& editorCamera);
 	void OnImGuiRender();
 
 	//Basic Statistics
 	struct Statistics {
-		glm::ivec3 CameraDist;
 		uint32_t ChunksRendered = 0;
+		float CameraDist = 0.0f;
 	};
 	Statistics& GetStatistics() { return m_Statistics; }
 	void ResetStatistics();
 
 	//If you can't find the chunk then return a nullptr
-	std::shared_ptr<Chunk> GetChunk(glm::ivec3 chunkPos) { return (m_ActiveChunks.find(chunkPos) != m_ActiveChunks.end()) ? m_ActiveChunks.find(chunkPos)->second : nullptr; }
+	std::shared_ptr<Chunk> GetChunk(glm::vec3 chunkPos) { return (m_ActiveChunks.find(chunkPos) != m_ActiveChunks.end()) ? m_ActiveChunks.find(chunkPos)->second : nullptr; }
 private:
-	inline glm::ivec3 Vec3ToChunkCords(glm::ivec3 cords);
-	inline glm::ivec3 ClampToNum(glm::ivec3& cords, int num);
 	void UpdateChunks();
 
+	inline glm::ivec3& ToChunkCoords(const glm::vec3& worldCoordinates) {
+		return glm::ivec3{
+			glm::floor(worldCoordinates.x / (float)Constants::CHUNK_SIZE),
+			glm::floor(worldCoordinates.y / (float)Constants::CHUNK_SIZE),
+			glm::floor(worldCoordinates.z / (float)Constants::CHUNK_SIZE)
+		};
+	}
 private:
 	//TODO: Make a Seperate load distance that should be at least 1 larger than the rendender distance
-	int m_RenderDistance = 10;
+	int m_RenderDistance = 1;
 	
 	//This is global so I can freeze the frustum culling
 	glm::vec4 m_FrustumPlanes[6];
 
 	RealEngine::Ref<RealEngine::Texture2D> m_Texture;
 
-	glm::ivec3 m_PreviousCameraPos = glm::vec3(0);
+	glm::ivec3 m_LastCameraChunkPosition;
 	std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>> m_ActiveChunks;
 	
 	bool m_FrustumFrozen = false;

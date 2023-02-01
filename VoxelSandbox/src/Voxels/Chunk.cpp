@@ -43,7 +43,7 @@ void Chunk::CreateMesh() {
 					m_Indices.resize(m_IndicesIndex + 36 * 2);
 				}
 
-				//AddLeftFace(glm::ivec3{ 0, 0, 0 });
+				//AddLeftFace(glm::vec3{ 0, 0, 0 });
 
 				glm::ivec3 tempCords = { x + m_WorldOffset.x, y + m_WorldOffset.y, z + m_WorldOffset.z };
 

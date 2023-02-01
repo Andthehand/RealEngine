@@ -1,6 +1,7 @@
 #pragma once
 #include <RealEngine.h>
 
+#include "Constants.h"
 #include "Voxel.h"
 
 class ChunkManager;
@@ -53,7 +54,7 @@ private:
 	glm::ivec3 m_WorldOffset;
 
 	// 3D array of voxels
-	Voxel m_Voxels[16][16][16];
+	Voxel m_Voxels[Constants::CHUNK_SIZE][Constants::CHUNK_SIZE][Constants::CHUNK_SIZE];
 
 	// vectors to hold vertex and index data for rendering
 	struct VoxelBuffer {

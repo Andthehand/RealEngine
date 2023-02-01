@@ -4,9 +4,10 @@
 
 
 MainLayer::MainLayer() : m_EditorCamera(70.0f, (float)(RealEngine::Application::Get().GetWindow().GetWidth() / RealEngine::Application::Get().GetWindow().GetHeight()), 0.1f, 1000.0f),
-						m_ChunkManager((glm::ivec3)m_EditorCamera.GetPosition()), m_Texture(m_Width, m_Height){
+						m_ChunkManager(m_EditorCamera.GetPosition()), m_Texture(m_Width, m_Height){
 	m_ChunkShader = RealEngine::Shader::Create("assets/shaders/Chunk.glsl");
 	m_TestShader = RealEngine::Shader::Create("assets/shaders/Test.glsl");
+	//RealEngine::Application::Get().GetWindow().SetVSync(false);
 }
 
 void MainLayer::OnUpdate(RealEngine::Timestep ts) {
