@@ -153,14 +153,14 @@ void ChunkManager::ResetStatistics() {
 void ChunkManager::UpdateChunks() {
 	//Remove Chunks that are too far away from the camera
 	for (auto chunk = m_ActiveChunks.begin(); chunk != m_ActiveChunks.end();) {
-		//Covert chunk position to chunk cords
+		//Covert chunk chunkCords to chunk cords
 		const glm::ivec3 localChunkPos = ToChunkCoords(chunk->first) - m_LastCameraChunkPosition;
 		bool inRangeOfPlayer =
 			(localChunkPos.x * localChunkPos.x) + (localChunkPos.y * localChunkPos.y) + (localChunkPos.z * localChunkPos.z) <=
 			(m_RenderDistance * m_RenderDistance) + (m_RenderDistance * m_RenderDistance);
 		if (!inRangeOfPlayer) {
 			Chunk::MemoryPool.push_back(chunk->second);
-			chunk = m_ActiveChunks.erase(chunk);
+			m_ActiveChunks.erase(chunk++);
 		}
 		else
 			chunk++;
@@ -169,20 +169,21 @@ void ChunkManager::UpdateChunks() {
 	for (int y = m_LastCameraChunkPosition.y - m_RenderDistance; y <= m_LastCameraChunkPosition.y + m_RenderDistance; y++) {
 		for (int x = m_LastCameraChunkPosition.x - m_RenderDistance; x <= m_LastCameraChunkPosition.x + m_RenderDistance; x++) {
 			for (int z = m_LastCameraChunkPosition.z - m_RenderDistance; z <= m_LastCameraChunkPosition.z + m_RenderDistance; z++) {
-				glm::ivec3 position(x, y, z);
-				glm::ivec3 localPos = m_LastCameraChunkPosition - position;
-				if ((localPos.x * localPos.x) + (localPos.y * localPos.y) + (localPos.z * localPos.z) <= (m_RenderDistance * m_RenderDistance)) {
+				glm::ivec3 chunkCords(x, y, z);
+				glm::ivec3 worldPos = chunkCords * Constants::CHUNK_SIZE;
+				glm::ivec3 localPos = m_LastCameraChunkPosition - chunkCords;
+				if ((localPos.x * localPos.x) + (localPos.y * localPos.y) + (localPos.z * localPos.z) <= (m_RenderDistance * m_RenderDistance) 
+					&& m_ActiveChunks.find(worldPos) == m_ActiveChunks.end()) {
 					if (Chunk::MemoryPool.empty()) {
-						//m_JobQueue.Push([&] {m_ActiveChunks.insert({ newChunkPos, std::make_shared<Chunk>(newChunkPos, *this) }); });
-						std::shared_ptr<Chunk> tempChunk = std::make_shared<Chunk>(position * Constants::CHUNK_SIZE, *this);
+						std::shared_ptr<Chunk> tempChunk = std::make_shared<Chunk>(worldPos, *this);
 						tempChunk->m_Status = Chunk::Status::Load;
-						m_ActiveChunks.insert({ position * Constants::CHUNK_SIZE, std::make_shared<Chunk>(position * Constants::CHUNK_SIZE, *this) });
+						m_ActiveChunks.insert({ worldPos, tempChunk });
 					}
 					else {
 						std::shared_ptr<Chunk> tempChunk = Chunk::MemoryPool.back();
-						tempChunk->SetPostition(position * Constants::CHUNK_SIZE);
+						tempChunk->SetPostition(worldPos);
 						tempChunk->m_Status = Chunk::Status::Load;
-						m_ActiveChunks.insert({ position * Constants::CHUNK_SIZE, tempChunk});
+						m_ActiveChunks.insert({ worldPos, tempChunk});
 						Chunk::MemoryPool.pop_back();
 					}
 				}
