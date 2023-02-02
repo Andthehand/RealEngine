@@ -155,6 +155,26 @@ void ChunkManager::ResetStatistics() {
 	m_Statistics.ChunksRendered = 0;
 }
 
+inline void ChunkManager::UpdateSurroundingChunks(glm::ivec3& worldChunkPos) {
+	for (int i = -1; i < 2; i += 2) {
+		auto chunk = m_ActiveChunks.find(glm::ivec3{ worldChunkPos.x + (Constants::CHUNK_SIZE * i), worldChunkPos.y, worldChunkPos.z });
+		if (chunk != m_ActiveChunks.end() && chunk->second->m_Status != Chunk::Status::Load) {
+			chunk->second->m_Status = Chunk::Status::UpdateMesh;
+		}
+
+		chunk = m_ActiveChunks.find(glm::ivec3{ worldChunkPos.x, worldChunkPos.y + (Constants::CHUNK_SIZE * i), worldChunkPos.z });
+		if (chunk != m_ActiveChunks.end() && chunk->second->m_Status != Chunk::Status::Load) {
+			chunk->second->m_Status = Chunk::Status::UpdateMesh;
+		}
+
+		chunk = m_ActiveChunks.find(glm::ivec3{ worldChunkPos.x, worldChunkPos.y, worldChunkPos.z + (Constants::CHUNK_SIZE * i) });
+		if (chunk != m_ActiveChunks.end() && chunk->second->m_Status != Chunk::Status::Load) {
+			chunk->second->m_Status = Chunk::Status::UpdateMesh;
+		}
+	}
+}
+
+
 //This checks the m_ActiveChunks to discard chunks to far away and add chunks that are in render distance
 void ChunkManager::UpdateChunks() {
 	{
@@ -185,6 +205,10 @@ void ChunkManager::UpdateChunks() {
 				
 				if ((localPos.x * localPos.x) + (localPos.y * localPos.y) + (localPos.z * localPos.z) <= (m_RenderDistance * m_RenderDistance) 
 					&& m_ActiveChunks.find(worldPos) == m_ActiveChunks.end()) {
+					
+					UpdateSurroundingChunks(worldPos);
+
+					//Add new chunks
 					if (Chunk::MemoryPool.empty()) {
 						std::shared_ptr<Chunk> tempChunk = std::make_shared<Chunk>(worldPos, *this);
 						tempChunk->m_Status = Chunk::Status::Load;

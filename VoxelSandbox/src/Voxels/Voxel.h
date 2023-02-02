@@ -1,8 +1,8 @@
 #pragma once
 #include <RealEngine.h>
 
-enum VoxelType {
-	BlockType_Default = 0,
+enum VoxelType : uint8_t {
+	BlockType_Air = 0,
 	BlockType_Grass,
 	BlockType_Dirt,
 	BlockType_Water,
@@ -36,7 +36,7 @@ public:
 
 	inline const glm::vec2* GetTexCord(VoxelSide side) {
 		switch (m_BlockType) {
-			case BlockType_Default:
+			case BlockType_Air:
 				return s_VoxelTextureCord.Empty_Cords;
 			case BlockType_Grass:
 				return Voxel::s_VoxelTextureCord.Grass_Cords[side]->GetTexCoords();
@@ -56,9 +56,7 @@ public:
 		}
 	}
 
-	inline bool IsActive() { return m_Active; }
-	inline void SetActive(bool active) { m_Active = active; }
+	inline bool IsAir() { return m_BlockType == VoxelType::BlockType_Air; }
 private: 
-	bool m_Active = true;
 	VoxelType m_BlockType;
 };

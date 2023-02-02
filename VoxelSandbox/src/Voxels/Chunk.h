@@ -17,7 +17,7 @@ public:
 	void CreateBuffers();
 	void Render();
 
-	glm::ivec3& GetPostition() { return m_WorldOffset; }
+	const glm::ivec3& GetPostition() const { return m_WorldOffset; }
 	void SetPostition(glm::ivec3& position) { m_WorldOffset = position; }
 
 	inline Voxel& GetVoxel(glm::ivec3 pos) { return m_Voxels[pos.x][pos.y][pos.z]; }
@@ -61,9 +61,9 @@ private:
 		glm::vec3 Position;
 		glm::vec2 TexCords;
 	};
-	int m_VertIndex = 0;
+	uint32_t m_VertIndex = 0;
 	std::vector<VoxelBuffer> m_Vertices;
-	int m_IndicesIndex = 0;
+	uint32_t m_IndicesIndex = 0;
 	std::vector<uint32_t> m_Indices;
 
 	RealEngine::Ref<RealEngine::VertexArray> m_VertexArray;

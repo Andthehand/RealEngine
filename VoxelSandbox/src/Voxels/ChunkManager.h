@@ -36,15 +36,20 @@ public:
 	void ResetStatistics();
 
 	//If you can't find the chunk then return a nullptr
-	std::shared_ptr<Chunk> GetChunk(glm::vec3 chunkPos) { 
+	const std::shared_ptr<Chunk> GetChunk(glm::ivec3 chunkPos) { 
 		std::shared_lock lock(m_ChunkMutex);
-		return (m_ActiveChunks.find(chunkPos) != m_ActiveChunks.end()) ? m_ActiveChunks.find(chunkPos)->second : nullptr; 
+		return m_ActiveChunks.find(chunkPos) != m_ActiveChunks.end() ? m_ActiveChunks.find(chunkPos)->second : nullptr; 
+	}
+
+	bool SetChunk(glm::ivec3& chunkPos, std::shared_ptr<Chunk> chunk) {
+		std::unique_lock lock(m_ChunkMutex);
+		return m_ActiveChunks.insert({ chunkPos, chunk }).second;
 	}
 private:
+	inline void UpdateSurroundingChunks(glm::ivec3& worldChunkPos);
 	void UpdateChunks();
-	void QueueCreateChunks();
 
-	inline glm::ivec3& ToChunkCoords(const glm::vec3& worldCoordinates) {
+	inline const glm::ivec3 ToChunkCoords(const glm::vec3& worldCoordinates) {
 		return glm::ivec3{
 			glm::floor(worldCoordinates.x / (float)Constants::CHUNK_SIZE),
 			glm::floor(worldCoordinates.y / (float)Constants::CHUNK_SIZE),

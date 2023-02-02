@@ -16,7 +16,6 @@ void Chunk::LoadVoxels() {
 
 	m_Status = Status::UpdateMesh;
 }
-
 void Chunk::CreateMesh() {
 	m_VertIndex = 0;
 	m_IndicesIndex = 0;
@@ -34,7 +33,7 @@ void Chunk::CreateMesh() {
 	for (int x = 0; x < Constants::CHUNK_SIZE; x++) {
 		for (int y = 0; y < Constants::CHUNK_SIZE; y++) {
 			for (int z = 0; z < Constants::CHUNK_SIZE; z++) {
-				if (!m_Voxels[x][y][z].IsActive()) continue;
+				if (m_Voxels[x][y][z].IsAir()) continue;
 
 				if (m_VertIndex + 24 > m_Vertices.size()) {
 					m_Vertices.resize(m_VertIndex + 24 * 2);
@@ -53,62 +52,61 @@ void Chunk::CreateMesh() {
 
 				/// Check for inactive voxels around the current voxel
 				if (x == 0) {
-																	//TODO: Fix this GetVoxel function call
-					if (neighborChunks[0] == nullptr || !neighborChunks[0]->GetVoxel({ 15, y, z }).IsActive()) {
+					if (neighborChunks[0] == nullptr || neighborChunks[0]->GetVoxel({ 15, y, z }).IsAir()) {
 						AddLeftFace(tempCords, voxelSideTexCords);
 					}
 				}
-				else if (!m_Voxels[x - 1][y][z].IsActive()) {
+				else if (m_Voxels[x - 1][y][z].IsAir()) {
 					// Add a face to the vertices and indices for the left side
 					AddLeftFace(tempCords, voxelSideTexCords);
 				}
 
 				if (x == Constants::CHUNK_SIZE - 1) {
-					if (neighborChunks[1] == nullptr || !neighborChunks[1]->GetVoxel({ 0, y, z }).IsActive()) {
+					if (neighborChunks[1] == nullptr || neighborChunks[1]->GetVoxel({ 0, y, z }).IsAir()) {
 						AddRightFace(tempCords, voxelSideTexCords);
 					}
 				}
-				else if (!m_Voxels[x + 1][y][z].IsActive()) {
+				else if (m_Voxels[x + 1][y][z].IsAir()) {
 					// Add a face to the vertices and indices for the right side
 					AddRightFace(tempCords, voxelSideTexCords);
 				}
 
 				if (y == 0) {
-					if (neighborChunks[2] == nullptr || !neighborChunks[2]->GetVoxel({ x, 15, z }).IsActive()) {
+					if (neighborChunks[2] == nullptr || neighborChunks[2]->GetVoxel({ x, 15, z }).IsAir()) {
 						AddBottomFace(tempCords, voxelBottomTexCords);
 					}
 				}
-				else if (!m_Voxels[x][y - 1][z].IsActive()) {
+				else if (m_Voxels[x][y - 1][z].IsAir()) {
 					// Add a face to the vertices and indices for the bottom side
 					AddBottomFace(tempCords, voxelBottomTexCords);
 				}
 
 				if (y == Constants::CHUNK_SIZE - 1) {
-					if (neighborChunks[3] == nullptr || !neighborChunks[3]->GetVoxel({ x, 0, z }).IsActive()) {
+					if (neighborChunks[3] == nullptr || neighborChunks[3]->GetVoxel({ x, 0, z }).IsAir()) {
 						AddTopFace(tempCords, voxelTopTexCords);
 					}
 				}
-				else if (!m_Voxels[x][y + 1][z].IsActive()) {
+				else if (m_Voxels[x][y + 1][z].IsAir()) {
 					// Add a face to the vertices and indices for the top side
 					AddTopFace(tempCords, voxelTopTexCords);
 				}
 
 				if (z == 0) {
-					if (neighborChunks[4] == nullptr || !neighborChunks[4]->GetVoxel({ x, y, 15 }).IsActive()) {
+					if (neighborChunks[4] == nullptr || neighborChunks[4]->GetVoxel({ x, y, 15 }).IsAir()) {
 						AddBackFace(tempCords, voxelSideTexCords);
 					}
 				}
-				else if (!m_Voxels[x][y][z - 1].IsActive()) {
+				else if (m_Voxels[x][y][z - 1].IsAir()) {
 					// Add a face to the vertices and indices for the back side
 					AddBackFace(tempCords, voxelSideTexCords);
 				}
 				
 				if (z == Constants::CHUNK_SIZE - 1) {
-					if (neighborChunks[5] == nullptr || !neighborChunks[5]->GetVoxel({ x , y, 0 }).IsActive()) {
+					if (neighborChunks[5] == nullptr || neighborChunks[5]->GetVoxel({ x , y, 0 }).IsAir()) {
 						AddFrontFace(tempCords, voxelSideTexCords);
 					}
 				}
-				else if (!m_Voxels[x][y][z + 1].IsActive()) {
+				else if (m_Voxels[x][y][z + 1].IsAir()) {
 					// Add a face to the vertices and indices for the front side
 					AddFrontFace(tempCords, voxelSideTexCords);
 				}
@@ -116,7 +114,6 @@ void Chunk::CreateMesh() {
 		}
 	}
 
-	m_Status = Status::NoData;
 	//Why try and render if there is nothing to render
 	if (m_VertIndex != 0) {
 		//Tells the main thread to upload the buffers

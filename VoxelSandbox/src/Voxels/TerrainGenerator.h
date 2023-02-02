@@ -19,8 +19,7 @@ public:
 				int height = (uint32_t)(std::abs(noiseValue * Constants::WORLD_HEIGHT));
 				for (uint32_t y = 0; y < Constants::CHUNK_SIZE; y++) {
 					int voxelWorldHeight = y + worldPos.y;
-					m_Voxels[x][y][z].SetActive(voxelWorldHeight < height);
-					m_Voxels[x][y][z].SetBlockType(VoxelType::BlockType_Grass);
+					m_Voxels[x][y][z].SetBlockType(voxelWorldHeight < height ? VoxelType::BlockType_Grass : VoxelType::BlockType_Air);
 				}
 			}
 		}
