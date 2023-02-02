@@ -36,9 +36,13 @@ public:
 	void ResetStatistics();
 
 	//If you can't find the chunk then return a nullptr
-	std::shared_ptr<Chunk> GetChunk(glm::vec3 chunkPos) { return (m_ActiveChunks.find(chunkPos) != m_ActiveChunks.end()) ? m_ActiveChunks.find(chunkPos)->second : nullptr; }
+	std::shared_ptr<Chunk> GetChunk(glm::vec3 chunkPos) { 
+		std::shared_lock lock(m_ChunkMutex);
+		return (m_ActiveChunks.find(chunkPos) != m_ActiveChunks.end()) ? m_ActiveChunks.find(chunkPos)->second : nullptr; 
+	}
 private:
 	void UpdateChunks();
+	void QueueCreateChunks();
 
 	inline glm::ivec3& ToChunkCoords(const glm::vec3& worldCoordinates) {
 		return glm::ivec3{
@@ -57,6 +61,8 @@ private:
 	RealEngine::Ref<RealEngine::Texture2D> m_Texture;
 
 	glm::ivec3 m_LastCameraChunkPosition;
+
+	std::shared_mutex m_ChunkMutex;
 	std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>> m_ActiveChunks;
 	
 	bool m_FrustumFrozen = false;

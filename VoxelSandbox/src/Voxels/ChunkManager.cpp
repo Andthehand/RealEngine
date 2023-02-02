@@ -89,6 +89,7 @@ void ChunkManager::Render(const RealEngine::EditorCamera& editorCamera) {
 
 	//This is used for the frustum culling
 	if(!m_FrustumFrozen) ExtractFrustum(m_FrustumPlanes, editorCamera.GetViewProjection());
+	std::shared_lock lock(m_ChunkMutex);
 	for (auto& [pos, chunk] : m_ActiveChunks) {		
 		switch (chunk->m_Status) {
 			case Chunk::Status::Load:
@@ -128,13 +129,18 @@ void ChunkManager::OnImGuiRender() {
 	//glm::vec3 temp = Vec3ToChunkCords(m_LastCameraChunkPosition);
 	//ImGui::Text("Previous Chunk Pos: %i, %i, %i", temp.x, temp.y, temp.z);
 	ImGui::Text("Distance: %f", std::sqrtf(m_Statistics.CameraDist));
+	
+	std::shared_lock lock(m_ChunkMutex);
 	ImGui::Text("Num Chunks Rendered %i", m_Statistics.ChunksRendered);
-	ImGui::Text("Num Chunks %i", m_ActiveChunks.size());
+	ImGui::Text("Num Chunks %i", m_ActiveChunks.size());	
 	if (ImGui::SliderInt("Render Distance", &m_RenderDistance, 1, 20)) {
 		for (auto& [key, chunk] : m_ActiveChunks) {
 			chunk->m_Status = Chunk::Status::UpdateMesh;
 		}
+
+		lock.unlock();
 		UpdateChunks();
+		lock.lock();
 	}
 	if (ImGui::Button("Regenerate Terrain")) {
 		for (auto& [key, chunk] : m_ActiveChunks) {
@@ -151,27 +157,32 @@ void ChunkManager::ResetStatistics() {
 
 //This checks the m_ActiveChunks to discard chunks to far away and add chunks that are in render distance
 void ChunkManager::UpdateChunks() {
-	//Remove Chunks that are too far away from the camera
-	for (auto chunk = m_ActiveChunks.begin(); chunk != m_ActiveChunks.end();) {
-		//Covert chunk chunkCords to chunk cords
-		const glm::ivec3 localChunkPos = ToChunkCoords(chunk->first) - m_LastCameraChunkPosition;
-		bool inRangeOfPlayer =
-			(localChunkPos.x * localChunkPos.x) + (localChunkPos.y * localChunkPos.y) + (localChunkPos.z * localChunkPos.z) <=
-			(m_RenderDistance * m_RenderDistance) + (m_RenderDistance * m_RenderDistance);
-		if (!inRangeOfPlayer) {
-			Chunk::MemoryPool.push_back(chunk->second);
-			m_ActiveChunks.erase(chunk++);
+	{
+		std::shared_lock lock(m_ChunkMutex);
+		//Remove Chunks that are too far away from the camera
+		for (auto chunk = m_ActiveChunks.begin(); chunk != m_ActiveChunks.end();) {
+			//Covert chunk chunkCords to chunk cords
+			const glm::ivec3 localChunkPos = ToChunkCoords(chunk->first) - m_LastCameraChunkPosition;
+			bool inRangeOfPlayer =
+				(localChunkPos.x * localChunkPos.x) + (localChunkPos.y * localChunkPos.y) + (localChunkPos.z * localChunkPos.z) <=
+				(m_RenderDistance * m_RenderDistance) + (m_RenderDistance * m_RenderDistance);
+			if (!inRangeOfPlayer) {
+				Chunk::MemoryPool.push_back(chunk->second);
+				m_ActiveChunks.erase(chunk++);
+			}
+			else
+				chunk++;
 		}
-		else
-			chunk++;
 	}
 
+	std::unique_lock lock(m_ChunkMutex);
 	for (int y = m_LastCameraChunkPosition.y - m_RenderDistance; y <= m_LastCameraChunkPosition.y + m_RenderDistance; y++) {
 		for (int x = m_LastCameraChunkPosition.x - m_RenderDistance; x <= m_LastCameraChunkPosition.x + m_RenderDistance; x++) {
 			for (int z = m_LastCameraChunkPosition.z - m_RenderDistance; z <= m_LastCameraChunkPosition.z + m_RenderDistance; z++) {
 				glm::ivec3 chunkCords(x, y, z);
 				glm::ivec3 worldPos = chunkCords * Constants::CHUNK_SIZE;
 				glm::ivec3 localPos = m_LastCameraChunkPosition - chunkCords;
+				
 				if ((localPos.x * localPos.x) + (localPos.y * localPos.y) + (localPos.z * localPos.z) <= (m_RenderDistance * m_RenderDistance) 
 					&& m_ActiveChunks.find(worldPos) == m_ActiveChunks.end()) {
 					if (Chunk::MemoryPool.empty()) {
