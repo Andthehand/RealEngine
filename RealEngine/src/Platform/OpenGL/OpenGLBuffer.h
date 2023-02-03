@@ -4,12 +4,47 @@
 
 namespace RealEngine {
 	//------------------------------------
-	// VertexBuffer -----------------------
+	// General Buffer --------------------
+	//------------------------------------
+	class OpenGLBuffer : public Buffer {
+	public:
+		OpenGLBuffer(uint32_t target, uint32_t size, const void* data, uint32_t usage);
+		virtual ~OpenGLBuffer();
+
+		virtual void Bind() const override;
+		virtual void Unbind() const override;
+
+		virtual void SetData(const void* data, uint32_t size) override;
+	private:
+		uint32_t m_RendererID;
+		uint32_t m_Target;
+	};
+
+	//------------------------------------
+	// Texture Buffer --------------------
+	//------------------------------------
+	class OpenGLTextureBuffer : public TextureBuffer {
+	public:
+		OpenGLTextureBuffer(uint32_t size, const void* data, uint32_t usage, uint32_t internalFormat);
+		virtual ~OpenGLTextureBuffer();
+
+		virtual void Bind() const override;
+		virtual void BindToTexture(const Texture& texture) const override;
+		virtual void Unbind() const override;
+
+		virtual void SetData(const void* data, uint32_t size) override;
+	private:
+		uint32_t m_RendererID;
+		uint32_t m_Usage, m_InternalFormat;
+	};
+
+	//------------------------------------
+	// VertexBuffer ----------------------
 	//------------------------------------
 	class OpenGLVertexBuffer : public VertexBuffer {
 	public:
 		OpenGLVertexBuffer(uint32_t size);
-		OpenGLVertexBuffer(float* verticies, uint32_t size);
+		OpenGLVertexBuffer(const float* verticies, uint32_t size);
 		virtual ~OpenGLVertexBuffer();
 
 		virtual void Bind() const override;
@@ -30,7 +65,7 @@ namespace RealEngine {
 	class OpenGLIndexBuffer : public IndexBuffer {
 	public:
 		OpenGLIndexBuffer(uint32_t count);
-		OpenGLIndexBuffer(uint32_t* indices, uint32_t count);
+		OpenGLIndexBuffer(const uint32_t* indices, uint32_t count);
 		virtual ~OpenGLIndexBuffer();
 
 		virtual uint32_t GetCount() const override { return m_Count; }

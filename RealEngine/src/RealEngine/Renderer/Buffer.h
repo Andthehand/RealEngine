@@ -1,4 +1,5 @@
 #pragma once
+#include "Texture.h"
 
 namespace RealEngine {
 	enum class ShaderDataType {
@@ -88,6 +89,34 @@ namespace RealEngine {
 		uint32_t m_Stride = 0;
 	};
 
+	//Not Tested
+	class Buffer {
+	public:
+		virtual ~Buffer() = default;
+
+		virtual void Bind() const = 0;
+		virtual void Unbind() const = 0;
+
+		virtual void SetData(const void* data, uint32_t size) = 0;
+
+		static Ref<Buffer> Create(uint32_t target, uint32_t size, uint32_t usage);
+		static Ref<Buffer> Create(uint32_t target, uint32_t size, const void* data, uint32_t usage);
+	};
+
+	//Not Tested
+	class TextureBuffer {
+	public:
+		virtual ~TextureBuffer() = default;
+
+		virtual void Bind() const = 0;
+		virtual void BindToTexture(const Texture& texture) const = 0;
+		virtual void Unbind() const = 0;
+
+		virtual void SetData(const void* data, uint32_t size) = 0;
+
+		static Ref<TextureBuffer> Create(uint32_t size, const void* data, uint32_t usage, uint32_t internalFormat);
+	};
+
 	class VertexBuffer {
 	public:
 		virtual ~VertexBuffer() = default;
@@ -101,7 +130,7 @@ namespace RealEngine {
 		virtual void SetLayout(const BufferLayout& layout) = 0;
 		
 		static Ref<VertexBuffer> Create(uint32_t size);
-		static Ref<VertexBuffer> Create(float* verticies, uint32_t size);
+		static Ref<VertexBuffer> Create(const float* verticies, uint32_t size);
 	};
 
 	class IndexBuffer {
@@ -116,6 +145,6 @@ namespace RealEngine {
 		virtual uint32_t GetCount() const = 0;
 
 		static Ref<IndexBuffer> Create(uint32_t count);
-		static Ref<IndexBuffer> Create(uint32_t* indices, uint32_t count);
+		static Ref<IndexBuffer> Create(const uint32_t* indices, uint32_t count);
 	};
 }

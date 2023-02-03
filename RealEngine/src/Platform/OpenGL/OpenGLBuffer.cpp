@@ -5,10 +5,85 @@
 
 namespace RealEngine {
 	//------------------------------------
-	// VertexBuffer -----------------------
+	// General Buffers -------------------
 	//------------------------------------
+	OpenGLBuffer::OpenGLBuffer(uint32_t target, uint32_t size, const void* data, uint32_t usage)
+		: m_Target(target) {
+		RE_PROFILE_FUNCTION();
+
+		//Create and bind VBO to VAO
+		glCreateBuffers(1, &m_RendererID);
+		glBindBuffer(target, m_RendererID);
+		glBufferData(target, size, data, usage);
+	}
+
+	OpenGLBuffer::~OpenGLBuffer() {
+		RE_PROFILE_FUNCTION();
+
+		glDeleteBuffers(1, &m_RendererID);
+	}
+
+	void OpenGLBuffer::Bind() const {
+		RE_PROFILE_FUNCTION();
+
+		glBindBuffer(m_Target, m_RendererID);
+	}
+
+	void OpenGLBuffer::Unbind() const {
+		RE_PROFILE_FUNCTION();
+
+		glBindBuffer(m_Target, 0);
+	}
+
+	void OpenGLBuffer::SetData(const void* data, uint32_t size) {
+		glBindBuffer(m_Target, m_RendererID);
+		glBufferSubData(m_Target, 0, size, data);
+	}
 
 
+	//------------------------------------
+	// TextureBuffer ----------------------
+	//------------------------------------
+	OpenGLTextureBuffer::OpenGLTextureBuffer(uint32_t size, const void* data, uint32_t usage, uint32_t internalFormat)
+		: m_Usage(usage), m_InternalFormat(internalFormat) {
+		RE_PROFILE_FUNCTION();
+
+		//Create and bind VBO to VAO
+		glCreateBuffers(1, &m_RendererID);
+		glBindBuffer(GL_TEXTURE_BUFFER, m_RendererID);
+		glBufferData(GL_TEXTURE_BUFFER, size, data, usage);
+	}
+
+	OpenGLTextureBuffer::~OpenGLTextureBuffer() {
+		RE_PROFILE_FUNCTION();
+
+		glDeleteBuffers(1, &m_RendererID);
+	}
+
+	void OpenGLTextureBuffer::Bind() const {
+		RE_PROFILE_FUNCTION();
+
+		glBindBuffer(GL_TEXTURE_BUFFER, m_RendererID);
+	}
+
+	void OpenGLTextureBuffer::BindToTexture(const Texture& texture) const {
+		texture.Bind();
+		glTexBuffer(GL_TEXTURE_BUFFER, m_InternalFormat, m_RendererID);
+	}
+
+	void OpenGLTextureBuffer::Unbind() const {
+		RE_PROFILE_FUNCTION();
+
+		glBindBuffer(GL_TEXTURE_BUFFER, 0);
+	}
+
+	void OpenGLTextureBuffer::SetData(const void* data, uint32_t size) {
+		glBufferData(GL_TEXTURE_BUFFER, size, data, m_Usage);
+	}
+
+	//------------------------------------
+	// VertexBuffer ----------------------
+	//------------------------------------
 	OpenGLVertexBuffer::OpenGLVertexBuffer(uint32_t size) {
 		RE_PROFILE_FUNCTION();
 
@@ -18,7 +93,7 @@ namespace RealEngine {
 		glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
 	}
 
-	OpenGLVertexBuffer::OpenGLVertexBuffer(float* verticies, uint32_t size) {
+	OpenGLVertexBuffer::OpenGLVertexBuffer(const float* verticies, uint32_t size) {
 		RE_PROFILE_FUNCTION();
 
 		//Create and bind VBO to VAO
@@ -65,7 +140,7 @@ namespace RealEngine {
 		glBufferData(GL_ARRAY_BUFFER, count * sizeof(uint32_t), nullptr, GL_STATIC_DRAW);
 	}
 
-	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count) : m_Count(count) {
+	OpenGLIndexBuffer::OpenGLIndexBuffer(const uint32_t* indices, uint32_t count) : m_Count(count) {
 		RE_PROFILE_FUNCTION();
 
 		//Create and bind EBO to VAO

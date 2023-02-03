@@ -18,7 +18,7 @@ namespace RealEngine {
 		virtual bool operator==(const Texture& other) const = 0;
 	};
 
-	class Texture2D : public Texture{
+	class Texture2D : public Texture {
 	public:
 		static Ref<Texture2D> Create(const uint32_t width, const uint32_t height);
 		static Ref<Texture2D> Create(const std::string& path);
