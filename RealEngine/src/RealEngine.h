@@ -33,6 +33,8 @@
 #include "RealEngine/Renderer/Texture.h"
 #include "RealEngine/Renderer/SubTexture2D.h" 
 
+#include "RealEngine/Core/GraphicsInternalVariables.h"
+
 #include "RealEngine/Renderer/OrthographicCamera.h"
 #include "RealEngine/Renderer/OrthographicCameraController.h"
 // -----------------------------------

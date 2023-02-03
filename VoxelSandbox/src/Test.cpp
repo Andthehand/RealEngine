@@ -68,9 +68,13 @@ Test::Test() {
 	RealEngine::Ref<RealEngine::IndexBuffer> indexBuffer = RealEngine::IndexBuffer::Create(cube_elements, 36);
 
 	m_VertexArray->SetIndexBuffer(indexBuffer);
+
+	glm::vec2 coords = { 0.0f, 1.0f };
+	m_TextureBuffer = RealEngine::TextureBuffer::Create(sizeof(glm::vec2), &coords, RealEngine::BufferUsage::StaticDraw, RealEngine::InternalFormat::R32F);
 }
 
-void Test::Render() {
+void Test::Render(const RealEngine::Ref<RealEngine::Shader> shader) {
 	//0 for the mode means GL_POINTS
+	m_TextureBuffer->Bind();
 	RealEngine::RenderCommand::DrawIndexedInstanced(m_VertexArray, numPoints, 36);
 }

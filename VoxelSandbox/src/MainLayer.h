@@ -25,7 +25,7 @@ private:
 	inline void TestFunction() {
 		m_TestShader->Bind();
 		m_TestShader->SetMat4("u_ViewProjection", m_EditorCamera.GetViewProjection());
-		m_Test.Render();
+		m_Test.Render(m_TestShader);
 	}
 
 private:

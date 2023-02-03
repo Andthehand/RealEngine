@@ -28,14 +28,12 @@ namespace RealEngine {
 		OpenGLTextureBuffer(uint32_t size, const void* data, uint32_t usage, uint32_t internalFormat);
 		virtual ~OpenGLTextureBuffer();
 
-		virtual void Bind() const override;
-		virtual void BindToTexture(const Texture& texture) const override;
-		virtual void Unbind() const override;
+		virtual uint32_t GetRenderID() const override { return m_TextureRendererID; }
 
-		virtual void SetData(const void* data, uint32_t size) override;
+		virtual void Bind() const override;
+		virtual void Unbind() const override;
 	private:
-		uint32_t m_RendererID;
-		uint32_t m_Usage, m_InternalFormat;
+		uint32_t m_BufferRendererID, m_TextureRendererID;
 	};
 
 	//------------------------------------

@@ -11,7 +11,6 @@ namespace RealEngine {
 		: m_Target(target) {
 		RE_PROFILE_FUNCTION();
 
-		//Create and bind VBO to VAO
 		glCreateBuffers(1, &m_RendererID);
 		glBindBuffer(target, m_RendererID);
 		glBufferData(target, size, data, usage);
@@ -40,45 +39,42 @@ namespace RealEngine {
 		glBufferSubData(m_Target, 0, size, data);
 	}
 
-
 	//------------------------------------
 	// TextureBuffer ----------------------
 	//------------------------------------
-	OpenGLTextureBuffer::OpenGLTextureBuffer(uint32_t size, const void* data, uint32_t usage, uint32_t internalFormat)
-		: m_Usage(usage), m_InternalFormat(internalFormat) {
+	OpenGLTextureBuffer::OpenGLTextureBuffer(uint32_t size, const void* data, uint32_t usage, uint32_t internalFormat) {
 		RE_PROFILE_FUNCTION();
 
-		//Create and bind VBO to VAO
-		glCreateBuffers(1, &m_RendererID);
-		glBindBuffer(GL_TEXTURE_BUFFER, m_RendererID);
+		//Create and load TBO
+		glCreateBuffers(1, &m_BufferRendererID);
+		glBindBuffer(GL_TEXTURE_BUFFER, m_BufferRendererID);
 		glBufferData(GL_TEXTURE_BUFFER, size, data, usage);
+
+		//Bind buffer to texture
+		glGenTextures(1, &m_TextureRendererID);
+		glBindTexture(GL_TEXTURE_BUFFER, m_TextureRendererID);
+		glTexBuffer(GL_TEXTURE_BUFFER, internalFormat, m_BufferRendererID);
+
+		glBindBuffer(GL_TEXTURE_BUFFER, 0);
+		glBindTexture(GL_TEXTURE_BUFFER, 0);
 	}
 
 	OpenGLTextureBuffer::~OpenGLTextureBuffer() {
 		RE_PROFILE_FUNCTION();
 
-		glDeleteBuffers(1, &m_RendererID);
+		glDeleteBuffers(1, &m_BufferRendererID);
 	}
 
 	void OpenGLTextureBuffer::Bind() const {
 		RE_PROFILE_FUNCTION();
 
-		glBindBuffer(GL_TEXTURE_BUFFER, m_RendererID);
-	}
-
-	void OpenGLTextureBuffer::BindToTexture(const Texture& texture) const {
-		texture.Bind();
-		glTexBuffer(GL_TEXTURE_BUFFER, m_InternalFormat, m_RendererID);
+		glBindTexture(GL_TEXTURE_BUFFER, m_TextureRendererID);
 	}
 
 	void OpenGLTextureBuffer::Unbind() const {
 		RE_PROFILE_FUNCTION();
 
-		glBindBuffer(GL_TEXTURE_BUFFER, 0);
-	}
-
-	void OpenGLTextureBuffer::SetData(const void* data, uint32_t size) {
-		glBufferData(GL_TEXTURE_BUFFER, size, data, m_Usage);
+		glBindTexture(GL_TEXTURE_BUFFER, 0);
 	}
 
 	//------------------------------------

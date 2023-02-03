@@ -13,8 +13,10 @@ void main() {
 #type fragment
 #version 450
 
+uniform samplerBuffer u_TexCoordTexture;
+
 out vec4 FragColor;
 
 void main() {
-	FragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	FragColor = vec4(texelFetch(u_TexCoordTexture, 0).r * 150, texelFetch(u_TexCoordTexture, 1).r * 150, 1.0f, 1.0f);
 }

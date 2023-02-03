@@ -103,16 +103,14 @@ namespace RealEngine {
 		static Ref<Buffer> Create(uint32_t target, uint32_t size, const void* data, uint32_t usage);
 	};
 
-	//Not Tested
 	class TextureBuffer {
 	public:
 		virtual ~TextureBuffer() = default;
 
 		virtual void Bind() const = 0;
-		virtual void BindToTexture(const Texture& texture) const = 0;
 		virtual void Unbind() const = 0;
 
-		virtual void SetData(const void* data, uint32_t size) = 0;
+		virtual uint32_t GetRenderID() const = 0;
 
 		static Ref<TextureBuffer> Create(uint32_t size, const void* data, uint32_t usage, uint32_t internalFormat);
 	};
