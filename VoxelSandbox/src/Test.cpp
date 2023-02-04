@@ -48,12 +48,12 @@ Test::Test() {
 	VoxelBuffer points[numPoints] = {
 		{ cube_vertices[0], 0 },
 		{ cube_vertices[1], 0 },
-		{ cube_vertices[2], 0 },
-		{ cube_vertices[3], 0 },
-		{ cube_vertices[4], 1 },
-		{ cube_vertices[5], 1 },
-		{ cube_vertices[6], 1 },
-		{ cube_vertices[7], 1 }
+		{ cube_vertices[2], 1 },
+		{ cube_vertices[3], 1 },
+		{ cube_vertices[4], 2 },
+		{ cube_vertices[5], 2 },
+		{ cube_vertices[6], 3 },
+		{ cube_vertices[7], 3 }
 	};
 
 	RealEngine::Ref<RealEngine::VertexBuffer> vertexBuffer;
@@ -72,9 +72,11 @@ Test::Test() {
 
 	m_VertexArray->SetIndexBuffer(indexBuffer);
 
-	glm::vec2 coords[2] = {
+	glm::vec2 coords[4] = {
 		{ 0.0f, 1.0f },
-		{ 1.0f, 0.0f }
+		{ 1.0f, 0.0f },
+		{ 1.0f, 1.0f },
+		{ 0.0f, 0.0f }
 	};
 	m_TextureBuffer = RealEngine::TextureBuffer::Create(sizeof(glm::vec2) * 2, &coords, RealEngine::BufferUsage::StaticDraw, RealEngine::ColorFormat::RG32F);
 	m_TextureBuffer->Bind();

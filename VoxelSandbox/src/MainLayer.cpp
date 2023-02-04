@@ -6,7 +6,10 @@
 MainLayer::MainLayer() : m_EditorCamera(70.0f, (float)(RealEngine::Application::Get().GetWindow().GetWidth() / RealEngine::Application::Get().GetWindow().GetHeight()), 0.1f, 1000.0f),
 						m_ChunkManager(m_EditorCamera.GetPosition()), m_Texture(m_Width, m_Height){
 	m_ChunkShader = RealEngine::Shader::Create("assets/shaders/Chunk.glsl");
-	m_TestShader = RealEngine::Shader::Create("assets/shaders/Test.glsl");
+
+	#ifdef TESTING
+		m_TestShader = RealEngine::Shader::Create("assets/shaders/Test.glsl");
+	#endif
 	//RealEngine::Application::Get().GetWindow().SetVSync(false);
 }
 
@@ -20,9 +23,16 @@ void MainLayer::OnUpdate(RealEngine::Timestep ts) {
 	m_ChunkShader->Bind();
 	m_ChunkShader->SetMat4("u_ViewProjection", m_EditorCamera.GetViewProjection());
 	
-	//m_ChunkManager.Render(m_EditorCamera);
+	#ifndef TESTING
+		m_ChunkManager.Render(m_EditorCamera);
+	#endif
 
-	TestFunction();
+
+	#ifdef TESTING
+		m_TestShader->Bind();
+		m_TestShader->SetMat4("u_ViewProjection", m_EditorCamera.GetViewProjection());
+		m_Test.Render(m_TestShader);
+	#endif
 }
 
 void MainLayer::OnImGuiRender() {

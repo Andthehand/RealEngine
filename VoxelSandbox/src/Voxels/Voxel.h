@@ -19,44 +19,65 @@ enum VoxelSide {
 
 class Voxel {
 public: 
-	static void CreateTextureCords(RealEngine::Ref<RealEngine::Texture2D> textureAtlas);
+	static void UploadTextureCords(RealEngine::Ref<RealEngine::Texture2D> textureAtlas);
 
 	inline VoxelType GetBlockType() { return m_BlockType; }
 	inline void SetBlockType(VoxelType blockType) { m_BlockType = blockType; }
 
-	static struct VoxelTextureCord {
-		glm::vec2 Empty_Cords[4] = { {0, 0}, {0, 0}, {0, 0}, {0, 0} };
-		std::array<RealEngine::Ref<RealEngine::SubTexture2D>, 3> Grass_Cords;
-		RealEngine::Ref<RealEngine::SubTexture2D> Dirt_Cords;
-		RealEngine::Ref<RealEngine::SubTexture2D> Water_Cords;
-		RealEngine::Ref<RealEngine::SubTexture2D> Stone_Cords;
-		std::array<RealEngine::Ref<RealEngine::SubTexture2D>, 3> Wood_Cords;
-		RealEngine::Ref<RealEngine::SubTexture2D> Sand_Cords;
-	} s_VoxelTextureCord;
+	enum VoxelTextureCordID : uint32_t {
+		Grass_Cords_Top,
+		Grass_Cords_Bottom,
+		Grass_Cords_Side,
+		Dirt_Cords,
+		Water_Cords,
+		Stone_Cords,
+		Wood_Cords_Top,
+		Wood_Cords_Bottom,
+		Wood_Cords_Side,
+		Sand_Cords
+	};
 
-	inline const glm::vec2* GetTexCord(VoxelSide side) {
+	inline const uint32_t GetTexCordID(VoxelSide side) {
 		switch (m_BlockType) {
 			case BlockType_Air:
-				return s_VoxelTextureCord.Empty_Cords;
+				break;
 			case BlockType_Grass:
-				return Voxel::s_VoxelTextureCord.Grass_Cords[side]->GetTexCoords();
+				switch (side) {
+					case Side:
+						return VoxelTextureCordID::Grass_Cords_Side;
+					case Top:
+						return VoxelTextureCordID::Grass_Cords_Top;
+					case Bottom:
+						return VoxelTextureCordID::Grass_Cords_Bottom;
+				}
+				break;
 			case BlockType_Dirt:
-				return Voxel::s_VoxelTextureCord.Dirt_Cords->GetTexCoords();
+				return VoxelTextureCordID::Dirt_Cords;
 			case BlockType_Water:
-				return Voxel::s_VoxelTextureCord.Water_Cords->GetTexCoords();
+				return VoxelTextureCordID::Water_Cords;
 			case BlockType_Stone:
-				return Voxel::s_VoxelTextureCord.Stone_Cords->GetTexCoords();
+				return VoxelTextureCordID::Stone_Cords;
 			case BlockType_Wood:
-				return Voxel::s_VoxelTextureCord.Wood_Cords[side]->GetTexCoords();
+				switch (side) {
+				case Side:
+					return VoxelTextureCordID::Wood_Cords_Side;
+				case Top:
+					return VoxelTextureCordID::Wood_Cords_Top;
+				case Bottom:
+					return VoxelTextureCordID::Wood_Cords_Bottom;
+				}
+				break;
 			case BlockType_Sand:
-				return Voxel::s_VoxelTextureCord.Sand_Cords->GetTexCoords();
-			default:
-				RE_WARN("Block type not implemented yet or block not loaded");
-				return s_VoxelTextureCord.Empty_Cords;
+				return VoxelTextureCordID::Sand_Cords;
 		}
+
+		RE_ASSERT(false, "Block type not implemented yet or block not loaded");
+		return 0;
 	}
 
 	inline bool IsAir() { return m_BlockType == VoxelType::BlockType_Air; }
 private: 
+	static RealEngine::Ref<RealEngine::TextureBuffer> s_TextureBuffer;
+
 	VoxelType m_BlockType;
 };

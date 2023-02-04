@@ -16,7 +16,7 @@ ChunkManager::ChunkManager(const glm::vec3& cameraPos)
 
 	//m_Texture = RealEngine::Texture2D::Create("assets/textures/awesomeface.png");
 	m_Texture = RealEngine::Texture2D::Create("assets/textures/Spritesheet.png");
-	Voxel::CreateTextureCords(m_Texture);
+	Voxel::UploadTextureCords(m_Texture);
 
 	//Populate m_ActiveChunks with actaul chunks
 	UpdateChunks();
