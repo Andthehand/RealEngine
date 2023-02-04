@@ -9,12 +9,12 @@ uniform mat4 u_ViewProjection;
 
 out vec2 v_TexCoord;
 
-#define Tex_Coord_ID_BITMASK uint(0x000000FF)
-#define UV_ID_BITMASK uint(0x00000300)
+#define Tex_Coord_ID_BITMASK uint(0x00000FFC)
+#define UV_ID_BITMASK uint(0x00000003)
 
 vec2 GetTextureCoords() {
-	uint textureCoordId = a_Data & Tex_Coord_ID_BITMASK;
-	uint UV = (a_Data & UV_ID_BITMASK) >> 8;
+	uint textureCoordId = (a_Data & Tex_Coord_ID_BITMASK) >> 2;
+	uint UV = a_Data & UV_ID_BITMASK;
 
 	//textureCoordId should always step by 4
 	int index = int((textureCoordId * uint(4)) + UV);

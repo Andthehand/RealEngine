@@ -155,18 +155,19 @@ void Chunk::Render() {
 	RealEngine::RenderCommand::DrawIndexed(m_VertexArray, m_IndicesIndex);
 }
 
-inline uint32_t CompressTextureCoords(const uint32_t texCoordID, uint32_t index) {
-	uint32_t ID = texCoordID;
-	uint32_t UV = index << 8;
+inline uint32_t CompressTextureCoords(const uint32_t texCoordID) {
+	uint32_t ID = (texCoordID << 2) & 0x00000FFC;
+	uint32_t UV = 0;
 	return ID | UV;
 }
 
 // Helper function to add a face to the left side of the current voxel
 void Chunk::AddLeftFace(glm::ivec3& pos, const uint32_t texCords) {
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos), CompressTextureCoords(texCords, 0) };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x,pos.y, pos.z + 1), CompressTextureCoords(texCords, 1) };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x ,pos.y + 1, pos.z + 1), CompressTextureCoords(texCords, 2) };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x ,pos.y + 1, pos.z), CompressTextureCoords(texCords, 3) };
+	uint32_t texCordId = CompressTextureCoords(texCords);
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos), texCordId++ };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x,pos.y, pos.z + 1), texCordId++ };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x ,pos.y + 1, pos.z + 1), texCordId++ };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x ,pos.y + 1, pos.z), texCordId };
 	// Add the indices for the vertices of the left face
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 4;
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 3;
@@ -178,10 +179,11 @@ void Chunk::AddLeftFace(glm::ivec3& pos, const uint32_t texCords) {
 
 // Helper function to add a face to the right side of the current voxel
 void Chunk::AddRightFace(glm::ivec3& pos, const uint32_t texCords) {
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1,pos.y, pos.z + 1), CompressTextureCoords(texCords, 0) };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1,pos.y, pos.z), CompressTextureCoords(texCords, 1) };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1,pos.y + 1, pos.z), CompressTextureCoords(texCords, 2) };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1,pos. y + 1, pos.z + 1), CompressTextureCoords(texCords, 3) };
+	uint32_t texCordId = CompressTextureCoords(texCords);
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1,pos.y, pos.z + 1), texCordId++ };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1,pos.y, pos.z), texCordId++ };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1,pos.y + 1, pos.z), texCordId++ };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1,pos. y + 1, pos.z + 1), texCordId };
 	// Add the indices for the vertices of the right face
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 4;
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 3;
@@ -193,10 +195,11 @@ void Chunk::AddRightFace(glm::ivec3& pos, const uint32_t texCords) {
 
 // Helper function to add a face to the bottom side of the current voxel
 void Chunk::AddBottomFace(glm::ivec3& pos, const uint32_t texCords) {
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x, pos.y, pos.z + 1), CompressTextureCoords(texCords, 0) };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos), CompressTextureCoords(texCords, 1) };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y, pos.z), CompressTextureCoords(texCords, 2) };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y, pos.z + 1), CompressTextureCoords(texCords, 3) };
+	uint32_t texCordId = CompressTextureCoords(texCords);
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x, pos.y, pos.z + 1), texCordId++ };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos), texCordId++ };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y, pos.z), texCordId++ };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y, pos.z + 1), texCordId };
 	// Add the indices for the vertices of the bottom face
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 4;
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 3;
@@ -208,10 +211,11 @@ void Chunk::AddBottomFace(glm::ivec3& pos, const uint32_t texCords) {
 
 // Helper function to add a face to the top side of the current voxel
 void Chunk::AddTopFace(glm::ivec3& pos, const uint32_t texCords) {
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x , pos.y + 1, pos.z), CompressTextureCoords(texCords, 0) };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x , pos.y + 1, pos.z + 1), CompressTextureCoords(texCords, 1) };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y + 1, pos.z + 1), CompressTextureCoords(texCords, 2) };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y + 1, pos.z), CompressTextureCoords(texCords, 3) };
+	uint32_t texCordId = CompressTextureCoords(texCords);
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x , pos.y + 1, pos.z), texCordId++ };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x , pos.y + 1, pos.z + 1), texCordId++ };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y + 1, pos.z + 1), texCordId++ };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y + 1, pos.z), texCordId };
 	// Add the indices for the vertices of the top face
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 4;
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 3;
@@ -223,10 +227,11 @@ void Chunk::AddTopFace(glm::ivec3& pos, const uint32_t texCords) {
 
 // Helper function to add a face to the back side of the current voxel
 void Chunk::AddBackFace(glm::ivec3& pos, const uint32_t texCords) {
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y, pos.z), CompressTextureCoords(texCords, 0) };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos), CompressTextureCoords(texCords, 1) };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x ,pos.y + 1, pos.z), CompressTextureCoords(texCords, 2) };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y + 1, pos.z), CompressTextureCoords(texCords, 3) };
+	uint32_t texCordId = CompressTextureCoords(texCords);
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y, pos.z), texCordId++ };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos), texCordId++ };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x ,pos.y + 1, pos.z), texCordId++ };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y + 1, pos.z), texCordId };
 	// Add the indices for the vertices of the back face
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 4;
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 3;
@@ -238,10 +243,11 @@ void Chunk::AddBackFace(glm::ivec3& pos, const uint32_t texCords) {
 
 // Helper function to add a face to the front side of the current voxel
 void Chunk::AddFrontFace(glm::ivec3& pos, const uint32_t texCords) {
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x, pos.y, pos.z + 1), CompressTextureCoords(texCords, 0) };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y, pos.z + 1), CompressTextureCoords(texCords, 1) };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y + 1, pos.z + 1), CompressTextureCoords(texCords, 2) };
-	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x , pos.y + 1, pos.z + 1), CompressTextureCoords(texCords, 3) };
+	uint32_t texCordId = CompressTextureCoords(texCords);
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x, pos.y, pos.z + 1), texCordId++ };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y, pos.z + 1), texCordId++ };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x + 1, pos.y + 1, pos.z + 1), texCordId++ };
+	m_Vertices[m_VertIndex++] = { glm::vec3(pos.x , pos.y + 1, pos.z + 1), texCordId };
 	
 	// Add the indices for the vertices of the front face
 	m_Indices[m_IndicesIndex++] = m_VertIndex - 4;
