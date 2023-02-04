@@ -52,7 +52,7 @@ void Chunk::CreateMesh() {
 
 				/// Check for inactive voxels around the current voxel
 				if (x == 0) {
-					if (neighborChunks[0] == nullptr || neighborChunks[0]->GetVoxel({ 15, y, z }).IsAir()) {
+					if (neighborChunks[0] == nullptr || neighborChunks[0]->GetVoxel({ Constants::CHUNK_SIZE - 1, y, z }).IsAir()) {
 						AddLeftFace(tempCords, voxelSideTexCords);
 					}
 				}
@@ -72,7 +72,7 @@ void Chunk::CreateMesh() {
 				}
 
 				if (y == 0) {
-					if (neighborChunks[2] == nullptr || neighborChunks[2]->GetVoxel({ x, 15, z }).IsAir()) {
+					if (neighborChunks[2] == nullptr || neighborChunks[2]->GetVoxel({ x, Constants::CHUNK_SIZE - 1, z }).IsAir()) {
 						AddBottomFace(tempCords, voxelBottomTexCords);
 					}
 				}
@@ -92,7 +92,7 @@ void Chunk::CreateMesh() {
 				}
 
 				if (z == 0) {
-					if (neighborChunks[4] == nullptr || neighborChunks[4]->GetVoxel({ x, y, 15 }).IsAir()) {
+					if (neighborChunks[4] == nullptr || neighborChunks[4]->GetVoxel({ x, y, Constants::CHUNK_SIZE - 1 }).IsAir()) {
 						AddBackFace(tempCords, voxelSideTexCords);
 					}
 				}

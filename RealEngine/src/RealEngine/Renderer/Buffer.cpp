@@ -5,7 +5,7 @@
 #include "Platform/OpenGL/OpenGLBuffer.h"
 
 namespace RealEngine {
-	Ref<Buffer> Buffer::Create(uint32_t target, uint32_t size, const void* data, uint32_t usage) {
+	Ref<Buffer> Buffer::Create(BufferTarget target, uint32_t size, const void* data, BufferUsage usage) {
 		switch (Renderer::GetAPI()) {
 			case RendererAPI::API::None:    RE_CORE_ASSERT(false, "RenderAPI::None is currently not supported!"); return nullptr;
 			case RendererAPI::API::OpenGL:  return CreateRef<OpenGLBuffer>(target, size, data, usage);
@@ -15,10 +15,10 @@ namespace RealEngine {
 		return nullptr;
 	}
 
-	Ref<TextureBuffer> TextureBuffer::Create(uint32_t size, const void* data, uint32_t usage, uint32_t internalFormat) {
+	Ref<TextureBuffer> TextureBuffer::Create(uint32_t size, const void* data, BufferUsage usage, ColorFormat colorFormat) {
 		switch (Renderer::GetAPI()) {
 			case RendererAPI::API::None:    RE_CORE_ASSERT(false, "RenderAPI::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:  return CreateRef<OpenGLTextureBuffer>(size, data, usage, internalFormat);
+			case RendererAPI::API::OpenGL:  return CreateRef<OpenGLTextureBuffer>(size, data, usage, colorFormat);
 		}
 
 		RE_CORE_ASSERT(false, "Unkown RendererAPI!");

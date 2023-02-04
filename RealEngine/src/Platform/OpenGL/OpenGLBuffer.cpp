@@ -4,16 +4,57 @@
 #include <glad/glad.h>
 
 namespace RealEngine {
+	static GLenum BufferTargetTypeToOpenGLBaseType(BufferTarget type) {
+		switch (type) {
+			case RealEngine::BufferTarget::None: break;
+		}
+
+		RE_CORE_ASSERT(false, "BufferTargetTypeToOpenGLBaseType Has not been implemented yet");
+		//RE_CORE_ASSERT(false, "Unknown BufferTarget");
+		return 0;
+	}
+
+	static GLenum BufferUsageTypeToOpenGLBaseType(BufferUsage type) {
+		switch (type) {
+			case RealEngine::BufferUsage::None: break;
+			case RealEngine::BufferUsage::StreamDraw:  return	GL_STREAM_DRAW;
+			case RealEngine::BufferUsage::StreamRead:  return	GL_STREAM_READ;
+			case RealEngine::BufferUsage::StreamCopy:  return	GL_STREAM_COPY;
+			case RealEngine::BufferUsage::StaticDraw:  return	GL_STATIC_DRAW;
+			case RealEngine::BufferUsage::StaticRead:  return	GL_STATIC_READ;
+			case RealEngine::BufferUsage::StaticCopy:  return	GL_STATIC_COPY;
+			case RealEngine::BufferUsage::DynamicDraw: return	GL_DYNAMIC_DRAW;
+			case RealEngine::BufferUsage::DynamicRead: return	GL_DYNAMIC_READ;
+			case RealEngine::BufferUsage::DynamicCopy: return	GL_DYNAMIC_COPY;
+		}
+
+		RE_CORE_ASSERT(false, "Unknown BufferUsage");
+		return 0;
+	}
+
+	//TODO: Move this to Texture or some other helper class
+	static GLenum ColorFormatTypeToOpenGLBaseType(ColorFormat type) {
+		switch (type) {
+			case RealEngine::ColorFormat::None:  break;
+			case RealEngine::ColorFormat::R8:	 return		GL_R8;
+			case RealEngine::ColorFormat::R32F:	 return		GL_R32F;
+			case RealEngine::ColorFormat::RG32F: return		GL_RG32F;
+		}
+
+		RE_CORE_ASSERT(false, "Unknown ColorFormat");
+		return 0;
+	}
+
 	//------------------------------------
 	// General Buffers -------------------
 	//------------------------------------
-	OpenGLBuffer::OpenGLBuffer(uint32_t target, uint32_t size, const void* data, uint32_t usage)
-		: m_Target(target) {
+	OpenGLBuffer::OpenGLBuffer(BufferTarget target, uint32_t size, const void* data, BufferUsage usage)
+		: m_Target(BufferTargetTypeToOpenGLBaseType(target)) {
 		RE_PROFILE_FUNCTION();
 
 		glCreateBuffers(1, &m_RendererID);
-		glBindBuffer(target, m_RendererID);
-		glBufferData(target, size, data, usage);
+		glBindBuffer(m_Target, m_RendererID);
+		glBufferData(m_Target, size, data, BufferUsageTypeToOpenGLBaseType(usage));
 	}
 
 	OpenGLBuffer::~OpenGLBuffer() {
@@ -42,18 +83,18 @@ namespace RealEngine {
 	//------------------------------------
 	// TextureBuffer ----------------------
 	//------------------------------------
-	OpenGLTextureBuffer::OpenGLTextureBuffer(uint32_t size, const void* data, uint32_t usage, uint32_t internalFormat) {
+	OpenGLTextureBuffer::OpenGLTextureBuffer(uint32_t size, const void* data, BufferUsage usage, ColorFormat colorFormat) {
 		RE_PROFILE_FUNCTION();
 
 		//Create and load TBO
 		glCreateBuffers(1, &m_BufferRendererID);
 		glBindBuffer(GL_TEXTURE_BUFFER, m_BufferRendererID);
-		glBufferData(GL_TEXTURE_BUFFER, size, data, usage);
+		glBufferData(GL_TEXTURE_BUFFER, size, data, BufferUsageTypeToOpenGLBaseType(usage));
 
 		//Bind buffer to texture
 		glGenTextures(1, &m_TextureRendererID);
 		glBindTexture(GL_TEXTURE_BUFFER, m_TextureRendererID);
-		glTexBuffer(GL_TEXTURE_BUFFER, internalFormat, m_BufferRendererID);
+		glTexBuffer(GL_TEXTURE_BUFFER, ColorFormatTypeToOpenGLBaseType(colorFormat), m_BufferRendererID);
 
 		glBindBuffer(GL_TEXTURE_BUFFER, 0);
 		glBindTexture(GL_TEXTURE_BUFFER, 0);

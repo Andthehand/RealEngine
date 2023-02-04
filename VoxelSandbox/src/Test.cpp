@@ -1,10 +1,14 @@
 #include "Test.h"
 
+#define Tex_Coord_ID_BITMASK uint32_t(0x000000FF)
+#define UV_ID_BITMASK uint32_t(0x00000300)
+
 struct VoxelBuffer {
-	glm::vec3 Position;
+	glm::vec3 Vert;
+	uint32_t Data;
 };
 
-glm::vec3 cube_vertices[] = {
+glm::vec3 cube_vertices[8] = {
 	// front
 	{ -1.0, -1.0,  1.0 },
 	{  1.0, -1.0,  1.0 },
@@ -38,43 +42,46 @@ uint32_t cube_elements[36] = {
 	6, 7, 3
 };
 
-const uint32_t numPoints = 5;
+const uint32_t numPoints = 8;
 
 Test::Test() {
-	glm::vec3 points[numPoints] = {
-		{ 0.0f, 0.0f, 0.0f },
-		{ 5.0f, 0.0f, 0.0f },
-		{ 5.0f, 5.0f, 0.0f },
-		{ 5.0f, 5.0f, 5.0f },
-		{ 5.0f, 0.0f, 5.0f }
+	VoxelBuffer points[numPoints] = {
+		{ cube_vertices[0], 0 },
+		{ cube_vertices[1], 0 },
+		{ cube_vertices[2], 0 },
+		{ cube_vertices[3], 0 },
+		{ cube_vertices[4], 1 },
+		{ cube_vertices[5], 1 },
+		{ cube_vertices[6], 1 },
+		{ cube_vertices[7], 1 }
 	};
 
-	RealEngine::Ref<RealEngine::VertexBuffer> vertexBuffer, instanceBuffer;
+	RealEngine::Ref<RealEngine::VertexBuffer> vertexBuffer;
 
 	m_VertexArray = RealEngine::VertexArray::Create();
 	
-	vertexBuffer = RealEngine::VertexBuffer::Create((float*)cube_vertices, sizeof(VoxelBuffer) * 8);
+	vertexBuffer = RealEngine::VertexBuffer::Create(sizeof(VoxelBuffer) * numPoints);
+	vertexBuffer->SetData(points, sizeof(VoxelBuffer) * numPoints);
 	vertexBuffer->SetLayout({
-		{ RealEngine::ShaderDataType::Float3, "a_Vert" },
+		{ RealEngine::ShaderDataType::Float3, "a_Position" },
+		{ RealEngine::ShaderDataType::UInt, "a_Data" }
 	});
 	m_VertexArray->AddVertexBuffer(vertexBuffer);
-
-	instanceBuffer = RealEngine::VertexBuffer::Create((float*)points, sizeof(VoxelBuffer) * numPoints);
-	instanceBuffer->SetLayout({
-		{ RealEngine::ShaderDataType::Float3, "a_Position", 1 }
-	});
-	m_VertexArray->AddVertexBuffer(instanceBuffer);
 
 	RealEngine::Ref<RealEngine::IndexBuffer> indexBuffer = RealEngine::IndexBuffer::Create(cube_elements, 36);
 
 	m_VertexArray->SetIndexBuffer(indexBuffer);
 
-	glm::vec2 coords = { 0.0f, 1.0f };
-	m_TextureBuffer = RealEngine::TextureBuffer::Create(sizeof(glm::vec2), &coords, RealEngine::BufferUsage::StaticDraw, RealEngine::InternalFormat::R32F);
+	glm::vec2 coords[2] = {
+		{ 0.0f, 1.0f },
+		{ 1.0f, 0.0f }
+	};
+	m_TextureBuffer = RealEngine::TextureBuffer::Create(sizeof(glm::vec2) * 2, &coords, RealEngine::BufferUsage::StaticDraw, RealEngine::ColorFormat::RG32F);
+	m_TextureBuffer->Bind();
 }
 
 void Test::Render(const RealEngine::Ref<RealEngine::Shader> shader) {
 	//0 for the mode means GL_POINTS
-	m_TextureBuffer->Bind();
-	RealEngine::RenderCommand::DrawIndexedInstanced(m_VertexArray, numPoints, 36);
+	//m_TextureBuffer->Bind();
+	RealEngine::RenderCommand::DrawIndexed(m_VertexArray, 36);
 }

@@ -14,6 +14,7 @@ namespace RealEngine {
 			case RealEngine::ShaderDataType::Float4:  return GL_FLOAT;
 			case RealEngine::ShaderDataType::Mat3:	  return GL_FLOAT;
 			case RealEngine::ShaderDataType::Mat4:	  return GL_FLOAT;
+			case RealEngine::ShaderDataType::UInt:	  return GL_UNSIGNED_INT;
 			case RealEngine::ShaderDataType::Int:	  return GL_INT;
 			case RealEngine::ShaderDataType::Int2:	  return GL_INT;
 			case RealEngine::ShaderDataType::Int3:	  return GL_INT;
@@ -61,6 +62,18 @@ namespace RealEngine {
 		const auto& layout = vertexBuffer->GetLayout();
 		for (const auto& element : layout) {
 			switch (element.Type) {
+			case ShaderDataType::UInt: {
+				glEnableVertexAttribArray(m_VertexBufferIndex);
+				glVertexAttribIPointer(m_VertexBufferIndex,
+					element.GetComponentCount(),
+					ShaderDataTypeToOpenGLBaseType(element.Type),
+					layout.GetStride(),
+					(const void*)element.Offset);
+				//This is for instancing
+				glVertexAttribDivisor(m_VertexBufferIndex, element.InstancedDivisor);
+				m_VertexBufferIndex++;
+				break;
+			}
 			case ShaderDataType::Float:
 			case ShaderDataType::Float2:
 			case ShaderDataType::Float3:

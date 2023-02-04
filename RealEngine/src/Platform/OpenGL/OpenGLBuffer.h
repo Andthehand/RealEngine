@@ -8,7 +8,7 @@ namespace RealEngine {
 	//------------------------------------
 	class OpenGLBuffer : public Buffer {
 	public:
-		OpenGLBuffer(uint32_t target, uint32_t size, const void* data, uint32_t usage);
+		OpenGLBuffer(BufferTarget target, uint32_t size, const void* data, BufferUsage usage);
 		virtual ~OpenGLBuffer();
 
 		virtual void Bind() const override;
@@ -25,7 +25,7 @@ namespace RealEngine {
 	//------------------------------------
 	class OpenGLTextureBuffer : public TextureBuffer {
 	public:
-		OpenGLTextureBuffer(uint32_t size, const void* data, uint32_t usage, uint32_t internalFormat);
+		OpenGLTextureBuffer(uint32_t size, const void* data, BufferUsage usage, ColorFormat colorFormat);
 		virtual ~OpenGLTextureBuffer();
 
 		virtual uint32_t GetRenderID() const override { return m_TextureRendererID; }

@@ -3,7 +3,7 @@
 
 namespace RealEngine {
 	enum class ShaderDataType {
-		None = 0, Float, Float2, Float3, Float4, Mat3, Mat4, Int, Int2, Int3, Int4, Bool
+		None = 0, Float, Float2, Float3, Float4, Mat3, Mat4, UInt, Int, Int2, Int3, Int4, Bool
 	};
 
 	static uint32_t ShaderDataTypeSize(ShaderDataType type) {
@@ -14,6 +14,7 @@ namespace RealEngine {
 			case ShaderDataType::Float4:  return 4 * 4;
 			case ShaderDataType::Mat3:	  return 4 * 3 * 3;
 			case ShaderDataType::Mat4:	  return 4 * 4 * 4;
+			case ShaderDataType::UInt:	  return 4;
 			case ShaderDataType::Int:	  return 4;
 			case ShaderDataType::Int2:	  return 4 * 2;
 			case ShaderDataType::Int3:	  return 4 * 3;
@@ -24,6 +25,14 @@ namespace RealEngine {
 
 		return 0;
 	}
+
+	enum class BufferUsage {
+		None = 0, StreamDraw, StreamRead, StreamCopy, StaticDraw, StaticRead, StaticCopy, DynamicDraw, DynamicRead, DynamicCopy
+	};
+
+	enum class BufferTarget {
+		None = 0
+	};
 
 	struct BufferElement {
 		std::string Name;
@@ -46,6 +55,7 @@ namespace RealEngine {
 				case ShaderDataType::Float4: return 4;
 				case ShaderDataType::Mat3:   return 3; // 3* float3
 				case ShaderDataType::Mat4:   return 4; // 4* float4
+				case ShaderDataType::UInt:	 return 1;
 				case ShaderDataType::Int:	 return 1;
 				case ShaderDataType::Int2:	 return 2;
 				case ShaderDataType::Int3:	 return 3;
@@ -99,8 +109,8 @@ namespace RealEngine {
 
 		virtual void SetData(const void* data, uint32_t size) = 0;
 
-		static Ref<Buffer> Create(uint32_t target, uint32_t size, uint32_t usage);
-		static Ref<Buffer> Create(uint32_t target, uint32_t size, const void* data, uint32_t usage);
+		static Ref<Buffer> Create(BufferTarget target, uint32_t size, BufferUsage usage);
+		static Ref<Buffer> Create(BufferTarget target, uint32_t size, const void* data, BufferUsage usage);
 	};
 
 	class TextureBuffer {
@@ -112,7 +122,7 @@ namespace RealEngine {
 
 		virtual uint32_t GetRenderID() const = 0;
 
-		static Ref<TextureBuffer> Create(uint32_t size, const void* data, uint32_t usage, uint32_t internalFormat);
+		static Ref<TextureBuffer> Create(uint32_t size, const void* data, BufferUsage usage, ColorFormat colorFormat);
 	};
 
 	class VertexBuffer {

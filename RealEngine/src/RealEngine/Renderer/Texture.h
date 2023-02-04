@@ -5,6 +5,10 @@
 #include "RealEngine/Core/Core.h"
 
 namespace RealEngine {
+	enum class ColorFormat {
+		None = 0, R8, R32F, RG32F
+	};
+
 	class Texture {
 	public:
 		virtual ~Texture() = default;
