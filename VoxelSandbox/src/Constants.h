@@ -9,5 +9,5 @@ public:
 	//All of the stuff to do with threads
 	static const uint32_t NUM_MAX_THREADS = 8;
 
-	inline static const float NOISE_STEP = 0.005f;
+	inline static const float FREQUENCY = 0.005f;
 };

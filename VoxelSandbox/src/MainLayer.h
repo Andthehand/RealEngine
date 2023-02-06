@@ -41,7 +41,7 @@ private:
 
 	int m_Width = 500;
 	int m_Height = 500;
-	float m_Precition = Constants::NOISE_STEP;
+	float m_Precition = Constants::FREQUENCY;
 	PerlinTexture m_Texture;
 
 	bool m_Wireframe = false;

@@ -21,7 +21,8 @@ project "VoxelSandbox"
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.ImGuizmo}",
-		"%{IncludeDir.ImPlot}"
+		"%{IncludeDir.ImPlot}",
+		"%{IncludeDir.FastNoise2}/include"
 	}
 
 	links {
@@ -35,13 +36,22 @@ project "VoxelSandbox"
 		defines "RE_DEBUG"
 		runtime "Debug"
 		symbols "on"
+		links {
+			"%{IncludeDir.FastNoise2}/lib/FastNoiseD.lib"
+		}
 
 	filter "configurations:Release"
 		defines "RE_RELEASE"
 		runtime "Release"
 		optimize "on"
+		links {
+			"%{IncludeDir.FastNoise2}/lib/FastNoise.lib"
+		}
 
 	filter "configurations:Dist"
 		defines "RE_DIST"
 		runtime "Release"
 		optimize "on"
+		links {
+			"%{IncludeDir.FastNoise2}/lib/FastNoise.lib"
+		}
