@@ -2,7 +2,6 @@
 
 #include <imgui/imgui.h>
 
-
 MainLayer::MainLayer() : m_EditorCamera(70.0f, (float)(RealEngine::Application::Get().GetWindow().GetWidth() / RealEngine::Application::Get().GetWindow().GetHeight()), 0.1f, 1000.0f),
 						m_ChunkManager(m_EditorCamera.GetPosition()), m_Texture(m_Width, m_Height){
 	m_ChunkShader = RealEngine::Shader::Create("assets/shaders/Chunk.glsl");
@@ -10,6 +9,7 @@ MainLayer::MainLayer() : m_EditorCamera(70.0f, (float)(RealEngine::Application::
 	#ifdef TESTING
 		m_TestShader = RealEngine::Shader::Create("assets/shaders/Test.glsl");
 	#endif
+
 	//RealEngine::Application::Get().GetWindow().SetVSync(false);
 }
 

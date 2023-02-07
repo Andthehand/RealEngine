@@ -13,8 +13,9 @@ public:
 	//static inline RealEngine::BasicPerlinNoise<float> GetNoiseObject() { return m_PerlinNoise; }
 
 	static inline void CreateTerrain(Voxel m_Voxels[Constants::CHUNK_SIZE][Constants::CHUNK_SIZE][Constants::CHUNK_SIZE], glm::ivec3 worldPos) {
-		FastNoise::SmartNode<FastNoise::Perlin> m_PerlinNoise = FastNoise::New<FastNoise::Perlin>();
-		
+		FastNoise::SmartNode<> m_PerlinNoise = FastNoise::NewFromEncodedNodeTree("FwAAAIC/AACAPwAAAAAAAIA/BwA=");
+		//FastNoise::SmartNode<FastNoise::Perlin> m_PerlinNoise = FastNoise::New<FastNoise::Perlin>();
+
 		float noiseOutput[Constants::CHUNK_SIZE * Constants::CHUNK_SIZE];
 
 		m_PerlinNoise->GenUniformGrid2D(noiseOutput, worldPos.x, worldPos.z, Constants::CHUNK_SIZE, Constants::CHUNK_SIZE, Constants::FREQUENCY, 0);
@@ -32,8 +33,4 @@ public:
 			}
 		}
 	}
-
-private:
-	//inline static FastNoise::SmartNode<FastNoise::Perlin> m_PerlinNoise = FastNoise::New<FastNoise::Perlin>();
-	//inline static RealEngine::BasicPerlinNoise<float> m_PerlinNoise;
 };
