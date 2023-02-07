@@ -3,6 +3,8 @@
 
 #include <glad/glad.h>
 
+#include "OpenGLBuffer.cpp"
+
 namespace RealEngine {
 
 	void OpenGLMessageCallback (
@@ -57,8 +59,8 @@ namespace RealEngine {
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	}
 
-	void OpenGLRendererAPI::DrawArrays(const Ref<VertexArray>& vertexArray, uint32_t mode, uint32_t count, uint32_t start) {
-		glDrawArrays(mode, start, count);
+	void OpenGLRendererAPI::DrawArrays(const Ref<VertexArray>& vertexArray, BufferMode mode, uint32_t count, uint32_t start) {
+		glDrawArrays(BufferModeTypeToOpenGLBaseType(mode), start, count);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
@@ -67,8 +69,8 @@ namespace RealEngine {
 		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
-	void OpenGLRendererAPI::DrawArraysInstanced(const Ref<VertexArray>& vertexArray, uint32_t mode, uint32_t verticeCount, uint32_t instanceCount, uint32_t start) {
-		glDrawArraysInstanced(mode, start, verticeCount, instanceCount);
+	void OpenGLRendererAPI::DrawArraysInstanced(const Ref<VertexArray>& vertexArray, BufferMode mode, uint32_t verticeCount, uint32_t instanceCount, uint32_t start) {
+		glDrawArraysInstanced(BufferModeTypeToOpenGLBaseType(mode), start, verticeCount, instanceCount);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 

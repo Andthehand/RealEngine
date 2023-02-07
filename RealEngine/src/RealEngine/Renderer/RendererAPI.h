@@ -21,10 +21,10 @@ namespace RealEngine {
 		virtual void SetClearColor(const glm::vec4& color) = 0;
 		virtual void Clear() = 0;
 
-		virtual void DrawArrays(const Ref<VertexArray>& vertexArray, uint32_t mode, uint32_t count, uint32_t start = 0) = 0;
+		virtual void DrawArrays(const Ref<VertexArray>& vertexArray, BufferMode mode, uint32_t count, uint32_t start = 0) = 0;
 		virtual void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount = 0) = 0;
 		
-		virtual void DrawArraysInstanced(const Ref<VertexArray>& vertexArray, uint32_t mode, uint32_t verticeCount, uint32_t instanceCount, uint32_t start = 0) = 0;
+		virtual void DrawArraysInstanced(const Ref<VertexArray>& vertexArray, BufferMode mode, uint32_t verticeCount, uint32_t instanceCount, uint32_t start = 0) = 0;
 		virtual void DrawIndexedInstanced(const Ref<VertexArray>& vertexArray, uint32_t instanceCount, uint32_t indexCount = 0) = 0;
 
 

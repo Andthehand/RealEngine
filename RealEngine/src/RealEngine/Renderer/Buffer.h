@@ -30,6 +30,10 @@ namespace RealEngine {
 		None = 0, StreamDraw, StreamRead, StreamCopy, StaticDraw, StaticRead, StaticCopy, DynamicDraw, DynamicRead, DynamicCopy
 	};
 
+	enum class BufferMode {
+		None = 0, Points, LineStrip, LineLoop, Lines, LineStripAdjacency, LinesAdjacency, TriangleStrip, TriangleFan, Triangles, TriangleStripAdjacency, TrianglesAdjacency, Patches
+	};
+
 	enum class BufferTarget {
 		None = 0
 	};

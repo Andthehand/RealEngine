@@ -32,6 +32,27 @@ namespace RealEngine {
 		return 0;
 	}
 
+	static GLenum BufferModeTypeToOpenGLBaseType(BufferMode type) {
+		switch (type) {
+			case RealEngine::BufferMode::None: break;
+			case RealEngine::BufferMode::Points: return					GL_POINTS;
+			case RealEngine::BufferMode::LineStrip: return				GL_LINE_STRIP;
+			case RealEngine::BufferMode::LineLoop: return				GL_LINE_LOOP;
+			case RealEngine::BufferMode::Lines: return					GL_LINES;
+			case RealEngine::BufferMode::LineStripAdjacency: return		GL_LINE_STRIP_ADJACENCY;
+			case RealEngine::BufferMode::LinesAdjacency: return			GL_LINES_ADJACENCY;
+			case RealEngine::BufferMode::TriangleStrip: return			GL_TRIANGLE_STRIP;
+			case RealEngine::BufferMode::TriangleFan: return			GL_TRIANGLE_FAN;
+			case RealEngine::BufferMode::Triangles: return				GL_TRIANGLES;
+			case RealEngine::BufferMode::TriangleStripAdjacency: return GL_TRIANGLE_STRIP_ADJACENCY;
+			case RealEngine::BufferMode::TrianglesAdjacency: return		GL_TRIANGLES_ADJACENCY;
+			case RealEngine::BufferMode::Patches: return				GL_PATCHES;
+		}
+
+		RE_CORE_ASSERT(false, "Unknown BufferMode");
+		return 0;
+	}
+
 	//TODO: Move this to Texture or some other helper class
 	static GLenum ColorFormatTypeToOpenGLBaseType(ColorFormat type) {
 		switch (type) {
