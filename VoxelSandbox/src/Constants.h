@@ -7,7 +7,7 @@ public:
 	//This is the amount of chunks that will be rendered in one direction around the camera
 	static const int WORLD_HEIGHT = 256;
 	//All of the stuff to do with threads
-	static const uint32_t NUM_MAX_THREADS = 8;
+	static const uint32_t NUM_MAX_THREADS = 1;
 
 	inline static const float FREQUENCY = 0.005f;
 };

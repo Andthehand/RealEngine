@@ -30,16 +30,19 @@ void Chunk::CreateMesh() {
 		m_ChunkManager.GetChunk({ m_WorldOffset.x, m_WorldOffset.y, m_WorldOffset.z + Constants::CHUNK_SIZE })
 	};
 
+	m_Vertices.resize(24);
+	m_Indices.resize(6);
+
 	for (int x = 0; x < Constants::CHUNK_SIZE; x++) {
 		for (int y = 0; y < Constants::CHUNK_SIZE; y++) {
 			for (int z = 0; z < Constants::CHUNK_SIZE; z++) {
 				if (m_Voxels[x][y][z].IsAir()) continue;
 
 				if (m_VertIndex + 24 > m_Vertices.size()) {
-					m_Vertices.resize(m_VertIndex + 24 * 2);
+					m_Vertices.resize(m_Vertices.size() * 2);
 				}
 				if (m_IndicesIndex + 36 > m_Indices.size()) {
-					m_Indices.resize(m_IndicesIndex + 36 * 2);
+					m_Indices.resize(m_Vertices.size() * 2);
 				}
 
 				//AddLeftFace(glm::vec3{ 0, 0, 0 });
@@ -146,6 +149,9 @@ void Chunk::CreateBuffers() {
 void Chunk::UpdateBuffers() {
 	m_VertexArray->GetVertexBuffers()[0]->SetData(std::data(m_Vertices), sizeof(VoxelBuffer) * m_VertIndex);
 	m_VertexArray->GetIndexBuffer()->SetData(std::data(m_Indices), m_IndicesIndex);
+
+	std::vector<VoxelBuffer>().swap(m_Vertices);
+	std::vector<uint32_t>().swap(m_Indices);
 
 	m_Status = Status::Renderable;
 }
