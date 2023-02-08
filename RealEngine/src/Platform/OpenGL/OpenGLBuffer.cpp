@@ -3,69 +3,9 @@
 
 #include <glad/glad.h>
 
+#include "OpenGLConstants.h"
+
 namespace RealEngine {
-	static GLenum BufferTargetTypeToOpenGLBaseType(BufferTarget type) {
-		switch (type) {
-			case RealEngine::BufferTarget::None: break;
-		}
-
-		RE_CORE_ASSERT(false, "BufferTargetTypeToOpenGLBaseType Has not been implemented yet");
-		//RE_CORE_ASSERT(false, "Unknown BufferTarget");
-		return 0;
-	}
-
-	static GLenum BufferUsageTypeToOpenGLBaseType(BufferUsage type) {
-		switch (type) {
-			case RealEngine::BufferUsage::None: break;
-			case RealEngine::BufferUsage::StreamDraw:  return	GL_STREAM_DRAW;
-			case RealEngine::BufferUsage::StreamRead:  return	GL_STREAM_READ;
-			case RealEngine::BufferUsage::StreamCopy:  return	GL_STREAM_COPY;
-			case RealEngine::BufferUsage::StaticDraw:  return	GL_STATIC_DRAW;
-			case RealEngine::BufferUsage::StaticRead:  return	GL_STATIC_READ;
-			case RealEngine::BufferUsage::StaticCopy:  return	GL_STATIC_COPY;
-			case RealEngine::BufferUsage::DynamicDraw: return	GL_DYNAMIC_DRAW;
-			case RealEngine::BufferUsage::DynamicRead: return	GL_DYNAMIC_READ;
-			case RealEngine::BufferUsage::DynamicCopy: return	GL_DYNAMIC_COPY;
-		}
-
-		RE_CORE_ASSERT(false, "Unknown BufferUsage");
-		return 0;
-	}
-
-	static GLenum BufferModeTypeToOpenGLBaseType(BufferMode type) {
-		switch (type) {
-			case RealEngine::BufferMode::None: break;
-			case RealEngine::BufferMode::Points: return					GL_POINTS;
-			case RealEngine::BufferMode::LineStrip: return				GL_LINE_STRIP;
-			case RealEngine::BufferMode::LineLoop: return				GL_LINE_LOOP;
-			case RealEngine::BufferMode::Lines: return					GL_LINES;
-			case RealEngine::BufferMode::LineStripAdjacency: return		GL_LINE_STRIP_ADJACENCY;
-			case RealEngine::BufferMode::LinesAdjacency: return			GL_LINES_ADJACENCY;
-			case RealEngine::BufferMode::TriangleStrip: return			GL_TRIANGLE_STRIP;
-			case RealEngine::BufferMode::TriangleFan: return			GL_TRIANGLE_FAN;
-			case RealEngine::BufferMode::Triangles: return				GL_TRIANGLES;
-			case RealEngine::BufferMode::TriangleStripAdjacency: return GL_TRIANGLE_STRIP_ADJACENCY;
-			case RealEngine::BufferMode::TrianglesAdjacency: return		GL_TRIANGLES_ADJACENCY;
-			case RealEngine::BufferMode::Patches: return				GL_PATCHES;
-		}
-
-		RE_CORE_ASSERT(false, "Unknown BufferMode");
-		return 0;
-	}
-
-	//TODO: Move this to Texture or some other helper class
-	static GLenum ColorFormatTypeToOpenGLBaseType(ColorFormat type) {
-		switch (type) {
-			case RealEngine::ColorFormat::None:  break;
-			case RealEngine::ColorFormat::R8:	 return		GL_R8;
-			case RealEngine::ColorFormat::R32F:	 return		GL_R32F;
-			case RealEngine::ColorFormat::RG32F: return		GL_RG32F;
-		}
-
-		RE_CORE_ASSERT(false, "Unknown ColorFormat");
-		return 0;
-	}
-
 	//------------------------------------
 	// General Buffers -------------------
 	//------------------------------------

@@ -3,7 +3,7 @@
 
 #include <glad/glad.h>
 
-#include "OpenGLBuffer.cpp"
+#include "OpenGLConstants.h"
 
 namespace RealEngine {
 
