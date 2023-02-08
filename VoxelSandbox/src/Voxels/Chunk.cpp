@@ -17,10 +17,12 @@ void Chunk::LoadVoxels() {
 	m_Status = Status::UpdateMesh;
 }
 
-inline uint32_t CompressTextureCoords(const uint32_t texCoordID) {
-	uint32_t ID = (texCoordID << 2) & 0x00000FFC;
-	uint32_t UV = 0;
-	return ID | UV;
+inline uint32_t CompressTextureCoords(const uint32_t texCoordID, const uint8_t uv, const uint32_t width, const uint32_t height) {
+	uint8_t UV = uv					  & 0x00000003;
+	uint16_t ID = (texCoordID << 2)   &	0x00000FFC;
+	uint32_t XOffset = (width << 12)  &	0x000FF000;
+	uint32_t YOffset = (height << 20) &	0x0FF00000;
+	return ID | UV | XOffset | YOffset;
 }
 
 inline int f(glm::ivec3& dims, int i, int j, int k) {
@@ -111,11 +113,15 @@ void Chunk::CreateMesh() {
 						glm::ivec3 dv = glm::ivec3(0);
 						dv[v] = h;
 
+						Voxel tempVox;
+						tempVox.SetBlockType(VoxelType::BlockType_Grass);
+						uint32_t ID = tempVox.GetTexCordID(VoxelSide::Side);
+						uint8_t UV = 0;
 						// Create a quad for this face. Colour, normal or textures are not stored in this block vertex format.
-						m_Vertices.push_back({ glm::ivec3{x[0] + du[0], x[1] + du[1], x[2] + du[2] } + m_WorldOffset, { 0 } });        // Top right vertice position
-						m_Vertices.push_back({ glm::ivec3{x[0], x[1], x[2] } + m_WorldOffset, { 0 } });                 // Top-left vertice position
-						m_Vertices.push_back({ glm::ivec3{x[0] + dv[0], x[1] + dv[1], x[2] + dv[2] } + m_WorldOffset, { 0 } });       // Bottom left vertice position
-						m_Vertices.push_back({ glm::ivec3{x[0] + du[0] + dv[0], x[1] + du[1] + dv[1], x[2] + du[2] + dv[2]} + m_WorldOffset, { 0 } });  // Bottom right vertice position
+						m_Vertices.push_back({ glm::ivec3{x[0] + du[0], x[1] + du[1], x[2] + du[2] } + m_WorldOffset, CompressTextureCoords(ID, UV++, w, h)});        // Top right vertice position
+						m_Vertices.push_back({ glm::ivec3{x[0], x[1], x[2] } + m_WorldOffset, CompressTextureCoords(ID, UV++, w, h) });                 // Top-left vertice position
+						m_Vertices.push_back({ glm::ivec3{x[0] + dv[0], x[1] + dv[1], x[2] + dv[2] } + m_WorldOffset, CompressTextureCoords(ID, UV++, w, h) });       // Bottom left vertice position
+						m_Vertices.push_back({ glm::ivec3{x[0] + du[0] + dv[0], x[1] + du[1] + dv[1], x[2] + du[2] + dv[2]} + m_WorldOffset, CompressTextureCoords(ID, UV, w, h) });  // Bottom right vertice position
 
 						// Clear this part of the mask, so we don't add duplicate faces
 						for (l = 0; l < h; ++l)
@@ -126,8 +132,7 @@ void Chunk::CreateMesh() {
 						i += w;
 						n += w;
 					}
-					else
-					{
+					else {
 						i++;
 						n++;
 					}

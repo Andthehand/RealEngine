@@ -9,11 +9,13 @@ uniform mat4 u_ViewProjection;
 
 out vec2 v_TexCoord;
 
-#define Tex_Coord_ID_BITMASK uint(0x00000FFC)
-#define UV_ID_BITMASK uint(0x00000003)
+#define UV_ID_BITMASK			uint(0x00000003)
+#define TEX_COORD_ID_BITMASK	uint(0x00000FFC)
+#define WIDTH_OFFSET_BITMASK	uint(0x000FF000)
+#define HEIGHT_OFFSET_BITMASK	uint(0x0FF00000)
 
-vec2 GetTextureCoords() {
-	uint textureCoordId = (a_Data & Tex_Coord_ID_BITMASK) >> 2;
+vec2 GetTextureCoord() {
+	uint textureCoordId = (a_Data & TEX_COORD_ID_BITMASK) >> 2;
 	uint UV = a_Data & UV_ID_BITMASK;
 
 	//textureCoordId should always step by 4
@@ -21,8 +23,15 @@ vec2 GetTextureCoords() {
 	return vec2(texelFetch(u_TexCoordTexture, index).rg);
 }
 
+vec2 GetOffset() {
+	uint XOffset = (a_Data & WIDTH_OFFSET_BITMASK)  >> 12;
+	uint YOffset = (a_Data & HEIGHT_OFFSET_BITMASK) >> 20;
+
+	return vec2(XOffset, YOffset);
+}
+
 void main() {
-	v_TexCoord = GetTextureCoords();
+	v_TexCoord = GetTextureCoord() * GetOffset();
 	
 	gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
 }
