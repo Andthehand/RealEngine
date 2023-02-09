@@ -19,6 +19,9 @@ enum VoxelSide {
 
 class Voxel {
 public: 
+	Voxel() = default;
+	Voxel(VoxelType type) : m_BlockType(type) {};
+
 	static void UploadTextureCords();
 
 	inline VoxelType GetBlockType() { return m_BlockType; }
@@ -77,6 +80,16 @@ public:
 
 	inline bool IsAir() { return m_BlockType == VoxelType::BlockType_Air; }
 	
+	operator bool() const {
+		return m_BlockType != VoxelType::BlockType_Air;
+	}
+	bool operator!=(const Voxel& other) const {
+		return m_BlockType != ((Voxel&)other).GetBlockType();
+	}
+	bool operator==(const Voxel& other) const {
+		return m_BlockType == ((Voxel&)other).GetBlockType();
+	}
+
 private:
 	static RealEngine::Ref<RealEngine::TextureBuffer> s_TextureBuffer;
 

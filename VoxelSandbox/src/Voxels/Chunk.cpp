@@ -49,7 +49,7 @@ void Chunk::CreateMesh() {
 		glm::ivec3 x = glm::ivec3(0);
 		glm::ivec3 q = glm::ivec3(0);
 
-		bool mask[Constants::CHUNK_SIZE * Constants::CHUNK_SIZE];
+		Voxel mask[Constants::CHUNK_SIZE * Constants::CHUNK_SIZE];
 		q[d] = 1;
 
 		// Check each slice of the chunk one at a time
@@ -62,12 +62,17 @@ void Chunk::CreateMesh() {
 					// q determines the direction (X, Y or Z) that we are searching
 					// m.IsBlockAt(x,y,z) takes global map positions and returns true if a block exists there
 
-					bool blockCurrent = 0 <= x[d] ? m_Voxels[x[0]][x[1]][x[2]].IsAir() : true;
-					bool blockCompare = x[d] < Constants::CHUNK_SIZE - 1 ? m_Voxels[x[0] + q[0]][x[1] + q[1]][x[2] + q[2]].IsAir() : true;
+					Voxel blockCurrent = 0 <= x[d] ? m_Voxels[x[0]][x[1]][x[2]].GetBlockType() : Voxel(VoxelType::BlockType_Air);
+					Voxel blockCompare = x[d] < Constants::CHUNK_SIZE - 1 ? m_Voxels[x[0] + q[0]][x[1] + q[1]][x[2] + q[2]].GetBlockType() : Voxel(VoxelType::BlockType_Air);
+
+
+					//bool blockCurrent = 0 <= x[d] ? m_Voxels[x[0]][x[1]][x[2]].IsAir() : true;
+					//bool blockCompare = x[d] < Constants::CHUNK_SIZE - 1 ? m_Voxels[x[0] + q[0]][x[1] + q[1]][x[2] + q[2]].IsAir() : true;
 
 					// The mask is set to true if there is a visible face between two blocks,
 					//   i.e. both aren't empty and both aren't blocks
-					mask[n++] = blockCurrent != blockCompare;
+					//mask[n++] = blockCurrent != blockCompare;
+					mask[n++] = blockCurrent != blockCompare ? Voxel(VoxelType::BlockType_Air) : blockCurrent;
 				}
 			}
 
@@ -79,7 +84,7 @@ void Chunk::CreateMesh() {
 			//   by looping over each block in this slice of the chunk
 			for (j = 0; j < Constants::CHUNK_SIZE; ++j) {
 				for (i = 0; i < Constants::CHUNK_SIZE;) {
-					if (mask[n]) {
+					if (!mask[n]) {
 						// Compute the width of this quad and store it in w                        
 						//   This is done by searching along the current axis until mask[n + w] is false
 						for (w = 1; i + w < Constants::CHUNK_SIZE && mask[n + w]; w++) {}
@@ -127,11 +132,10 @@ void Chunk::CreateMesh() {
 						m_Vertices.push_back({ glm::ivec3{x[0] + dv[0], x[1] + dv[1], x[2] + dv[2] } + m_WorldOffset, CompressTextureCoords(UV++, side, ID, w, h) });       // Bottom left vertice position
 						m_Vertices.push_back({ glm::ivec3{x[0] + du[0] + dv[0], x[1] + du[1] + dv[1], x[2] + du[2] + dv[2]} + m_WorldOffset, CompressTextureCoords(UV, side, ID, w, h) });  // Bottom right vertice position
 
-
 						// Clear this part of the mask, so we don't add duplicate faces
 						for (l = 0; l < h; ++l)
 							for (k = 0; k < w; ++k)
-								mask[n + k + l * Constants::CHUNK_SIZE] = false;
+								mask[n + k + l * Constants::CHUNK_SIZE].SetBlockType(VoxelType::BlockType_Air);
 
 						// Increment counters and continue
 						i += w;
