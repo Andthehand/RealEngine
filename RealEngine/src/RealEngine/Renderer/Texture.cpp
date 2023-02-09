@@ -24,4 +24,24 @@ namespace RealEngine {
 		RE_CORE_ASSERT(false, "Unkown RendererAPI!");
 		return nullptr;
 	}
+
+	Ref<Texture2DArray> Texture2DArray::Create(uint32_t width, uint32_t height, uint32_t numTextures) {
+		switch (Renderer::GetAPI()) {
+			case RendererAPI::API::None:    RE_CORE_ASSERT(false, "RenderAPI::None is currently not supported!"); return nullptr;
+			case RendererAPI::API::OpenGL:  return CreateRef<OpenGLTexture2DArray>(width, height, numTextures);
+		}
+
+		RE_CORE_ASSERT(false, "Unkown RendererAPI!");
+		return nullptr;
+	}
+
+	Ref<Texture2DArray> Texture2DArray::Create(const std::string* path, uint32_t numTextures) {
+		switch (Renderer::GetAPI()) {
+			case RendererAPI::API::None:    RE_CORE_ASSERT(false, "RenderAPI::None is currently not supported!"); return nullptr;
+			case RendererAPI::API::OpenGL:  return CreateRef<OpenGLTexture2DArray>(path, numTextures);
+		}
+
+		RE_CORE_ASSERT(false, "Unkown RendererAPI!");
+		return nullptr;
+	}
 }

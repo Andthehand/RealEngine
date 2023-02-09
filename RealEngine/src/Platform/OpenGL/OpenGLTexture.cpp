@@ -4,6 +4,9 @@
 #include "stb_image.h"
 
 namespace RealEngine {
+	//------------------------------------
+	// Texture2D -------------------------
+	//------------------------------------
 	OpenGLTexture2D::OpenGLTexture2D(const uint32_t width, const uint32_t height) : m_Width(width), m_Height(height) {
 		RE_PROFILE_FUNCTION();
 
@@ -80,6 +83,95 @@ namespace RealEngine {
 	void OpenGLTexture2D::Bind(uint32_t slot) const {
 		RE_PROFILE_FUNCTION();
 
+		glBindTextureUnit(slot, m_RendererID);	
+	}
+
+	//------------------------------------
+	// Texture2DArray --------------------
+	//------------------------------------
+	OpenGLTexture2DArray::OpenGLTexture2DArray(uint32_t width, uint32_t height, uint32_t numTextures) : m_Width(width), m_Height(height) {
+		RE_PROFILE_FUNCTION();
+
+		m_InternalFormat = GL_RGBA8;
+		m_DataFormat = GL_RGBA;
+
+		glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &m_RendererID);
+		glTextureStorage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8, width, height, numTextures);
+
+		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	}
+	
+	OpenGLTexture2DArray::OpenGLTexture2DArray(const std::string* path, const uint32_t numTextures) {
+		RE_ASSERT(numTextures != 0, "Can't make Texuture without any textures")
+
+		TextureData* textureData = new TextureData[numTextures];
+		stbi_uc** data = new stbi_uc*[numTextures];
+
+		int checkChannel = -1;
+
+		stbi_set_flip_vertically_on_load(1);
+		//Load all of the images into memory
+		for (uint32_t i = 0; i < numTextures; i++) {
+			data[i] = stbi_load(path[i].c_str(), &textureData[i].Width, &textureData[i].Height, &textureData[i].Channels, 0);
+			RE_CORE_ASSERT(data[i], "Failed to load image!");
+			
+			if (checkChannel == -1) {
+				checkChannel =	textureData[i].Channels;
+				m_Width =	textureData[i].Width;
+				m_Height =	textureData[i].Height;
+			}
+
+			//Make sure the channels, width, and height are the same
+			RE_ASSERT(checkChannel   == textureData[i].Channels &&
+							m_Width  == textureData[i].Width    &&
+							m_Height == textureData[i].Height, "Channel, Width, or height do not match while creating TextureArray");
+		}
+
+		if (checkChannel == 4) {
+			m_InternalFormat = GL_RGBA8;
+			m_DataFormat = GL_RGBA;
+		}
+		else if (checkChannel == 3) {
+			m_InternalFormat = GL_RGB8;
+			m_DataFormat = GL_RGB;
+		}
+		RE_CORE_ASSERT(m_InternalFormat & m_DataFormat, "Format not supported!");
+
+		//Create TextureArray and allocate memory
+		glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &m_RendererID);
+		glTextureStorage3D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height, numTextures);
+
+		//Upload the images to the GPU
+		for (uint32_t i = 0; i < numTextures; i++) {
+			glTextureSubImage3D(m_RendererID, 0, 0, 0, i, m_Width, m_Height, 1, m_DataFormat, GL_UNSIGNED_BYTE, data[i]);
+		}
+
+		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		//Delete rescources
+		for (uint32_t i = 0; i < numTextures; i++) {
+			stbi_image_free(data[i]);
+		}
+		delete[] data;
+		delete[] textureData;
+	}
+	
+	OpenGLTexture2DArray::~OpenGLTexture2DArray() {
+		glDeleteTextures(1, &m_RendererID);
+	}
+	
+	//TODO: Implement
+	void OpenGLTexture2DArray::SetData(void* data, uint32_t size) {
+		
+	}
+	
+	void OpenGLTexture2DArray::Bind(uint32_t slot) const {
 		glBindTextureUnit(slot, m_RendererID);
 	}
 }

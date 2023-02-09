@@ -19,7 +19,7 @@ enum VoxelSide {
 
 class Voxel {
 public: 
-	static void UploadTextureCords(RealEngine::Ref<RealEngine::Texture2D> textureAtlas);
+	static void UploadTextureCords();
 
 	inline VoxelType GetBlockType() { return m_BlockType; }
 	inline void SetBlockType(VoxelType blockType) { m_BlockType = blockType; }
@@ -76,7 +76,8 @@ public:
 	}
 
 	inline bool IsAir() { return m_BlockType == VoxelType::BlockType_Air; }
-private: 
+	
+private:
 	static RealEngine::Ref<RealEngine::TextureBuffer> s_TextureBuffer;
 
 	VoxelType m_BlockType;

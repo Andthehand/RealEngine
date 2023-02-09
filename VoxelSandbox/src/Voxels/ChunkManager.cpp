@@ -14,9 +14,14 @@ ChunkManager::ChunkManager(const glm::vec3& cameraPos)
 	m_ActiveChunks.reserve((2 * m_RenderDistance + 1) ^ 3);
 	Chunk::MemoryPool.reserve((2 * m_RenderDistance + 1) ^ 3);
 
-	//m_Texture = RealEngine::Texture2D::Create("assets/textures/awesomeface.png");
-	m_Texture = RealEngine::Texture2D::Create("assets/textures/Spritesheet.png");
-	Voxel::UploadTextureCords(m_Texture);
+	std::array<std::string, 3> blocks = {
+		std::string("assets/textures/Blocks/Grass_Side.png"),
+		std::string("assets/textures/Blocks/Grass_Top.png"),
+		std::string("assets/textures/Blocks/Grass_Bottom.png")
+	};
+
+	m_Texture = RealEngine::Texture2DArray::Create(std::data(blocks), (uint32_t)blocks.size());
+	Voxel::UploadTextureCords();
 
 	//Populate m_ActiveChunks with actaul chunks
 	UpdateChunks();

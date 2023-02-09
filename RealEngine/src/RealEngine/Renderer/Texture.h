@@ -6,7 +6,7 @@
 
 namespace RealEngine {
 	enum class ColorFormat {
-		None = 0, R8, R32F, RG32F
+		None = 0, R8, R32F, RG32F, RGB32F
 	};
 
 	class Texture {
@@ -26,5 +26,11 @@ namespace RealEngine {
 	public:
 		static Ref<Texture2D> Create(const uint32_t width, const uint32_t height);
 		static Ref<Texture2D> Create(const std::string& path);
+	};
+
+	class Texture2DArray : public Texture {
+	public:
+		static Ref<Texture2DArray> Create(uint32_t width, uint32_t height, uint32_t numTextures);
+		static Ref<Texture2DArray> Create(const std::string* path, uint32_t numTextures);
 	};
 }

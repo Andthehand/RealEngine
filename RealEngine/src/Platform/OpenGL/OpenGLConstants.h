@@ -59,6 +59,7 @@ namespace RealEngine {
 		case ColorFormat::R8:	 return		GL_R8;
 		case ColorFormat::R32F:	 return		GL_R32F;
 		case ColorFormat::RG32F: return		GL_RG32F;
+		case ColorFormat::RGB32F: return	GL_RGB32F;
 		}
 
 		RE_CORE_ASSERT(false, "Unknown ColorFormat");
