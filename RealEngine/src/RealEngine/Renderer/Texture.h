@@ -6,7 +6,7 @@
 
 namespace RealEngine {
 	enum class ColorFormat {
-		None = 0, R8, R32F, RG32F
+		None = 0, R8, R32F, RG32F, RGB32F
 	};
 
 	class Texture {
