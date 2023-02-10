@@ -53,5 +53,5 @@ out vec4 FragColor;
 void main() {
 			  //texture(textures, vec3(UV, layer))
 	FragColor = texture(ourTexture, v_TexCoord);
-	//FragColor = vec4(v_TexCoord.x, v_TexCoord.y, 0.0f, 1.0f);
+	//FragColor = vec4(250.0f, 0, 0.0f, 1.0f);
 }

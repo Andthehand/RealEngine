@@ -22,14 +22,13 @@ public:
 		
 		for (uint32_t x = 0; x < Constants::CHUNK_SIZE; x++) {
 			for (uint32_t z = 0; z < Constants::CHUNK_SIZE; z++) {
-				float tempX = ((float)x + worldPos.x) * Constants::FREQUENCY;
-				float tempZ = ((float)z + worldPos.z) * Constants::FREQUENCY;
-				//float noiseValue = m_PerlinNoise.noise2D_01(tempX, tempZ);
-				int height = (uint32_t)(std::abs(noiseOutput[x * z] * Constants::WORLD_HEIGHT));
+				uint32_t height = (uint32_t)(noiseOutput[x + Constants::CHUNK_SIZE * z] * Constants::WORLD_HEIGHT);
 				for (uint32_t y = 0; y < Constants::CHUNK_SIZE; y++) {
-					int voxelWorldHeight = y + worldPos.y;
+					uint32_t voxelWorldHeight = y + worldPos.y;
 					m_Voxels[x][y][z].SetBlockType(voxelWorldHeight < height ? VoxelType::BlockType_Grass : VoxelType::BlockType_Air);
-					//m_Voxels[x][y][z].SetBlockType(x % 2 == 0 && y % 2 == 0 && z % 2 == 0 ? VoxelType::BlockType_Grass : VoxelType::BlockType_Air);
+					//m_Voxels[x][y][z].SetBlockType(x % 2 == 0 && y % 2 == 0 && z % 2 == 0 ? VoxelType::BlockType_Sand : VoxelType::BlockType_Grass);
+					//m_Voxels[x][y][z].SetBlockType(x % 2 == 0 && z % 2 == 0 ? VoxelType::BlockType_Grass : VoxelType::BlockType_Sand);
+					//m_Voxels[x][y][z].SetBlockType(x % 2 == 0 && z % 2 == 0 ? VoxelType::BlockType_Grass : VoxelType::BlockType_Air);
 				}
 			}
 		}

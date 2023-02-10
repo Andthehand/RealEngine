@@ -71,7 +71,7 @@ private:
 	std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>> m_ActiveChunks;
 	
 	bool m_FrustumFrozen = false;
-	bool m_FreezePos = false;
+	bool m_FreezePos = true;
 	Statistics m_Statistics;
 
 	RealEngine::JobQueue m_JobQueue;

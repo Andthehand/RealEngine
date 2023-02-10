@@ -14,10 +14,12 @@ ChunkManager::ChunkManager(const glm::vec3& cameraPos)
 	m_ActiveChunks.reserve((2 * m_RenderDistance + 1) ^ 3);
 	Chunk::MemoryPool.reserve((2 * m_RenderDistance + 1) ^ 3);
 
-	std::array<std::string, 3> blocks = {
+	std::array<std::string, 5> blocks = {
 		std::string("assets/textures/Blocks/Grass_Side.png"),
 		std::string("assets/textures/Blocks/Grass_Top.png"),
-		std::string("assets/textures/Blocks/Grass_Bottom.png")
+		std::string("assets/textures/Blocks/Grass_Bottom.png"),
+		std::string("assets/textures/Blocks/Plank.png"),
+		std::string("assets/textures/Blocks/Sand.png")
 	};
 
 	m_Texture = RealEngine::Texture2DArray::Create(std::data(blocks), (uint32_t)blocks.size());
@@ -199,6 +201,11 @@ void ChunkManager::UpdateChunks() {
 				chunk++;
 		}
 	}
+
+	//Test only 1 chunk
+	//std::shared_ptr<Chunk> tempChunk = std::make_shared<Chunk>(glm::ivec3{ 0, 0, 0 }, *this);
+	//tempChunk->m_Status = Chunk::Status::Load;
+	//m_ActiveChunks.insert({ glm::ivec3{ 0, 0, 0 }, tempChunk });
 
 	std::unique_lock lock(m_ChunkMutex);
 	for (int y = m_LastCameraChunkPosition.y - m_RenderDistance; y <= m_LastCameraChunkPosition.y + m_RenderDistance; y++) {

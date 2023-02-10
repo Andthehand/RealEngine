@@ -27,7 +27,7 @@ public:
 	inline VoxelType GetBlockType() { return m_BlockType; }
 	inline void SetBlockType(VoxelType blockType) { m_BlockType = blockType; }
 
-	enum VoxelTextureCordID : uint32_t {
+	enum VoxelTextureCordID : int {
 		Grass_Cords_Top,
 		Grass_Cords_Bottom,
 		Grass_Cords_Side,
