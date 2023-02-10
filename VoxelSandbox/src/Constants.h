@@ -9,5 +9,6 @@ public:
 	//All of the stuff to do with threads
 	static const uint32_t NUM_MAX_THREADS = 8;
 
+	static const uint32_t SEED = 5;
 	inline static const float FREQUENCY = 0.005f;
 };

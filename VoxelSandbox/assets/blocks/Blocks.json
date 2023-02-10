@@ -1,0 +1,17 @@
+{
+  "formatVersion": 1,
+	"blocks": {
+		"grass": {
+			"name": "Grass",
+			"textures": [
+				"Grass_Side.png",
+				"Grass_Top.png",
+				"Grass_Bottom.png"
+			]
+		},
+		"sand": {
+			"name": "Sand",
+			"textures": [ "Sand.png" ]
+		}
+	}
+}

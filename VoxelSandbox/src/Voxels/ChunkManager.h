@@ -63,8 +63,6 @@ private:
 	//This is global so I can freeze the frustum culling
 	glm::vec4 m_FrustumPlanes[6];
 
-	RealEngine::Ref<RealEngine::Texture2DArray> m_Texture;
-
 	glm::ivec3 m_LastCameraChunkPosition;
 
 	std::shared_mutex m_ChunkMutex;

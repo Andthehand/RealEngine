@@ -3,6 +3,7 @@
 #include "ChunkManager.h"
 #include "TerrainGenerator.h"
 #include "Constants.h"
+#include "JsonParser.h"
 
 std::vector<std::shared_ptr<Chunk>> Chunk::MemoryPool;
 
@@ -31,16 +32,6 @@ inline int f(glm::ivec3& dims, int i, int j, int k) {
 }
 
 void Chunk::CreateMesh() {
-	//Get the chunks around this chunk
-	std::shared_ptr<Chunk> neighborChunks[6] = {
-		m_ChunkManager.GetChunk({ m_WorldOffset.x - Constants::CHUNK_SIZE, m_WorldOffset.y, m_WorldOffset.z }),
-		m_ChunkManager.GetChunk({ m_WorldOffset.x + Constants::CHUNK_SIZE, m_WorldOffset.y, m_WorldOffset.z }),
-		m_ChunkManager.GetChunk({ m_WorldOffset.x, m_WorldOffset.y - Constants::CHUNK_SIZE, m_WorldOffset.z }),
-		m_ChunkManager.GetChunk({ m_WorldOffset.x, m_WorldOffset.y + Constants::CHUNK_SIZE, m_WorldOffset.z }),
-		m_ChunkManager.GetChunk({ m_WorldOffset.x, m_WorldOffset.y, m_WorldOffset.z - Constants::CHUNK_SIZE }),
-		m_ChunkManager.GetChunk({ m_WorldOffset.x, m_WorldOffset.y, m_WorldOffset.z + Constants::CHUNK_SIZE })
-	};
-
 	// Sweep over each axis (X, Y and Z)
 	for (int d = 0; d < 3; ++d) {
 		int i, j, k, l, w, h;
@@ -117,7 +108,7 @@ void Chunk::CreateMesh() {
 						du[u] = w;
 						dv[v] = h;
 
-						uint32_t ID = currentType.GetTexCordID(VoxelSide::Side);
+						uint32_t ID = JsonParser::GetTexCordID("grass", VoxelSide::Side);
 						uint8_t UV = 0;
 
 						//Jank

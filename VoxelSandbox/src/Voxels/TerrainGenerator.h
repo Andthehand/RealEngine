@@ -18,7 +18,7 @@ public:
 
 		float noiseOutput[Constants::CHUNK_SIZE * Constants::CHUNK_SIZE];
 
-		m_PerlinNoise->GenUniformGrid2D(noiseOutput, worldPos.x, worldPos.z, Constants::CHUNK_SIZE, Constants::CHUNK_SIZE, Constants::FREQUENCY, 0);
+		m_PerlinNoise->GenUniformGrid2D(noiseOutput, worldPos.x, worldPos.z, Constants::CHUNK_SIZE, Constants::CHUNK_SIZE, Constants::FREQUENCY, Constants::SEED);
 		
 		for (uint32_t x = 0; x < Constants::CHUNK_SIZE; x++) {
 			for (uint32_t z = 0; z < Constants::CHUNK_SIZE; z++) {

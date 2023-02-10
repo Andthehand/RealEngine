@@ -5,7 +5,7 @@ class PerlinTexture {
 public:
 	PerlinTexture(uint32_t width, uint32_t height);
 
-	void Regenerate(uint32_t width, uint32_t height, float noiseStep);
+	void Regenerate(uint32_t width, uint32_t height, float frequency);
 
 	inline RealEngine::Ref<RealEngine::Texture2D> GetTexture() { return m_Texture; }
 private:

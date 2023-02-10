@@ -6,8 +6,8 @@
 #include <glm/gtc/matrix_access.hpp>
 
 #include "imgui/imgui.h"
-
 #include "Constants.h"
+#include "JsonParser.h"
 
 ChunkManager::ChunkManager(const glm::vec3& cameraPos) 
 	: m_LastCameraChunkPosition(ToChunkCoords(cameraPos)), m_JobQueue(Constants::NUM_MAX_THREADS) {
@@ -22,8 +22,7 @@ ChunkManager::ChunkManager(const glm::vec3& cameraPos)
 		std::string("assets/textures/Blocks/Sand.png")
 	};
 
-	m_Texture = RealEngine::Texture2DArray::Create(std::data(blocks), (uint32_t)blocks.size());
-	Voxel::UploadTextureCords();
+	JsonParser::Init();
 
 	//Populate m_ActiveChunks with actaul chunks
 	UpdateChunks();
@@ -122,7 +121,6 @@ void ChunkManager::Render(const RealEngine::EditorCamera& editorCamera) {
 				//Check if the chunk is intersecting
 				if (IntersectFrustum(m_FrustumPlanes, min, max)) {
 					//TODO: Put this into a display list
-					m_Texture->Bind();
 					chunk->Render();
 					m_Statistics.ChunksRendered++;
 				}
