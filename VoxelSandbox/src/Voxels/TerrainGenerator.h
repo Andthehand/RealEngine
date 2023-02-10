@@ -13,7 +13,7 @@ public:
 	//static inline RealEngine::BasicPerlinNoise<float> GetNoiseObject() { return m_PerlinNoise; }
 
 	static inline void CreateTerrain(Voxel m_Voxels[Constants::CHUNK_SIZE][Constants::CHUNK_SIZE][Constants::CHUNK_SIZE], glm::ivec3 worldPos) {
-		FastNoise::SmartNode<> m_PerlinNoise = FastNoise::NewFromEncodedNodeTree("FwAAAIC/AACAPwAAAAAAAIA/BwA=");
+		static FastNoise::SmartNode<> m_PerlinNoise = FastNoise::NewFromEncodedNodeTree("FwAAAIC/AACAPwAAAAAAAIA/BwA=");
 		//FastNoise::SmartNode<FastNoise::Perlin> m_PerlinNoise = FastNoise::New<FastNoise::Perlin>();
 
 		float noiseOutput[Constants::CHUNK_SIZE * Constants::CHUNK_SIZE];

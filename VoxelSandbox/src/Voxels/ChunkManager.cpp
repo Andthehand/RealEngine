@@ -215,7 +215,9 @@ void ChunkManager::UpdateChunks() {
 				glm::ivec3 worldPos = chunkCords * Constants::CHUNK_SIZE;
 				glm::ivec3 localPos = m_LastCameraChunkPosition - chunkCords;
 				
-				if ((localPos.x * localPos.x) + (localPos.y * localPos.y) + (localPos.z * localPos.z) <= (m_RenderDistance * m_RenderDistance) 
+				//Clamp Chunks to only above 0 height
+				if (worldPos.y >= 0 &&
+					(localPos.x * localPos.x) + (localPos.y * localPos.y) + (localPos.z * localPos.z) <= (m_RenderDistance * m_RenderDistance) 
 					&& m_ActiveChunks.find(worldPos) == m_ActiveChunks.end()) {
 					
 					UpdateSurroundingChunks(worldPos);
