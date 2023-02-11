@@ -1,7 +1,8 @@
 {
-  "formatVersion": 1,
+	"formatVersion": 1,
 	"blocks": {
 		"grass": {
+			"ID": 0,
 			"name": "Grass",
 			"textures": [
 				"Grass_Side.png",
@@ -10,6 +11,7 @@
 			]
 		},
 		"sand": {
+			"ID": 1,
 			"name": "Sand",
 			"textures": [ "Sand.png" ]
 		}

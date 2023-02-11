@@ -4,7 +4,6 @@
 layout(location = 0) in vec3 a_Position;
 layout(location = 1) in uint a_Data;
 
-uniform samplerBuffer u_TexCoordTexture;
 uniform mat4 u_ViewProjection;
 
 out vec3 v_TexCoord;
@@ -24,7 +23,7 @@ vec3 GetTextureCoord() {
 	uint UV = a_Data & UV_ID_BITMASK;
 	uint Side = (a_Data & SIDE_ID_BITMASK) >> 2;
 
-	return vec3(coord[Side][UV], texelFetch(u_TexCoordTexture, textureCoordId).r);
+	return vec3(coord[Side][UV], textureCoordId);
 }
 
 vec2 GetOffset() {

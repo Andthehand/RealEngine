@@ -7,22 +7,14 @@
 
 #include "imgui/imgui.h"
 #include "Constants.h"
-#include "JsonParser.h"
+#include "Voxel.h"
 
 ChunkManager::ChunkManager(const glm::vec3& cameraPos) 
 	: m_LastCameraChunkPosition(ToChunkCoords(cameraPos)), m_JobQueue(Constants::NUM_MAX_THREADS) {
 	m_ActiveChunks.reserve((2 * m_RenderDistance + 1) ^ 3);
 	Chunk::MemoryPool.reserve((2 * m_RenderDistance + 1) ^ 3);
 
-	std::array<std::string, 5> blocks = {
-		std::string("assets/textures/Blocks/Grass_Side.png"),
-		std::string("assets/textures/Blocks/Grass_Top.png"),
-		std::string("assets/textures/Blocks/Grass_Bottom.png"),
-		std::string("assets/textures/Blocks/Plank.png"),
-		std::string("assets/textures/Blocks/Sand.png")
-	};
-
-	JsonParser::Init();
+	VoxelHelper::Init();
 
 	//Populate m_ActiveChunks with actaul chunks
 	UpdateChunks();

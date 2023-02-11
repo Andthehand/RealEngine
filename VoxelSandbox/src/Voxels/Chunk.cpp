@@ -3,7 +3,7 @@
 #include "ChunkManager.h"
 #include "TerrainGenerator.h"
 #include "Constants.h"
-#include "JsonParser.h"
+#include "JsonParsers/BlockJsonParser.h"
 
 std::vector<std::shared_ptr<Chunk>> Chunk::MemoryPool;
 
@@ -51,11 +51,11 @@ void Chunk::CreateMesh() {
 				for (x[u] = 0; x[u] < Constants::CHUNK_SIZE; ++x[u], n++) {
 					// q determines the direction (X, Y or Z) that we are searching
 					// m.IsBlockAt(x,y,z) takes global map positions and returns true if a block exists there
-					Voxel blockCurrent = 0 <= x[d] ? m_Voxels[x[0]][x[1]][x[2]].GetBlockType() : Voxel(VoxelType::BlockType_Air);
-					Voxel blockCompare = x[d] < Constants::CHUNK_SIZE - 1 ? m_Voxels[x[0] + q[0]][x[1] + q[1]][x[2] + q[2]].GetBlockType() : Voxel(VoxelType::BlockType_Air);
+					Voxel blockCurrent = 0 <= x[d] ? m_Voxels[x[0]][x[1]][x[2]].GetBlockType() : Voxel(VoxelTypeIDs::Air);
+					Voxel blockCompare = x[d] < Constants::CHUNK_SIZE - 1 ? m_Voxels[x[0] + q[0]][x[1] + q[1]][x[2] + q[2]].GetBlockType() : Voxel(VoxelTypeIDs::Air);
 
 					if (blockCurrent.IsAir() == blockCompare.IsAir()) {
-						mask[n] = Voxel(VoxelType::BlockType_Air);
+						mask[n] = Voxel(VoxelTypeIDs::Air);
 					}
 					else if (blockCurrent) {
 						mask[n] = blockCurrent;
@@ -108,7 +108,7 @@ void Chunk::CreateMesh() {
 						du[u] = w;
 						dv[v] = h;
 
-						uint32_t ID = JsonParser::GetTexCordID("grass", VoxelSide::Side);
+						uint32_t ID = VoxelHelper::GetTexCordID(currentType.GetBlockType(), VoxelSide::Side);
 						uint8_t UV = 0;
 
 						//Jank
@@ -134,7 +134,7 @@ void Chunk::CreateMesh() {
 						// Clear this part of the mask, so we don't add duplicate faces
 						for (l = 0; l < h; ++l)
 							for (k = 0; k < w; ++k)
-								mask[n + k + l * Constants::CHUNK_SIZE].SetBlockType(VoxelType::BlockType_Air);
+								mask[n + k + l * Constants::CHUNK_SIZE].SetBlockType(VoxelTypeIDs::Air);
 
 						// Increment counters and continue
 						i += w;
