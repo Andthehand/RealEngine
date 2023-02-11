@@ -40,7 +40,8 @@ void Chunk::CreateMesh() {
 		glm::ivec3 x = glm::ivec3(0);
 		glm::ivec3 q = glm::ivec3(0);
 
-		Voxel mask[Constants::CHUNK_SIZE * Constants::CHUNK_SIZE];
+		//The bool is used only on the y axes to see if I'm rendering the top or bottom of the Voxel for texturing
+		std::pair<Voxel, bool>* mask = new std::pair<Voxel, bool>[Constants::CHUNK_SIZE * Constants::CHUNK_SIZE];
 		q[d] = 1;
 
 		// Check each slice of the chunk one at a time
@@ -49,19 +50,20 @@ void Chunk::CreateMesh() {
 			int n = 0;
 			for (x[v] = 0; x[v] < Constants::CHUNK_SIZE; ++x[v]) {
 				for (x[u] = 0; x[u] < Constants::CHUNK_SIZE; ++x[u], n++) {
-					// q determines the direction (X, Y or Z) that we are searching
-					// m.IsBlockAt(x,y,z) takes global map positions and returns true if a block exists there
+					//TODO: Implement chunk face culling by checking other chunks blocks
 					Voxel blockCurrent = 0 <= x[d] ? m_Voxels[x[0]][x[1]][x[2]].GetBlockType() : Voxel(VoxelTypeIDs::Air);
 					Voxel blockCompare = x[d] < Constants::CHUNK_SIZE - 1 ? m_Voxels[x[0] + q[0]][x[1] + q[1]][x[2] + q[2]].GetBlockType() : Voxel(VoxelTypeIDs::Air);
 
 					if (blockCurrent.IsAir() == blockCompare.IsAir()) {
-						mask[n] = Voxel(VoxelTypeIDs::Air);
+						mask[n].first = Voxel(VoxelTypeIDs::Air);
 					}
 					else if (blockCurrent) {
-						mask[n] = blockCurrent;
+						mask[n].first = blockCurrent;
+						mask[n].second = true;
 					}
 					else {
-						mask[n] = blockCompare;
+						mask[n].first = blockCompare;
+						mask[n].second = false;
 					}
 				}
 			}
@@ -74,11 +76,12 @@ void Chunk::CreateMesh() {
 			//   by looping over each block in this slice of the chunk
 			for (j = 0; j < Constants::CHUNK_SIZE; ++j) {
 				for (i = 0; i < Constants::CHUNK_SIZE;) {
-					Voxel currentType = mask[n];
+					Voxel currentType = mask[n].first;
+					bool topFace = mask[n].second;
 					if (currentType) {
 						// Compute the width of this quad and store it in w                        
 						//   This is done by searching along the current axis until mask[n + w] is false
-						for (w = 1; i + w < Constants::CHUNK_SIZE && mask[n + w] == currentType; w++) {}
+						for (w = 1; i + w < Constants::CHUNK_SIZE && mask[n + w].first == currentType; w++) {}
 
 						// Compute the height of this quad and store it in h                        
 						//   This is done by checking if every block next to this row (range 0 to w) is also part of the mask.
@@ -90,7 +93,7 @@ void Chunk::CreateMesh() {
 							// Check each block next to this quad
 							for (k = 0; k < w; ++k) {
 								// If there's a hole in the mask, exit
-								if (currentType != mask[n + k + h * Constants::CHUNK_SIZE]) {
+								if (currentType != mask[n + k + h * Constants::CHUNK_SIZE].first) {
 									done = true;
 									break;
 								}
@@ -107,11 +110,20 @@ void Chunk::CreateMesh() {
 						glm::ivec3 du = glm::ivec3(0), dv = glm::ivec3(0);
 						du[u] = w;
 						dv[v] = h;
+						
+						uint32_t ID;
+						//Only check when I'm on the x axes
+						if (d == 1) {
+							ID = VoxelHelper::GetTexCordID(currentType.GetBlockType(), topFace ? VoxelSide::Top : VoxelSide::Bottom);
+						}
+						else {
+							ID = VoxelHelper::GetTexCordID(currentType.GetBlockType(), VoxelSide::Side);
 
-						uint32_t ID = VoxelHelper::GetTexCordID(currentType.GetBlockType(), VoxelSide::Side);
+						}
 						uint8_t UV = 0;
 
-						//Jank
+						//Jank that makes texture wrapping work
+						//TBH I don't even remember how this works
 						uint32_t side;
 						int width = w, height = h;
 						if (u != 1) {
@@ -125,7 +137,6 @@ void Chunk::CreateMesh() {
 							width = h;
 						}
 
-						// Create a quad for this face. Colour, normal or textures are not stored in this block vertex format.
 						m_Vertices.push_back({ glm::ivec3{x[0] + du[0], x[1] + du[1], x[2] + du[2] } + m_WorldOffset, CompressTextureCoords(UV++, side, ID, width, height) });        // Top right vertice position
 						m_Vertices.push_back({ glm::ivec3{x[0], x[1], x[2] } + m_WorldOffset, CompressTextureCoords(UV++, side, ID, width, height) });                 // Top-left vertice position
 						m_Vertices.push_back({ glm::ivec3{x[0] + dv[0], x[1] + dv[1], x[2] + dv[2] } + m_WorldOffset, CompressTextureCoords(UV++, side, ID, width, height) });       // Bottom left vertice position
@@ -134,7 +145,7 @@ void Chunk::CreateMesh() {
 						// Clear this part of the mask, so we don't add duplicate faces
 						for (l = 0; l < h; ++l)
 							for (k = 0; k < w; ++k)
-								mask[n + k + l * Constants::CHUNK_SIZE].SetBlockType(VoxelTypeIDs::Air);
+								mask[n + k + l * Constants::CHUNK_SIZE].first.SetBlockType(VoxelTypeIDs::Air);
 
 						// Increment counters and continue
 						i += w;
@@ -147,6 +158,7 @@ void Chunk::CreateMesh() {
 				}
 			}
 		}
+		delete[] mask;
 	}
 
 	uint32_t offset = 0;
