@@ -13,7 +13,12 @@ enum VoxelSide {
 enum VoxelTypeIDs : uint16_t {
 	Air = std::numeric_limits<uint16_t>::max(),
 	Grass = 0,
-	Sand = 1
+	Sand = 1,
+	Gravel = 2,
+	OakLog = 3,
+	OakPlank = 4,
+	Obsidian = 5,
+	Bedrock = 6,
 };
 
 //Holds static UVs and names for voxels

@@ -20,8 +20,8 @@ public:
 				uint32_t height = (uint32_t)(noiseOutput[x + Constants::CHUNK_SIZE * z] * Constants::WORLD_HEIGHT);
 				for (uint32_t y = 0; y < Constants::CHUNK_SIZE; y++) {
 					uint32_t voxelWorldHeight = y + worldPos.y;
-					//m_Voxels[x][y][z].SetBlockType(voxelWorldHeight < height ? VoxelTypeIDs::Grass : VoxelTypeIDs::Air);
-					m_Voxels[x][y][z].SetBlockType(x % 2 == 0 && y % 2 == 0 && z % 2 == 0 ? VoxelTypeIDs::Sand : VoxelTypeIDs::Grass);
+					m_Voxels[x][y][z].SetBlockType(voxelWorldHeight < height ? VoxelTypeIDs::Grass : VoxelTypeIDs::Air);
+					//m_Voxels[x][y][z].SetBlockType(x % 2 == 0 && y % 2 == 0 && z % 2 == 0 ? VoxelTypeIDs::Sand : VoxelTypeIDs::Grass);
 					//m_Voxels[x][y][z].SetBlockType(x % 2 == 0 && z % 2 == 0 ? VoxelTypeIDs::Grass : VoxelTypeIDs::Sand);
 					//m_Voxels[x][y][z].SetBlockType(x % 2 == 0 && z % 2 == 0 ? VoxelTypeIDs::Grass : VoxelTypeIDs::Air);
 				}

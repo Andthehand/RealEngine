@@ -46,7 +46,6 @@ public:
 		return m_ActiveChunks.insert({ chunkPos, chunk }).second;
 	}
 private:
-	inline void UpdateSurroundingChunks(glm::ivec3& worldChunkPos);
 	void UpdateChunks();
 
 	inline const glm::ivec3 ToChunkCoords(const glm::vec3& worldCoordinates) {

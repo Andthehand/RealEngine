@@ -14,6 +14,42 @@
 			"ID": 1,
 			"name": "Sand",
 			"textures": [ "Sand.png" ]
+		},
+		"gravel": {
+			"ID": 2,
+			"name": "Gravel",
+			"textures": [
+				"Gravel.png"
+			]
+		},
+		"oakLog": {
+			"ID": 3,
+			"name": "Oak Log",
+			"textures": [
+				"Oak_Log_Side.png",
+				"Oak_Log_Top.png"
+			]
+		},
+		"oakPlank": {
+			"ID": 4,
+			"name": "Oak Plank",
+			"textures": [
+				"Oak_Plank.png"
+			]
+		},
+		"obsidian": {
+			"ID": 5,
+			"name": "Obsidian",
+			"textures": [
+				"Obsidian.png"
+			]
+		},
+		"bedrock": {
+			"ID": 6,
+			"name": "Bedrock",
+			"textures": [
+				"Bedrock.png"
+			]
 		}
 	}
 }
