@@ -45,8 +45,8 @@ namespace RealEngine {
 	class OpenGLTexture2DArray : public Texture2DArray {
 	public:
 		//Not Tested
-		OpenGLTexture2DArray(uint32_t width, uint32_t height, uint32_t numTextures);
-		OpenGLTexture2DArray(const std::string* path, uint32_t numTextures);
+		OpenGLTexture2DArray(uint32_t width, uint32_t height, uint32_t numTextures, uint32_t mipLevels = 1);
+		OpenGLTexture2DArray(const std::string* path, uint32_t numTextures, uint32_t mipLevels = 1);
 		virtual ~OpenGLTexture2DArray();
 
 		virtual uint32_t GetWidth() const override { return m_Width; }

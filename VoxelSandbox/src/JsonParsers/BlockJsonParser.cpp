@@ -45,6 +45,6 @@ void BlockJsonParser::Parse(std::unordered_map<uint32_t, BlockData>& blockData, 
 		RE_ASSERT(insertSuccess, "ID already in blockData");
 	}
 
-	texture = RealEngine::Texture2DArray::Create(files.data(), (uint32_t)files.size());
+	texture = RealEngine::Texture2DArray::Create(files.data(), (uint32_t)files.size(), 5);
 	texture->Bind();
 }

@@ -89,14 +89,14 @@ namespace RealEngine {
 	//------------------------------------
 	// Texture2DArray --------------------
 	//------------------------------------
-	OpenGLTexture2DArray::OpenGLTexture2DArray(uint32_t width, uint32_t height, uint32_t numTextures) : m_Width(width), m_Height(height) {
+	OpenGLTexture2DArray::OpenGLTexture2DArray(uint32_t width, uint32_t height, uint32_t numTextures, uint32_t mipLevels) : m_Width(width), m_Height(height) {
 		RE_PROFILE_FUNCTION();
 
 		m_InternalFormat = GL_RGBA8;
 		m_DataFormat = GL_RGBA;
 
 		glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &m_RendererID);
-		glTextureStorage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8, width, height, numTextures);
+		glTextureStorage3D(GL_TEXTURE_2D_ARRAY, mipLevels, GL_RGBA8, width, height, numTextures);
 
 		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -104,20 +104,20 @@ namespace RealEngine {
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	}
 	
-	OpenGLTexture2DArray::OpenGLTexture2DArray(const std::string* path, const uint32_t numTextures) {
+	OpenGLTexture2DArray::OpenGLTexture2DArray(const std::string* path, const uint32_t numTextures, uint32_t mipLevels) {
 		RE_ASSERT(numTextures != 0, "Can't make Texuture without any textures")
 
 		TextureData* textureData = new TextureData[numTextures];
 		stbi_uc** data = new stbi_uc*[numTextures];
 
 		int checkChannel = -1;
-
 		stbi_set_flip_vertically_on_load(1);
 		//Load all of the images into memory
 		for (uint32_t i = 0; i < numTextures; i++) {
 			data[i] = stbi_load(path[i].c_str(), &textureData[i].Width, &textureData[i].Height, &textureData[i].Channels, 0);
 			RE_CORE_ASSERT(data[i], "Failed to load image!");
 			
+			//Set data only on the first texture upload
 			if (checkChannel == -1) {
 				checkChannel =	textureData[i].Channels;
 				m_Width =	textureData[i].Width;
@@ -142,17 +142,21 @@ namespace RealEngine {
 
 		//Create TextureArray and allocate memory
 		glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &m_RendererID);
-		glTextureStorage3D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height, numTextures);
-
+		glTextureStorage3D(m_RendererID, mipLevels, m_InternalFormat, m_Width, m_Height, numTextures);
 		//Upload the images to the GPU
 		for (uint32_t i = 0; i < numTextures; i++) {
 			glTextureSubImage3D(m_RendererID, 0, 0, 0, i, m_Width, m_Height, 1, m_DataFormat, GL_UNSIGNED_BYTE, data[i]);
 		}
+		glGenerateTextureMipmap(m_RendererID);
 
-		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		GLfloat max_aniso; 
+		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &max_aniso); 
+		glTextureParameterf(m_RendererID, GL_TEXTURE_MAX_ANISOTROPY, max_aniso);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
 
 		//Delete rescources
 		for (uint32_t i = 0; i < numTextures; i++) {

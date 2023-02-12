@@ -30,7 +30,7 @@ namespace RealEngine {
 
 	class Texture2DArray : public Texture {
 	public:
-		static Ref<Texture2DArray> Create(uint32_t width, uint32_t height, uint32_t numTextures);
-		static Ref<Texture2DArray> Create(const std::string* path, uint32_t numTextures);
+		static Ref<Texture2DArray> Create(uint32_t width, uint32_t height, uint32_t numTextures, uint32_t mipLevels = 1);
+		static Ref<Texture2DArray> Create(const std::string* path, uint32_t numTextures, uint32_t mipLevels = 1);
 	};
 }

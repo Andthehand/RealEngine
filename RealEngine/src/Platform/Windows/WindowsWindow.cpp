@@ -48,6 +48,9 @@ namespace RealEngine {
 			glfwSetErrorCallback(GLFWErrorCallback);
 		}
 
+		//MSAA
+		glfwWindowHint(GLFW_SAMPLES, props.MMSA);
+
 		{
 			RE_PROFILE_SCOPE("glfwCreateWindow");
 		#if defined(RE_DEBUG)
