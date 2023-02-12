@@ -1,15 +1,8 @@
 #include "Voxel.h"
 
-RealEngine::Ref<RealEngine::TextureBuffer> Voxel::s_TextureBuffer;
+RealEngine::Ref<RealEngine::Texture2DArray> VoxelHelper::s_Texture;
+std::unordered_map<uint32_t, BlockData> VoxelHelper::s_BlockData;
 
-void Voxel::UploadTextureCords() {
-	std::array<float, 10> texID;
-
-	//Dirt
-	texID[Grass_Cords_Top] =		1.0f;
-	texID[Grass_Cords_Bottom] =		2.0f;
-	texID[Grass_Cords_Side] =		0.0f;
-
-	Voxel::s_TextureBuffer = RealEngine::TextureBuffer::Create(sizeof(texID), texID.data(), RealEngine::BufferUsage::StaticDraw, RealEngine::ColorFormat::R32F);
-	Voxel::s_TextureBuffer->Bind();
+void VoxelHelper::Init() {
+	BlockJsonParser::Parse(s_BlockData, s_Texture);
 }

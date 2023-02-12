@@ -2,6 +2,7 @@
 #include <RealEngine.h>
 
 #include "Voxels/ChunkManager.h"
+#include "FirstPersonCamera.h"
 #include "PerlinTexture.h"
 #include "Constants.h"
 
@@ -24,13 +25,9 @@ private:
 		fps = 1.0f / deltaTime;
 	}
 
-	inline void TestFunction() {
-
-	}
-
 private:
 	RealEngine::Ref<RealEngine::Shader> m_ChunkShader;
-	RealEngine::EditorCamera m_EditorCamera;
+	FirstPersonCamera m_Camera;
 	ChunkManager m_ChunkManager;
 
 	#ifdef TESTING
@@ -38,13 +35,14 @@ private:
 		RealEngine::Ref<RealEngine::Shader> m_TestShader;
 	#endif
 
-
+	//This is all for PerlinTexture
 	int m_Width = 500;
 	int m_Height = 500;
 	float m_Precition = Constants::FREQUENCY;
 	PerlinTexture m_Texture;
 
 	bool m_Wireframe = false;
+	bool m_CursorEnabled = false;
 
 	//FPS counter
 	float deltaTime = 0.0f;

@@ -1,15 +1,7 @@
 #pragma once
 #include <RealEngine.h>
 
-enum VoxelType : uint8_t {
-	BlockType_Air = 0,
-	BlockType_Grass,
-	BlockType_Dirt,
-	BlockType_Water,
-	BlockType_Stone,
-	BlockType_Wood,
-	BlockType_Sand
-};
+#include "JsonParsers/BlockJsonParser.h"
 
 enum VoxelSide {
 	Side = 0,
@@ -17,68 +9,61 @@ enum VoxelSide {
 	Bottom = 2
 };
 
-class Voxel {
-public: 
-	static void UploadTextureCords();
+//TODO: Make this dynamic
+enum VoxelTypeIDs : uint16_t {
+	Air = std::numeric_limits<uint16_t>::max(),
+	Grass = 0,
+	Sand = 1,
+	Gravel = 2,
+	OakLog = 3,
+	OakPlank = 4,
+	Obsidian = 5,
+	Bedrock = 6,
+};
 
-	inline VoxelType GetBlockType() { return m_BlockType; }
-	inline void SetBlockType(VoxelType blockType) { m_BlockType = blockType; }
-
-	enum VoxelTextureCordID : uint32_t {
-		Grass_Cords_Top,
-		Grass_Cords_Bottom,
-		Grass_Cords_Side,
-		Dirt_Cords,
-		Water_Cords,
-		Stone_Cords,
-		Wood_Cords_Top,
-		Wood_Cords_Bottom,
-		Wood_Cords_Side,
-		Sand_Cords
-	};
-
-	inline const uint32_t GetTexCordID(VoxelSide side) {
-		switch (m_BlockType) {
-			case BlockType_Air:
-				break;
-			case BlockType_Grass:
-				switch (side) {
-					case Side:
-						return VoxelTextureCordID::Grass_Cords_Side;
-					case Top:
-						return VoxelTextureCordID::Grass_Cords_Top;
-					case Bottom:
-						return VoxelTextureCordID::Grass_Cords_Bottom;
-				}
-				break;
-			case BlockType_Dirt:
-				return VoxelTextureCordID::Dirt_Cords;
-			case BlockType_Water:
-				return VoxelTextureCordID::Water_Cords;
-			case BlockType_Stone:
-				return VoxelTextureCordID::Stone_Cords;
-			case BlockType_Wood:
-				switch (side) {
-				case Side:
-					return VoxelTextureCordID::Wood_Cords_Side;
-				case Top:
-					return VoxelTextureCordID::Wood_Cords_Top;
-				case Bottom:
-					return VoxelTextureCordID::Wood_Cords_Bottom;
-				}
-				break;
-			case BlockType_Sand:
-				return VoxelTextureCordID::Sand_Cords;
+//Holds static UVs and names for voxels
+class VoxelHelper {
+public:
+	static void Init();
+	static inline const uint32_t GetTexCordID(VoxelTypeIDs type, VoxelSide side) {
+		//Check if the block exists
+		if (s_BlockData.count(type)) {
+			switch (side) {
+				case Side:		return s_BlockData.at(type).Side;
+				case Top:		return s_BlockData.at(type).Top;
+				case Bottom:	return s_BlockData.at(type).Bottom;
+			}
 		}
 
-		RE_ASSERT(false, "Block type not implemented yet or block not loaded");
+		RE_ASSERT(false, "Block type not in unordered map");
 		return 0;
 	}
-
-	inline bool IsAir() { return m_BlockType == VoxelType::BlockType_Air; }
-	
 private:
-	static RealEngine::Ref<RealEngine::TextureBuffer> s_TextureBuffer;
+	static RealEngine::Ref<RealEngine::Texture2DArray> s_Texture;
+	static std::unordered_map<uint32_t, BlockData> s_BlockData;
+};
 
-	VoxelType m_BlockType;
+//Class for keeping a voxel block data
+class Voxel {
+public:
+	Voxel() = default;
+	Voxel(VoxelTypeIDs type) : m_BlockType(type) {};
+
+	inline VoxelTypeIDs GetBlockType() { return m_BlockType; }
+	inline void SetBlockType(VoxelTypeIDs blockType) { m_BlockType = blockType; }
+
+	inline bool IsAir() { return m_BlockType == Air; }
+
+	operator bool() const {
+		return m_BlockType != Air;
+	}
+	bool operator!=(const Voxel& other) const {
+		return m_BlockType != ((Voxel&)other).GetBlockType();
+	}
+	bool operator==(const Voxel& other) const {
+		return m_BlockType == ((Voxel&)other).GetBlockType();
+	}
+
+private:
+	VoxelTypeIDs m_BlockType;
 };

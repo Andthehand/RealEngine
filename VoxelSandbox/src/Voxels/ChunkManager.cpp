@@ -2,26 +2,20 @@
 
 #include <functional>
 
-#include <glm/glm.hpp>
 #include <glm/gtc/matrix_access.hpp>
+#include <glm/glm.hpp>
 
-#include "imgui/imgui.h"
+#include <imgui/imgui.h>
 
 #include "Constants.h"
+#include "Voxel.h"
 
 ChunkManager::ChunkManager(const glm::vec3& cameraPos) 
 	: m_LastCameraChunkPosition(ToChunkCoords(cameraPos)), m_JobQueue(Constants::NUM_MAX_THREADS) {
 	m_ActiveChunks.reserve((2 * m_RenderDistance + 1) ^ 3);
 	Chunk::MemoryPool.reserve((2 * m_RenderDistance + 1) ^ 3);
 
-	std::array<std::string, 3> blocks = {
-		std::string("assets/textures/Blocks/Grass_Side.png"),
-		std::string("assets/textures/Blocks/Grass_Top.png"),
-		std::string("assets/textures/Blocks/Grass_Bottom.png")
-	};
-
-	m_Texture = RealEngine::Texture2DArray::Create(std::data(blocks), (uint32_t)blocks.size());
-	Voxel::UploadTextureCords();
+	VoxelHelper::Init();
 
 	//Populate m_ActiveChunks with actaul chunks
 	UpdateChunks();
@@ -74,12 +68,12 @@ bool IntersectFrustum(const glm::vec4* frustumPlanes, const glm::vec3& min, cons
 	return true;
 }
 
-void ChunkManager::Render(const RealEngine::EditorCamera& editorCamera) {
+void ChunkManager::Render(const FirstPersonCamera& camera) {
 	ResetStatistics(); 
 
 	static glm::vec3 currentCameraPos = { 0, 0, 0 };
 	if(!m_FreezePos)
-		currentCameraPos = editorCamera.GetPosition();
+		currentCameraPos = camera.GetPosition();
 	
 	static glm::vec3 lastPlayerLoadPosition = currentCameraPos;
 
@@ -93,7 +87,7 @@ void ChunkManager::Render(const RealEngine::EditorCamera& editorCamera) {
 	}
 
 	//This is used for the frustum culling
-	if(!m_FrustumFrozen) ExtractFrustum(m_FrustumPlanes, editorCamera.GetViewProjection());
+	if(!m_FrustumFrozen) ExtractFrustum(m_FrustumPlanes, camera.GetViewProjection());
 	std::shared_lock lock(m_ChunkMutex);
 	for (auto& [pos, chunk] : m_ActiveChunks) {		
 		switch (chunk->m_Status) {
@@ -120,7 +114,6 @@ void ChunkManager::Render(const RealEngine::EditorCamera& editorCamera) {
 				//Check if the chunk is intersecting
 				if (IntersectFrustum(m_FrustumPlanes, min, max)) {
 					//TODO: Put this into a display list
-					m_Texture->Bind();
 					chunk->Render();
 					m_Statistics.ChunksRendered++;
 				}
@@ -139,10 +132,6 @@ void ChunkManager::OnImGuiRender() {
 	ImGui::Text("Num Chunks Rendered %i", m_Statistics.ChunksRendered);
 	ImGui::Text("Num Chunks %i", m_ActiveChunks.size());	
 	if (ImGui::SliderInt("Render Distance", &m_RenderDistance, 1, 20)) {
-		for (auto& [key, chunk] : m_ActiveChunks) {
-			chunk->m_Status = Chunk::Status::UpdateMesh;
-		}
-
 		lock.unlock();
 		UpdateChunks();
 		lock.lock();
@@ -159,26 +148,6 @@ void ChunkManager::OnImGuiRender() {
 void ChunkManager::ResetStatistics() {
 	m_Statistics.ChunksRendered = 0;
 }
-
-inline void ChunkManager::UpdateSurroundingChunks(glm::ivec3& worldChunkPos) {
-	for (int i = -1; i < 2; i += 2) {
-		auto chunk = m_ActiveChunks.find(glm::ivec3{ worldChunkPos.x + (Constants::CHUNK_SIZE * i), worldChunkPos.y, worldChunkPos.z });
-		if (chunk != m_ActiveChunks.end() && chunk->second->m_Status != Chunk::Status::Load) {
-			chunk->second->m_Status = Chunk::Status::UpdateMesh;
-		}
-
-		chunk = m_ActiveChunks.find(glm::ivec3{ worldChunkPos.x, worldChunkPos.y + (Constants::CHUNK_SIZE * i), worldChunkPos.z });
-		if (chunk != m_ActiveChunks.end() && chunk->second->m_Status != Chunk::Status::Load) {
-			chunk->second->m_Status = Chunk::Status::UpdateMesh;
-		}
-
-		chunk = m_ActiveChunks.find(glm::ivec3{ worldChunkPos.x, worldChunkPos.y, worldChunkPos.z + (Constants::CHUNK_SIZE * i) });
-		if (chunk != m_ActiveChunks.end() && chunk->second->m_Status != Chunk::Status::Load) {
-			chunk->second->m_Status = Chunk::Status::UpdateMesh;
-		}
-	}
-}
-
 
 //This checks the m_ActiveChunks to discard chunks to far away and add chunks that are in render distance
 void ChunkManager::UpdateChunks() {
@@ -200,6 +169,11 @@ void ChunkManager::UpdateChunks() {
 		}
 	}
 
+	//Test only 1 chunk
+	//std::shared_ptr<Chunk> tempChunk = std::make_shared<Chunk>(glm::ivec3{ 0, 0, 0 }, *this);
+	//tempChunk->m_Status = Chunk::Status::Load;
+	//m_ActiveChunks.insert({ glm::ivec3{ 0, 0, 0 }, tempChunk });
+
 	std::unique_lock lock(m_ChunkMutex);
 	for (int y = m_LastCameraChunkPosition.y - m_RenderDistance; y <= m_LastCameraChunkPosition.y + m_RenderDistance; y++) {
 		for (int x = m_LastCameraChunkPosition.x - m_RenderDistance; x <= m_LastCameraChunkPosition.x + m_RenderDistance; x++) {
@@ -208,11 +182,11 @@ void ChunkManager::UpdateChunks() {
 				glm::ivec3 worldPos = chunkCords * Constants::CHUNK_SIZE;
 				glm::ivec3 localPos = m_LastCameraChunkPosition - chunkCords;
 				
-				if ((localPos.x * localPos.x) + (localPos.y * localPos.y) + (localPos.z * localPos.z) <= (m_RenderDistance * m_RenderDistance) 
+				//Clamp Chunks to only above 0 height and below the worldheight
+				if (worldPos.y >= 0 && worldPos.y <= Constants::WORLD_HEIGHT &&
+					(localPos.x * localPos.x) + (localPos.y * localPos.y) + (localPos.z * localPos.z) <= (m_RenderDistance * m_RenderDistance) 
 					&& m_ActiveChunks.find(worldPos) == m_ActiveChunks.end()) {
 					
-					UpdateSurroundingChunks(worldPos);
-
 					//Add new chunks
 					if (Chunk::MemoryPool.empty()) {
 						std::shared_ptr<Chunk> tempChunk = std::make_shared<Chunk>(worldPos, *this);

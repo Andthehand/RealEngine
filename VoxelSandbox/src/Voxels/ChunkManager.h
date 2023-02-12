@@ -1,8 +1,10 @@
 #pragma once
 #include "Chunk.h"
+#include <shared_mutex>
 
 #include <RealEngine/Utils/Threads/JobQueue.h>
-#include <shared_mutex>
+
+#include "FirstPersonCamera.h"
 
 //This is for the unordered map
 namespace std {
@@ -24,7 +26,7 @@ public:
 	ChunkManager(const glm::vec3& cameraPos);
 	~ChunkManager();
 
-	void Render(const RealEngine::EditorCamera& editorCamera);
+	void Render(const FirstPersonCamera& camera);
 	void OnImGuiRender();
 
 	//Basic Statistics
@@ -36,17 +38,16 @@ public:
 	void ResetStatistics();
 
 	//If you can't find the chunk then return a nullptr
-	const std::shared_ptr<Chunk> GetChunk(glm::ivec3 chunkPos) { 
+	const std::shared_ptr<Chunk> GetChunk(const glm::ivec3& chunkPos) { 
 		std::shared_lock lock(m_ChunkMutex);
 		return m_ActiveChunks.find(chunkPos) != m_ActiveChunks.end() ? m_ActiveChunks.find(chunkPos)->second : nullptr; 
 	}
 
-	bool SetChunk(glm::ivec3& chunkPos, std::shared_ptr<Chunk> chunk) {
+	bool SetChunk(const glm::ivec3& chunkPos, const std::shared_ptr<Chunk> chunk) {
 		std::unique_lock lock(m_ChunkMutex);
 		return m_ActiveChunks.insert({ chunkPos, chunk }).second;
 	}
 private:
-	inline void UpdateSurroundingChunks(glm::ivec3& worldChunkPos);
 	void UpdateChunks();
 
 	inline const glm::ivec3 ToChunkCoords(const glm::vec3& worldCoordinates) {
@@ -63,15 +64,13 @@ private:
 	//This is global so I can freeze the frustum culling
 	glm::vec4 m_FrustumPlanes[6];
 
-	RealEngine::Ref<RealEngine::Texture2DArray> m_Texture;
-
 	glm::ivec3 m_LastCameraChunkPosition;
 
 	std::shared_mutex m_ChunkMutex;
 	std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>> m_ActiveChunks;
 	
 	bool m_FrustumFrozen = false;
-	bool m_FreezePos = false;
+	bool m_FreezePos = true;
 	Statistics m_Statistics;
 
 	RealEngine::JobQueue m_JobQueue;

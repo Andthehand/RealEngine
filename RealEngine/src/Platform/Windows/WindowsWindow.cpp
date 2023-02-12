@@ -173,4 +173,8 @@ namespace RealEngine {
 	bool WindowsWindow::IsVSync() const {
 		return m_Data.VSync;
 	}
+	
+	void WindowsWindow::SetCusorEnabled(bool enabled) {
+		glfwSetInputMode(m_Window, GLFW_CURSOR, enabled ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+	}
 }

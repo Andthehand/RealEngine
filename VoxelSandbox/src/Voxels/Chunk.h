@@ -41,13 +41,6 @@ public:
 private:
 	void UpdateBuffers();
 
-	void AddLeftFace(glm::ivec3& pos, const uint32_t texCords);
-	void AddRightFace(glm::ivec3& pos, const uint32_t texCords);
-	void AddBottomFace(glm::ivec3& pos, const uint32_t texCords);
-	void AddTopFace(glm::ivec3& pos, const uint32_t texCords);
-	void AddBackFace(glm::ivec3& pos, const uint32_t texCords);
-	void AddFrontFace(glm::ivec3& pos, const uint32_t texCords);
-
 private:
 	ChunkManager& m_ChunkManager;
 
@@ -58,12 +51,10 @@ private:
 
 	// vectors to hold vertex and index data for rendering
 	struct VoxelBuffer {
-		glm::vec3 Position;
+		glm::vec3 m_Position;
 		uint32_t Data;
 	};
-	uint32_t m_VertIndex = 0;
 	std::vector<VoxelBuffer> m_Vertices;
-	uint32_t m_IndicesIndex = 0;
 	std::vector<uint32_t> m_Indices;
 
 	RealEngine::Ref<RealEngine::VertexArray> m_VertexArray;

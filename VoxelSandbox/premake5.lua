@@ -9,7 +9,8 @@ project "VoxelSandbox"
 
 	files {
 		"src/**.h",
-		"src/**.cpp"
+		"src/**.cpp",
+		"vendor/nlohmann/json.hpp"
 	}
 
 	includedirs {
@@ -22,7 +23,8 @@ project "VoxelSandbox"
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.ImGuizmo}",
 		"%{IncludeDir.ImPlot}",
-		"vendor/FastNoise2/include"
+		"vendor/FastNoise2/include",
+		"vendor/nlohmann"
 	}
 
 	links {
