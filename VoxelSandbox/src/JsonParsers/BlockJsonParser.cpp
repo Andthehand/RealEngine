@@ -13,7 +13,7 @@ void BlockJsonParser::Parse(std::unordered_map<uint32_t, BlockData>& blockData, 
 	std::ifstream f("assets/blocks/Blocks.json");
 	json data = json::parse(f);
 
-	RE_ASSERT(data["formatVersion"] == Constants::JSON_BLOCK_VERSION, "JSON format doesn't match current version");
+	RE_ASSERT(data["formatVersion"] == Constants::JSON_FORMAT_VERSION, "JSON format doesn't match current version");
 
 	std::vector<std::string> files;
 	uint32_t blockOffset = 0;
@@ -22,7 +22,7 @@ void BlockJsonParser::Parse(std::unordered_map<uint32_t, BlockData>& blockData, 
 		std::string name = value["name"];
 
 		std::vector<std::string> textures = value["textures"].get<std::vector<std::string>>();
-		bool insertSuccess;
+		bool insertSuccess = false;
 		switch (textures.size()) {
 		case 1:
 			files.push_back("assets/blocks/" + textures[0]);

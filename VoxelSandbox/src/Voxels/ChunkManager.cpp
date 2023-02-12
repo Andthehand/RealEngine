@@ -2,10 +2,11 @@
 
 #include <functional>
 
-#include <glm/glm.hpp>
 #include <glm/gtc/matrix_access.hpp>
+#include <glm/glm.hpp>
 
-#include "imgui/imgui.h"
+#include <imgui/imgui.h>
+
 #include "Constants.h"
 #include "Voxel.h"
 
@@ -67,12 +68,12 @@ bool IntersectFrustum(const glm::vec4* frustumPlanes, const glm::vec3& min, cons
 	return true;
 }
 
-void ChunkManager::Render(const RealEngine::EditorCamera& editorCamera) {
+void ChunkManager::Render(const FirstPersonCamera& camera) {
 	ResetStatistics(); 
 
 	static glm::vec3 currentCameraPos = { 0, 0, 0 };
 	if(!m_FreezePos)
-		currentCameraPos = editorCamera.GetPosition();
+		currentCameraPos = camera.GetPosition();
 	
 	static glm::vec3 lastPlayerLoadPosition = currentCameraPos;
 
@@ -86,7 +87,7 @@ void ChunkManager::Render(const RealEngine::EditorCamera& editorCamera) {
 	}
 
 	//This is used for the frustum culling
-	if(!m_FrustumFrozen) ExtractFrustum(m_FrustumPlanes, editorCamera.GetViewProjection());
+	if(!m_FrustumFrozen) ExtractFrustum(m_FrustumPlanes, camera.GetViewProjection());
 	std::shared_lock lock(m_ChunkMutex);
 	for (auto& [pos, chunk] : m_ActiveChunks) {		
 		switch (chunk->m_Status) {

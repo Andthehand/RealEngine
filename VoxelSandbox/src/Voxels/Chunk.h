@@ -51,7 +51,7 @@ private:
 
 	// vectors to hold vertex and index data for rendering
 	struct VoxelBuffer {
-		glm::vec3 Position;
+		glm::vec3 m_Position;
 		uint32_t Data;
 	};
 	std::vector<VoxelBuffer> m_Vertices;
