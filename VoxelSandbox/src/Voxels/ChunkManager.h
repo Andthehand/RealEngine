@@ -67,6 +67,8 @@ private:
 	glm::ivec3 m_LastCameraChunkPosition;
 
 	std::shared_mutex m_ChunkMutex;
+	std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>> m_RenderableChunks;
+	std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>> m_PreLoadedChunks;
 	std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>> m_ActiveChunks;
 	
 	bool m_FrustumFrozen = false;

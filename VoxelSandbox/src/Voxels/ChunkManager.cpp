@@ -130,7 +130,8 @@ void ChunkManager::OnImGuiRender() {
 	
 	std::shared_lock lock(m_ChunkMutex);
 	ImGui::Text("Num Chunks Rendered %i", m_Statistics.ChunksRendered);
-	ImGui::Text("Num Chunks %i", m_ActiveChunks.size());	
+	ImGui::Text("Num Chunks Active %i", m_ActiveChunks.size());	
+	ImGui::Text("Num Chunks PreLoaded %i", m_PreLoadedChunks.size());	
 	if (ImGui::SliderInt("Render Distance", &m_RenderDistance, 1, 20)) {
 		lock.unlock();
 		UpdateChunks();
@@ -183,22 +184,37 @@ void ChunkManager::UpdateChunks() {
 				glm::ivec3 localPos = m_LastCameraChunkPosition - chunkCords;
 				
 				//Clamp Chunks to only above 0 height and below the worldheight
-				if (worldPos.y >= 0 && worldPos.y <= Constants::WORLD_HEIGHT &&
-					(localPos.x * localPos.x) + (localPos.y * localPos.y) + (localPos.z * localPos.z) <= (m_RenderDistance * m_RenderDistance) 
-					&& m_ActiveChunks.find(worldPos) == m_ActiveChunks.end()) {
-					
-					//Add new chunks
-					if (Chunk::MemoryPool.empty()) {
-						std::shared_ptr<Chunk> tempChunk = std::make_shared<Chunk>(worldPos, *this);
-						tempChunk->m_Status = Chunk::Status::Load;
-						m_ActiveChunks.insert({ worldPos, tempChunk });
+				if (worldPos.y >= 0 && worldPos.y <= Constants::WORLD_HEIGHT) {
+					if ((localPos.x * localPos.x) + (localPos.y * localPos.y) + (localPos.z * localPos.z) <= (m_RenderDistance * m_RenderDistance) 
+						&& m_ActiveChunks.find(worldPos) == m_ActiveChunks.end()) {
+						//Add new chunks
+						if (Chunk::MemoryPool.empty()) {
+							std::shared_ptr<Chunk> tempChunk = std::make_shared<Chunk>(worldPos, *this);
+							tempChunk->m_Status = Chunk::Status::Load;
+							m_ActiveChunks.insert({ worldPos, tempChunk });
+						}
+						else {
+							std::shared_ptr<Chunk> tempChunk = Chunk::MemoryPool.back();
+							tempChunk->SetPostition(worldPos);
+							tempChunk->m_Status = Chunk::Status::Load;
+							m_ActiveChunks.insert({ worldPos, tempChunk });
+							Chunk::MemoryPool.pop_back();
+						}
 					}
-					else {
-						std::shared_ptr<Chunk> tempChunk = Chunk::MemoryPool.back();
-						tempChunk->SetPostition(worldPos);
-						tempChunk->m_Status = Chunk::Status::Load;
-						m_ActiveChunks.insert({ worldPos, tempChunk});
-						Chunk::MemoryPool.pop_back();
+					else if ((localPos.x * localPos.x) + (localPos.y * localPos.y) + (localPos.z * localPos.z) <= (m_RenderDistance * m_RenderDistance) + 1) {
+						//Add new chunks
+						//if (Chunk::MemoryPool.empty()) {
+						//	std::shared_ptr<Chunk> tempChunk = std::make_shared<Chunk>(worldPos, *this);
+						//	tempChunk->m_Status = Chunk::Status::Load;
+						//	m_PreLoadedChunks.insert({ worldPos, tempChunk });
+						//}
+						//else {
+						//	std::shared_ptr<Chunk> tempChunk = Chunk::MemoryPool.back();
+						//	tempChunk->SetPostition(worldPos);
+						//	tempChunk->m_Status = Chunk::Status::Load;
+						//	m_PreLoadedChunks.insert({ worldPos, tempChunk });
+						//	Chunk::MemoryPool.pop_back();
+						//}
 					}
 				}
 			}
