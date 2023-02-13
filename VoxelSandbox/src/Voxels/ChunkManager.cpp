@@ -184,7 +184,7 @@ void ChunkManager::UpdateChunks() {
 				glm::ivec3 localPos = m_LastCameraChunkPosition - chunkCords;
 				
 				//Clamp Chunks to only above 0 height and below the worldheight
-				if (worldPos.y >= 0 && worldPos.y <= Constants::WORLD_HEIGHT) {
+				if (worldPos.y >= -Constants::WORLD_HEIGHT / 2 && worldPos.y <= Constants::WORLD_HEIGHT / 2) {
 					if ((localPos.x * localPos.x) + (localPos.y * localPos.y) + (localPos.z * localPos.z) <= (m_RenderDistance * m_RenderDistance) 
 						&& m_ActiveChunks.find(worldPos) == m_ActiveChunks.end()) {
 						//Add new chunks
