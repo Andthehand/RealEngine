@@ -5,6 +5,7 @@
 
 #include "Voxel.h"
 #include "Constants.h"
+#include "Utils/ScopeTimer.h"
 
 class TerrainGenerator {
 public:
@@ -12,7 +13,7 @@ public:
 		return (z * Constants::CHUNK_SIZE * Constants::CHUNK_SIZE) + (y * Constants::CHUNK_SIZE) + x;
 	}
 
-	static inline void CreateTerrain(Voxel m_Voxels[Constants::CHUNK_SIZE][Constants::CHUNK_SIZE][Constants::CHUNK_SIZE], glm::ivec3 worldPos) {
+	static inline void CreateTerrain(Voxel m_Voxels[Constants::CHUNK_SIZE][Constants::CHUNK_SIZE][Constants::CHUNK_SIZE], const glm::ivec3& worldPos) {
 		static FastNoise::SmartNode<> m_PerlinNoise = FastNoise::NewFromEncodedNodeTree("EQACAAAAAAAgQBAAAAAAQBkAEwDD9Sg/DQAEAAAAAAAgQAkAAGZmJj8AAAAAPwEEAAAAAAAAAEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM3MTD4AMzMzPwAAAAA/");
 		//static FastNoise::SmartNode<> m_PerlinNoise = FastNoise::NewFromEncodedNodeTree("FwAAAIC/AACAPwAAAAAAAIA/BwA=");
 		

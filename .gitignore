@@ -5,6 +5,9 @@ bin-int/
 # RealEngine files
 *.log
 
+# VoxelSandbox files
+VoxelSandbox/assets/chunks
+
 # Visual Studio files and folder
 .vs/
 **.sln

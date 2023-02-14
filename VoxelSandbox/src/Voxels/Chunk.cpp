@@ -12,8 +12,11 @@ Chunk::Chunk(glm::ivec3 worldOffset, ChunkManager& manager)
 
 //This is used for so that I don't have to keep re allocating memory for new Chunks
 void Chunk::LoadVoxels() {
-	//Generate new Voxels
-	TerrainGenerator::CreateTerrain(m_Voxels, m_WorldOffset);
+	if (!ChunkReadWrite::ReadVoxels(m_Voxels, m_WorldOffset)) {
+		//Generate new Voxels
+		TerrainGenerator::CreateTerrain(m_Voxels, m_WorldOffset);
+		ChunkReadWrite::SaveVoxels(m_Voxels, m_WorldOffset);
+	}
 
 	m_Status = Status::UpdateMesh;
 }
@@ -57,7 +60,7 @@ void Chunk::CreateMesh() {
 					if (blockCurrent.IsAir() == blockCompare.IsAir()) {
 						mask[n].first = Voxel(VoxelTypeIDs::Air);
 					}
-					else if (blockCurrent) {
+					else if (!blockCurrent.IsAir()) {
 						mask[n].first = blockCurrent;
 						mask[n].second = true;
 					}
@@ -78,7 +81,7 @@ void Chunk::CreateMesh() {
 				for (i = 0; i < Constants::CHUNK_SIZE;) {
 					Voxel currentType = mask[n].first;
 					bool topFace = mask[n].second;
-					if (currentType) {
+					if (!currentType.IsAir()) {
 						// Compute the width of this quad and store it in w                        
 						//   This is done by searching along the current axis until mask[n + w] is false
 						for (w = 1; i + w < Constants::CHUNK_SIZE && mask[n + w].first == currentType; w++) {}

@@ -54,9 +54,6 @@ public:
 
 	inline bool IsAir() { return m_BlockType == Air; }
 
-	operator bool() const {
-		return m_BlockType != Air;
-	}
 	bool operator!=(const Voxel& other) const {
 		return m_BlockType != ((Voxel&)other).GetBlockType();
 	}
