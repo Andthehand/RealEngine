@@ -3,6 +3,11 @@
 
 namespace RealEngine {
 	JobQueue::JobQueue(uint32_t numThreads) {
+		if (numThreads > (uint32_t)std::thread::hardware_concurrency()) {
+			RE_CORE_ASSERT(false, "Too many threads specified");
+			numThreads = (uint32_t)std::thread::hardware_concurrency();
+		}
+
 		for (uint32_t i = 0; i < numThreads; i++) {
 			m_WorkerThreads.emplace_back(std::make_unique<WorkerThread>(*this));
 		}
