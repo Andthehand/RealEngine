@@ -1,7 +1,7 @@
 #pragma once
 #include <RealEngine.h>
 
-#include "JsonParsers/BlockJsonParser.h"
+#include "BlockJsonParser.h"
 
 enum VoxelSide {
 	Side = 0,
@@ -9,7 +9,6 @@ enum VoxelSide {
 	Bottom = 2
 };
 
-//TODO: Make this dynamic
 enum VoxelTypeIDs : uint16_t {
 	Air = std::numeric_limits<uint16_t>::max(),
 	Grass = 0,

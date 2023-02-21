@@ -1,6 +1,7 @@
 #pragma once
 #include <RealEngine.h>
 
+//TODO: Make parse a template and move this to Voxel.h
 struct BlockData {
 	std::string Name;
 	uint32_t Side;

@@ -1,11 +1,11 @@
-#include "JsonParsers/BlockJsonParser.h"
+#include "BlockJsonParser.h"
 
 #include <fstream>
 #include <iostream>
 
 #include <json.hpp>
 
-#include "Constants.h"
+#include "Core/Constants.h"
 
 using namespace nlohmann;
 

@@ -1,9 +1,9 @@
 #pragma once
 #include <RealEngine.h>
 
-#include "Voxels/ChunkManager.h"
+#include "Chunks/ChunkManager.h"
 #include "FirstPersonCamera.h"
-#include "PerlinTexture.h"
+#include "Utils/PerlinTexture.h"
 #include "Constants.h"
 
 #include "Test.h"
@@ -20,9 +20,13 @@ public:
 	bool OnKeyPressed(RealEngine::KeyPressedEvent& e);
 private:
 	inline void FPSCounter(RealEngine::Timestep ts) {
-		deltaTime += ts;
-		deltaTime /= 2.0f;
-		fps = 1.0f / deltaTime;
+		m_DeltaTime += ts;
+		m_DeltaTime /= 2.0f;
+		m_FPS = 1.0f / m_DeltaTime;
+	}
+
+	inline void FrameTimeCounter(RealEngine::Timestep ts) {
+		m_FrameTime = ts.GetMilliseconds();
 	}
 
 private:
@@ -41,10 +45,14 @@ private:
 	float m_Precition = Constants::FREQUENCY;
 	PerlinTexture m_Texture;
 
+	bool m_VSync = true;
 	bool m_Wireframe = false;
 	bool m_CursorEnabled = false;
 
 	//FPS counter
-	float deltaTime = 0.0f;
-	float fps = 0.0f;
+	float m_DeltaTime = 0.0f;
+	float m_FPS = 0.0f;
+
+	//Frame Time Counter
+	float m_FrameTime = 0.0f;
 };

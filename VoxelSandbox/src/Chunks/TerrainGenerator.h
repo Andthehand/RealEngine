@@ -3,8 +3,8 @@
 
 #include <FastNoise/FastNoise.h>
 
-#include "Voxel.h"
-#include "Constants.h"
+#include "Voxels/Voxel.h"
+#include "Core/Constants.h"
 #include "Utils/ScopeTimer.h"
 
 class TerrainGenerator {
@@ -18,7 +18,7 @@ public:
 		//static FastNoise::SmartNode<> m_PerlinNoise = FastNoise::NewFromEncodedNodeTree("FwAAAIC/AACAPwAAAAAAAIA/BwA=");
 		
 		float* noiseOutput3D = new float[Constants::CHUNK_SIZE * Constants::CHUNK_SIZE * Constants::CHUNK_SIZE];
-		float* noiseOutput2D = new float[Constants::CHUNK_SIZE * Constants::CHUNK_SIZE];
+		//float* noiseOutput2D = new float[Constants::CHUNK_SIZE * Constants::CHUNK_SIZE];
 
 		FastNoise::OutputMinMax minMax = m_PerlinNoise->GenUniformGrid3D(noiseOutput3D, worldPos.x, worldPos.y, worldPos.z, Constants::CHUNK_SIZE, Constants::CHUNK_SIZE, Constants::CHUNK_SIZE, Constants::FREQUENCY, Constants::SEED);
 		//FastNoise::OutputMinMax minMax = m_PerlinNoise->GenUniformGrid2D(noiseOutput2D, worldPos.x, worldPos.z, Constants::CHUNK_SIZE, Constants::CHUNK_SIZE, Constants::FREQUENCY, Constants::SEED + 10);
@@ -58,6 +58,6 @@ public:
 		}
 
 		delete[] noiseOutput3D;
-		delete[] noiseOutput2D;
+		//delete[] noiseOutput2D;
 	}
 };

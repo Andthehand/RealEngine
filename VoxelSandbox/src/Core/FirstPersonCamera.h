@@ -130,5 +130,5 @@ private:
 	float m_FOV = 90.0f;
 	float m_AspectRatio;
 
-	inline static const glm::vec3 s_WorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	static constexpr glm::vec3 s_WorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 };

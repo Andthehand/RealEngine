@@ -3,8 +3,8 @@
 
 #include <glm/gtx/string_cast.hpp>
 
-#include "Constants.h"
-#include "Voxel.h"
+#include "Core/Constants.h"
+#include "Voxels/Voxel.h"
 #include "Utils/ScopeTimer.h"
 
 class ChunkManager;
@@ -46,14 +46,13 @@ public:
 		//Check if the file exists
 		struct stat buffer;
 		if (stat(Format(worldPos).c_str(), &buffer) == 0) {
-			std::pair<uint32_t, VoxelTypeIDs>* RLE;
 			uint32_t size = (uint32_t)Filesize(Format(worldPos).c_str()) / sizeof(std::pair < uint32_t, VoxelTypeIDs>);
-			RLE = new std::pair<uint32_t, VoxelTypeIDs>[size];
+			std::pair<uint32_t, VoxelTypeIDs>* RLE = new std::pair<uint32_t, VoxelTypeIDs>[size];
 
 			std::ifstream chunkFile(Format(worldPos), std::ios::binary);
 			chunkFile.read((char*)RLE, Filesize(Format(worldPos).c_str()));
 
-			//Uncompress
+			//Uncompress RLE
 			uint32_t lastOffset = 0;
 			for (uint32_t i = 0; i < size; i++) {
 				uint32_t offset = RLE[i].first;
@@ -92,6 +91,26 @@ private:
 	}
 };
 
+//This is mainly used for statistics
+class ChunkRenderer {
+public:
+	static inline void Render(RealEngine::Ref<RealEngine::VertexArray> vertexArray) {
+		m_VerticeCount += vertexArray->GetIndexBuffer()->GetCount();
+		
+		vertexArray->Bind();
+		RealEngine::RenderCommand::DrawIndexed(vertexArray);
+	}
+
+	static inline void ResetStatistics() { m_VerticeCount = 0; }
+
+	static inline uint32_t GetVerticeCount() { return m_VerticeCount; }
+	static inline uint32_t GetTriangleCount() { return m_VerticeCount / 2; }
+	static inline uint32_t GetQuadCount() { return m_VerticeCount / 4; }
+	static inline uint32_t GetIndiceCount() { return m_VerticeCount / 4 * 6; }
+private:
+	static uint32_t m_VerticeCount;
+};
+
 class Chunk {
 public:
 	Chunk(glm::ivec3 worldOffset, ChunkManager& manager);
@@ -120,7 +139,7 @@ public:
 		//Mesh needs to be recreated
 		UpdateMesh,
 		//Only the main thread can upload stuff to gpu
-		UploadBuffers,	
+		UploadBuffers,
 		Proccessing
 	};
 	Status m_Status = Status::Load;

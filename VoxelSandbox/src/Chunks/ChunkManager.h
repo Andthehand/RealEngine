@@ -4,7 +4,7 @@
 
 #include <RealEngine/Utils/Threads/JobQueue.h>
 
-#include "FirstPersonCamera.h"
+#include "Core/FirstPersonCamera.h"
 
 //This is for the unordered map
 namespace std {
@@ -32,6 +32,9 @@ public:
 	//Basic Statistics
 	struct Statistics {
 		uint32_t ChunksRendered = 0;
+		uint32_t ChunksActive = 0;
+		uint32_t PreLoadedChunks = 0;
+
 		float CameraDist = 0.0f;
 	};
 	Statistics& GetStatistics() { return m_Statistics; }
@@ -58,17 +61,21 @@ private:
 		};
 	}
 private:
-	//TODO: Make a Seperate load distance that should be at least 1 larger than the rendender distance
 	int m_RenderDistance = 1;
-	
+	int m_LoadDistance = 1;
+
 	//This is global so I can freeze the frustum culling
 	glm::vec4 m_FrustumPlanes[6];
 
+	//TODO: Move to statistics
 	glm::ivec3 m_LastCameraChunkPosition;
 
 	std::shared_mutex m_ChunkMutex;
+	
+	//TODO: Implement these
 	std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>> m_RenderableChunks;
 	std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>> m_PreLoadedChunks;
+
 	std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>> m_ActiveChunks;
 	
 	bool m_FrustumFrozen = false;

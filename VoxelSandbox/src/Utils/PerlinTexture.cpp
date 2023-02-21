@@ -1,7 +1,7 @@
 #include "PerlinTexture.h"
 
-#include "Voxels/TerrainGenerator.h"
-#include "Constants.h"
+#include "Chunks/TerrainGenerator.h"
+#include "Core/Constants.h"
 
 struct Color {
 	uint8_t r = 0;

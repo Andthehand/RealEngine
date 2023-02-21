@@ -7,8 +7,8 @@
 
 #include <imgui/imgui.h>
 
-#include "Constants.h"
-#include "Voxel.h"
+#include "Core/Constants.h"
+#include "Voxels/Voxel.h"
 
 ChunkManager::ChunkManager(const glm::vec3& cameraPos) 
 	: m_LastCameraChunkPosition(ToChunkCoords(cameraPos)), m_JobQueue(Constants::NUM_MAX_THREADS) {
@@ -71,23 +71,21 @@ bool IntersectFrustum(const glm::vec4* frustumPlanes, const glm::vec3& min, cons
 void ChunkManager::Render(const FirstPersonCamera& camera) {
 	ResetStatistics(); 
 
-	static glm::vec3 currentCameraPos = { 0, 0, 0 };
-	if(!m_FreezePos)
-		currentCameraPos = camera.GetPosition();
+	static glm::vec3 currentCameraPos = camera.GetPosition();
+	if(!m_FreezePos) currentCameraPos = camera.GetPosition();
 	
 	static glm::vec3 lastPlayerLoadPosition = currentCameraPos;
-
 	m_Statistics.CameraDist = glm::distance2(currentCameraPos, lastPlayerLoadPosition);
 	if (m_Statistics.CameraDist > Constants::CHUNK_SIZE * Constants::CHUNK_SIZE) {
 		lastPlayerLoadPosition = currentCameraPos;
 		m_LastCameraChunkPosition = ToChunkCoords(currentCameraPos);
 
-		//m_JobQueue.Push(std::bind(&ChunkManager::UpdateChunks, this));
 		UpdateChunks();
 	}
 
 	//This is used for the frustum culling
 	if(!m_FrustumFrozen) ExtractFrustum(m_FrustumPlanes, camera.GetViewProjection());
+
 	std::shared_lock lock(m_ChunkMutex);
 	for (auto& [pos, chunk] : m_ActiveChunks) {		
 		switch (chunk->m_Status) {
@@ -123,31 +121,45 @@ void ChunkManager::Render(const FirstPersonCamera& camera) {
 }
 
 void ChunkManager::OnImGuiRender() {
+	ImGui::Begin("Chunk Manager Stats");
+	
 	ImGui::Text("Previous Camera Pos: %i, %i, %i", m_LastCameraChunkPosition.x, m_LastCameraChunkPosition.y, m_LastCameraChunkPosition.z);
-	//glm::vec3 temp = Vec3ToChunkCords(m_LastCameraChunkPosition);
-	//ImGui::Text("Previous Chunk Pos: %i, %i, %i", temp.x, temp.y, temp.z);
+	glm::vec3 temp = ToChunkCoords(m_LastCameraChunkPosition);
+	ImGui::Text("Previous Chunk Pos: %i, %i, %i", temp.x, temp.y, temp.z);
 	ImGui::Text("Distance: %f", std::sqrtf(m_Statistics.CameraDist));
 	
-	std::shared_lock lock(m_ChunkMutex);
-	ImGui::Text("Num Chunks Rendered %i", m_Statistics.ChunksRendered);
-	ImGui::Text("Num Chunks Active %i", m_ActiveChunks.size());	
-	ImGui::Text("Num Chunks PreLoaded %i", m_PreLoadedChunks.size());	
-	if (ImGui::SliderInt("Render Distance", &m_RenderDistance, 1, 20)) {
-		lock.unlock();
-		UpdateChunks();
-		lock.lock();
-	}
-	if (ImGui::Button("Regenerate Terrain")) {
-		for (auto& [key, chunk] : m_ActiveChunks) {
-			chunk->m_Status = Chunk::Status::UpdateMesh;
+	if (ImGui::TreeNode("Chunk Stats")) {
+		std::shared_lock lock(m_ChunkMutex);
+		ImGui::Text("Num Chunks Rendered %i", m_Statistics.ChunksRendered);
+		ImGui::Text("Num Chunks Active %i", m_Statistics.ChunksActive);
+		ImGui::Text("Num Chunks PreLoaded %i", m_Statistics.PreLoadedChunks);
+		if (ImGui::SliderInt("Render Distance", &m_RenderDistance, 1, 20)) {
+			lock.unlock();
+			UpdateChunks();
+			lock.lock();
+		}
+		ImGui::Text("Vertices Rendered: %i", ChunkRenderer::GetVerticeCount());
+		ImGui::Text("Triangles Rendered: %i", ChunkRenderer::GetTriangleCount());
+		ImGui::Text("Quads Rendered: %i", ChunkRenderer::GetQuadCount());
+		ImGui::Text("Indices Rendered: %i", ChunkRenderer::GetIndiceCount());
+		ImGui::TreePop();
+
+		if (ImGui::Button("Regenerate Terrain")) {
+			for (auto& [key, chunk] : m_ActiveChunks) {
+				chunk->m_Status = Chunk::Status::UpdateMesh;
+			}
 		}
 	}
 	if (ImGui::Button("Freeze Frustum")) m_FrustumFrozen = !m_FrustumFrozen;
 	if (ImGui::Button("Freeze Position")) m_FreezePos = !m_FreezePos;
+
+	ImGui::End();
 }
 
 void ChunkManager::ResetStatistics() {
 	m_Statistics.ChunksRendered = 0;
+
+	ChunkRenderer::ResetStatistics();
 }
 
 //This checks the m_ActiveChunks to discard chunks to far away and add chunks that are in render distance
@@ -201,8 +213,7 @@ void ChunkManager::UpdateChunks() {
 							Chunk::MemoryPool.pop_back();
 						}
 					}
-					else if ((localPos.x * localPos.x) + (localPos.y * localPos.y) + (localPos.z * localPos.z) <= (m_RenderDistance * m_RenderDistance) + 1) {
-						//Add new chunks
+					//else if ((localPos.x * localPos.x) + (localPos.y * localPos.y) + (localPos.z * localPos.z) <= (m_RenderDistance * m_RenderDistance) + m_LoadDistance) {
 						//if (Chunk::MemoryPool.empty()) {
 						//	std::shared_ptr<Chunk> tempChunk = std::make_shared<Chunk>(worldPos, *this);
 						//	tempChunk->m_Status = Chunk::Status::Load;
@@ -215,9 +226,12 @@ void ChunkManager::UpdateChunks() {
 						//	m_PreLoadedChunks.insert({ worldPos, tempChunk });
 						//	Chunk::MemoryPool.pop_back();
 						//}
-					}
+					//}
 				}
 			}
 		}
 	}
+
+	m_Statistics.ChunksActive = (uint32_t)m_ActiveChunks.size();
+	m_Statistics.PreLoadedChunks = (uint32_t)m_PreLoadedChunks.size();
 }

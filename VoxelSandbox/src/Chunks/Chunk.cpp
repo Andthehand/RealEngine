@@ -2,9 +2,10 @@
 
 #include "ChunkManager.h"
 #include "TerrainGenerator.h"
-#include "Constants.h"
-#include "JsonParsers/BlockJsonParser.h"
+#include "Core/Constants.h"
+#include "Utils/ScopeTimer.h"
 
+uint32_t ChunkRenderer::m_VerticeCount = 0;
 std::vector<std::shared_ptr<Chunk>> Chunk::MemoryPool;
 
 Chunk::Chunk(glm::ivec3 worldOffset, ChunkManager& manager) 
@@ -35,13 +36,15 @@ inline int f(glm::ivec3& dims, int i, int j, int k) {
 }
 
 void Chunk::CreateMesh() {
+	VOXEL_TIMER();
+
 	// Sweep over each axis (X, Y and Z)
 	for (int d = 0; d < 3; ++d) {
 		int i, j, k, l, w, h;
 		int u = (d + 1) % 3;
 		int v = (d + 2) % 3;
-		glm::ivec3 x = glm::ivec3(0);
-		glm::ivec3 q = glm::ivec3(0);
+		int x[3] = { 0 };
+		int q[3] = { 0 };;
 
 		//The bool is used only on the y axes to see if I'm rendering the top or bottom of the Voxel for texturing
 		std::pair<Voxel, bool>* mask = new std::pair<Voxel, bool>[Constants::CHUNK_SIZE * Constants::CHUNK_SIZE];
@@ -110,7 +113,7 @@ void Chunk::CreateMesh() {
 						x[v] = j;
 
 						// du and dv determine the size and orientation of this face
-						glm::ivec3 du = glm::ivec3(0), dv = glm::ivec3(0);
+						int du[3] = { 0 }, dv[3] = { 0 };
 						du[u] = w;
 						dv[v] = h;
 						
@@ -216,6 +219,5 @@ void Chunk::UpdateBuffers() {
 }
 
 void Chunk::Render() {
-	m_VertexArray->Bind();
-	RealEngine::RenderCommand::DrawIndexed(m_VertexArray, ((uint32_t)m_Vertices.size() / 4) * 6);
+	ChunkRenderer::Render(m_VertexArray);
 }

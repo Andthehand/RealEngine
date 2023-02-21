@@ -21,7 +21,7 @@ namespace RealEngine {
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;
 
-		void SetCusorEnabled(bool enabled) override;
+		void SetCursorEnabled(bool enabled) override;
 
 		inline virtual void* GetNativeWindow() const override { return m_Window; }
 
