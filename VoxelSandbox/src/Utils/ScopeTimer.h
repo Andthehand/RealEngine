@@ -19,9 +19,9 @@ private:
 	std::chrono::steady_clock::time_point m_Start;
 };
 
-#ifdef RE_DEBUG
+//#ifdef RE_DEBUG
 	#define VOXEL_TIMER() ScopeTimer timer(__FUNCTION__);
-#else
-	#define VOXEL_TIMER();
-#endif
+//#else
+//	#define VOXEL_TIMER();
+//#endif
 

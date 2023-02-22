@@ -125,7 +125,10 @@ public:
 	const glm::ivec3& GetPostition() const { return m_WorldOffset; }
 	void SetPostition(glm::ivec3& position) { m_WorldOffset = position; }
 
-	inline Voxel& GetVoxel(glm::ivec3 pos) { return m_Voxels[pos.x][pos.y][pos.z]; }
+	inline Voxel& GetVoxel(glm::ivec3 pos) { 
+		RE_ASSERT( std::abs(pos.x) < Constants::CHUNK_SIZE&& std::abs(pos.y) < Constants::CHUNK_SIZE && std::abs(pos.z) < Constants::CHUNK_SIZE, "Out of bounds");
+		return m_Voxels[pos.x][pos.y][pos.z]; 
+	}
 public:
 	//This is used by the Chunk manager for better memory manigment
 	static std::vector<std::shared_ptr<Chunk>> MemoryPool;

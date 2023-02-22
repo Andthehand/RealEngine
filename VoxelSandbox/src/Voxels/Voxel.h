@@ -48,7 +48,7 @@ public:
 	Voxel() = default;
 	Voxel(VoxelTypeIDs type) : m_BlockType(type) {};
 
-	inline VoxelTypeIDs GetBlockType() { return m_BlockType; }
+	inline VoxelTypeIDs GetBlockType() const { return m_BlockType; }
 	inline void SetBlockType(VoxelTypeIDs blockType) { m_BlockType = blockType; }
 
 	inline bool IsAir() { return m_BlockType == Air; }

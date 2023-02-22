@@ -35,8 +35,26 @@ inline int f(glm::ivec3& dims, int i, int j, int k) {
 	return i + dims[0] * (j + dims[1] * k);
 }
 
+inline Voxel GetNeighboringVoxel(std::shared_ptr<Chunk> chunk, glm::ivec3 pos, uint32_t d, bool top) {
+	//Check if the chunk actually exists
+	if (!chunk) 
+		return Voxel(VoxelTypeIDs::Air);
+	
+	pos[d] = top ? Constants::CHUNK_SIZE - 1 : 0;
+	return chunk->GetVoxel(pos);
+}
+
 void Chunk::CreateMesh() {
 	VOXEL_TIMER();
+
+	std::shared_ptr<Chunk> neighboringChunks[6] = {
+		m_ChunkManager.GetChunk({ m_WorldOffset.x + Constants::CHUNK_SIZE, m_WorldOffset.y, m_WorldOffset.z }),
+		m_ChunkManager.GetChunk({ m_WorldOffset.x - Constants::CHUNK_SIZE, m_WorldOffset.y, m_WorldOffset.z }),
+		m_ChunkManager.GetChunk({ m_WorldOffset.x, m_WorldOffset.y + Constants::CHUNK_SIZE, m_WorldOffset.z }),
+		m_ChunkManager.GetChunk({ m_WorldOffset.x, m_WorldOffset.y - Constants::CHUNK_SIZE, m_WorldOffset.z }),
+		m_ChunkManager.GetChunk({ m_WorldOffset.x, m_WorldOffset.y, m_WorldOffset.z + Constants::CHUNK_SIZE }),
+		m_ChunkManager.GetChunk({ m_WorldOffset.x, m_WorldOffset.y, m_WorldOffset.z - Constants::CHUNK_SIZE }),
+	};
 
 	// Sweep over each axis (X, Y and Z)
 	for (int d = 0; d < 3; ++d) {
@@ -44,7 +62,7 @@ void Chunk::CreateMesh() {
 		int u = (d + 1) % 3;
 		int v = (d + 2) % 3;
 		int x[3] = { 0 };
-		int q[3] = { 0 };;
+		int q[3] = { 0 };
 
 		//The bool is used only on the y axes to see if I'm rendering the top or bottom of the Voxel for texturing
 		std::pair<Voxel, bool>* mask = new std::pair<Voxel, bool>[Constants::CHUNK_SIZE * Constants::CHUNK_SIZE];
@@ -56,10 +74,13 @@ void Chunk::CreateMesh() {
 			int n = 0;
 			for (x[v] = 0; x[v] < Constants::CHUNK_SIZE; ++x[v]) {
 				for (x[u] = 0; x[u] < Constants::CHUNK_SIZE; ++x[u], n++) {
-					//TODO: Implement chunk face culling by checking other chunks blocks
-					Voxel blockCurrent = 0 <= x[d] ? m_Voxels[x[0]][x[1]][x[2]].GetBlockType() : Voxel(VoxelTypeIDs::Air);
-					Voxel blockCompare = x[d] < Constants::CHUNK_SIZE - 1 ? m_Voxels[x[0] + q[0]][x[1] + q[1]][x[2] + q[2]].GetBlockType() : Voxel(VoxelTypeIDs::Air);
-
+					//TODO: Optimize this
+					Voxel blockCurrent = x[d] >= 0 ? m_Voxels[x[0]][x[1]][x[2]].GetBlockType() : GetNeighboringVoxel(neighboringChunks[(d + 1) * 2 - 1], { x[0], x[1], x[2] }, d, true);
+					Voxel blockCompare = x[d] < Constants::CHUNK_SIZE - 1 ? m_Voxels[x[0] + q[0]][x[1] + q[1]][x[2] + q[2]].GetBlockType() : GetNeighboringVoxel(neighboringChunks[d * 2], glm::ivec3{ x[0] + q[0], x[1] + q[1], x[2] + q[2] }, d, false);
+					
+					//Voxel blockCurrent = x[d] >= 0 ? m_Voxels[x[0]][x[1]][x[2]].GetBlockType() : Voxel(VoxelTypeIDs::Air);
+					//Voxel blockCompare = x[d] < Constants::CHUNK_SIZE - 1 ? m_Voxels[x[0] + q[0]][x[1] + q[1]][x[2] + q[2]].GetBlockType() : Voxel(VoxelTypeIDs::Air);
+					
 					if (blockCurrent.IsAir() == blockCompare.IsAir()) {
 						mask[n].first = Voxel(VoxelTypeIDs::Air);
 					}

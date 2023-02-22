@@ -20,6 +20,14 @@ namespace std {
 	};
 }
 
+inline const glm::ivec3 ToChunkCoords(const glm::vec3& worldCoordinates) {
+	return glm::ivec3{
+		glm::floor(worldCoordinates.x / (float)Constants::CHUNK_SIZE),
+		glm::floor(worldCoordinates.y / (float)Constants::CHUNK_SIZE),
+		glm::floor(worldCoordinates.z / (float)Constants::CHUNK_SIZE)
+	};
+}
+
 class ChunkManager {
 public:
 	//Base functions
@@ -53,13 +61,6 @@ public:
 private:
 	void UpdateChunks();
 
-	inline const glm::ivec3 ToChunkCoords(const glm::vec3& worldCoordinates) {
-		return glm::ivec3{
-			glm::floor(worldCoordinates.x / (float)Constants::CHUNK_SIZE),
-			glm::floor(worldCoordinates.y / (float)Constants::CHUNK_SIZE),
-			glm::floor(worldCoordinates.z / (float)Constants::CHUNK_SIZE)
-		};
-	}
 private:
 	int m_RenderDistance = 1;
 	int m_LoadDistance = 1;
