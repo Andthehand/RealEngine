@@ -214,29 +214,9 @@ namespace RealEngine {
 			ImGui::OpenPopup("AddComponent");
 
 		if (ImGui::BeginPopup("AddComponent")) {
-			if (ImGui::MenuItem("Transform")) {
-				if (!m_SelectionContext.HasComponent<TransformComponent>())
-					m_SelectionContext.AddComponent<TransformComponent>();
-				else
-					RE_CORE_WARN("This entity already has the Transform Component!");
-				ImGui::CloseCurrentPopup();
-			}
-
-			if (ImGui::MenuItem("Camera")) {
-				if (!m_SelectionContext.HasComponent<CameraComponent>())
-					m_SelectionContext.AddComponent<CameraComponent>();
-				else
-					RE_CORE_WARN("This entity already has the Camera Component!");
-				ImGui::CloseCurrentPopup();
-			}
-
-			if (ImGui::MenuItem("Sprite Renderer")) {
-				if (!m_SelectionContext.HasComponent<SpriteRendererComponent>())
-					m_SelectionContext.AddComponent<SpriteRendererComponent>();
-				else
-					RE_CORE_WARN("This entity already has the Sprite Renderer Component!");
-				ImGui::CloseCurrentPopup();
-			}
+			DisplayAddComponentEntry<TransformComponent>("Transform");
+			DisplayAddComponentEntry<CameraComponent>("Camera");
+			DisplayAddComponentEntry<SpriteRendererComponent>("Sprite Renderer");
 
 			ImGui::EndPopup();
 		}
@@ -310,4 +290,13 @@ namespace RealEngine {
 
 	}
 
+	template<typename T>
+	void SceneHierarchyPanel::DisplayAddComponentEntry(const std::string& entryName) {
+		if (!m_SelectionContext.HasComponent<T>()) {
+			if (ImGui::MenuItem(entryName.c_str())) {
+				m_SelectionContext.AddComponent<T>();
+				ImGui::CloseCurrentPopup();
+			}
+		}
+	}
 }
