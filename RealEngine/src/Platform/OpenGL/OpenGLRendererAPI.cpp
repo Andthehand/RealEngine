@@ -62,7 +62,7 @@ namespace RealEngine {
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	}
 
-	void OpenGLRendererAPI::DrawArrays(const Ref<VertexArray>& vertexArray, BufferMode mode, uint32_t count, uint32_t start) {
+	void OpenGLRendererAPI::DrawArrays(const Ref<VertexArray>& vertexArray, uint32_t count, BufferMode mode, uint32_t start) {
 		glDrawArrays(BufferModeTypeToOpenGLBaseType(mode), start, count);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}

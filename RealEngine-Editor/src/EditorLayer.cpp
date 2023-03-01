@@ -18,6 +18,7 @@ namespace RealEngine {
         RE_PROFILE_FUNCTION();
 
         FramebufferSpecification fbSpec;
+		fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::Depth };
         fbSpec.Width = 1280;
         fbSpec.Height = 720;
         m_Framebuffer = Framebuffer::Create(fbSpec);
@@ -27,7 +28,9 @@ namespace RealEngine {
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
 		m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.01f, 1000.0f);
-    }
+		
+		RenderCommand::SetClearColor({ 0.1, 0.1, 0.1, 1 });
+	}
 
     void EditorLayer::OnDetach() {
         RE_PROFILE_FUNCTION();
@@ -51,8 +54,7 @@ namespace RealEngine {
 		m_EditorCamera.OnUpdate(ts);
 
         Renderer2D::ResetStats();
-        m_Framebuffer->Bind();
-        RenderCommand::SetClearColor({ 0.1, 0.1, 0.1, 1 });
+		m_Framebuffer->Bind();
         RenderCommand::Clear();
 
         m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
