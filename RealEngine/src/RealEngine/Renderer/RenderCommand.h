@@ -25,8 +25,8 @@ namespace RealEngine {
 			s_RendererAPI->Clear();
 		};
 
-		inline static void DrawArrays(const Ref<VertexArray>& vertexArray, BufferMode mode, uint32_t count, uint32_t start = 0) {
-			s_RendererAPI->DrawArrays(vertexArray, mode, count, start);
+		inline static void DrawArrays(const Ref<VertexArray>& vertexArray, uint32_t count, BufferMode mode = BufferMode::Triangles, uint32_t start = 0) {
+			s_RendererAPI->DrawArrays(vertexArray, count, mode, start);
 		}
 
 		inline static void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount = 0) {
