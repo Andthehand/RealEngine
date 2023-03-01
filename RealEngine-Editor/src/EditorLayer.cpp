@@ -181,7 +181,8 @@ void EditorLayer::OnImGuiRender() {
 		RenderCommand::SetWireFrame(m_Wireframe);
 	}
 
-	/* This is a demo of ImPlot
+	/*
+	// This is a demo of ImPlot
 	srand(0);
 	static float xs1[100], ys1[100];
 	for (int i = 0; i < 100; ++i) {
@@ -288,12 +289,12 @@ void EditorLayer::OnImGuiRender() {
 		bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
 
 		switch (e.GetKeyCode()) {
-		//Saze Shortcuts
+			//Saze Shortcuts
 		case Key::N:
 			if (control)
 				//Ctrl+N
 				NewScene();
-		break; 
+			break;
 
 		case Key::O:
 			if (control)
@@ -303,7 +304,7 @@ void EditorLayer::OnImGuiRender() {
 
 		case Key::S:
 			if (control) {
-				if(shift) {
+				if (shift) {
 					//Ctrl+Shift+S
 					SaveSceneAs();
 					break;
@@ -313,24 +314,28 @@ void EditorLayer::OnImGuiRender() {
 			}
 			break;
 
-		//Gizmos
-		case Key::Q:
-			m_GizmoType = -1;
-			break;
-
-		case Key::W:
-			m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
-			break;
-
-		case Key::E:
-			m_GizmoType = ImGuizmo::OPERATION::ROTATE;
-			break;
-
-		case Key::R:
-			m_GizmoType = ImGuizmo::OPERATION::SCALE;
-			break;
+			// Gizmos
+			case Key::Q: {
+				if (!ImGuizmo::IsUsing())
+					m_GizmoType = -1;
+				break;
+			}
+			case Key::W: {
+				if (!ImGuizmo::IsUsing())
+					m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+				break;
+			}
+			case Key::E: {
+				if (!ImGuizmo::IsUsing())
+					m_GizmoType = ImGuizmo::OPERATION::ROTATE;
+				break;
+			}
+			case Key::R: {
+				if (!ImGuizmo::IsUsing())
+					m_GizmoType = ImGuizmo::OPERATION::SCALE;
+				break;
+			}
 		}
-		
 		return false;
 	}
 
