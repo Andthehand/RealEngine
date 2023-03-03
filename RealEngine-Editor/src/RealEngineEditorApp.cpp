@@ -6,8 +6,8 @@
 namespace RealEngine {
 	class RealEngineEditor : public Application {
 	public:
-		RealEngineEditor() 
-			: Application("RealEngine Editor") {
+		RealEngineEditor(ApplicationCommandLineArgs args)
+			: Application("RealEngine Editor", args) {
 			PushLayer(new EditorLayer());
 		}
 
@@ -16,7 +16,7 @@ namespace RealEngine {
 		}
 	};
 
-	Application* CreateApplication() {
-		return new RealEngineEditor();
+	Application* CreateApplication(ApplicationCommandLineArgs args) {
+		return new RealEngineEditor(args);
 	}
 }

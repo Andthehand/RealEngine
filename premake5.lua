@@ -1,4 +1,5 @@
 include "./vendor/premake/premake_customization/solution_items.lua"
+include "Dependencies.lua"
 
 workspace "RealEngine"
 	architecture "x86_64"
@@ -19,18 +20,6 @@ workspace "RealEngine"
 	}
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
-
--- Include directories relative to root folder (solution directory)
-IncludeDir = {}
-IncludeDir["GLFW"] = "%{wks.location}/RealEngine/vendor/GLFW/include"
-IncludeDir["Glad"] = "%{wks.location}/RealEngine/vendor/Glad/include"
-IncludeDir["ImGui"] = "%{wks.location}/RealEngine/vendor/imgui"
-IncludeDir["glm"] = "%{wks.location}/RealEngine/vendor/glm"
-IncludeDir["stb_image"] = "%{wks.location}/RealEngine/vendor/stb_image"
-IncludeDir["entt"] = "%{wks.location}/RealEngine/vendor/entt/include"
-IncludeDir["yaml_cpp"] = "%{wks.location}/RealEngine/vendor/yaml-cpp/include"
-IncludeDir["ImGuizmo"] = "%{wks.location}/RealEngine/vendor/ImGuizmo"
-IncludeDir["ImPlot"] = "%{wks.location}/RealEngine/vendor/ImPlot"
 
 group "Dependencies"
 	include "vendor/premake"

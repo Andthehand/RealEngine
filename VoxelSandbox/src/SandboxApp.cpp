@@ -15,6 +15,6 @@ public:
 	}
 };
 
-RealEngine::Application* RealEngine::CreateApplication() {
+RealEngine::Application* RealEngine::CreateApplication(ApplicationCommandLineArgs args) {
 	return new Sandbox();
 }

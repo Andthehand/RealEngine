@@ -14,3 +14,11 @@ VoxelSandbox/assets/chunks
 **.vcxproj
 **.vcxproj.filters
 **.vcxproj.user
+
+# Directories
+RealEngine/vendor/VulkanSDK
+RealEngine-Editor/assets/cache
+VoxelSandbox/assets/cache
+Sandbox/assets/cache
+MachineLearningSandbox/assets/cache
+scripts/__pycache__
