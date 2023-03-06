@@ -79,7 +79,7 @@ namespace RealEngine {
 
 		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y) {
 			int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
-			RE_CORE_WARN("Pixel data = {0}", pixelData);
+			m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_ActiveScene.get());
 		}
 
         m_Framebuffer->UnBind();
@@ -173,6 +173,11 @@ void EditorLayer::OnImGuiRender() {
 	m_SceneHierarchyPanel.OnImGuiRender();
 
 	ImGui::Begin("Stats");
+
+	std::string name = "None";
+	if (m_HoveredEntity)
+		name = m_HoveredEntity.GetComponent<TagComponent>().Tag;
+	ImGui::Text("Hovered Entity: %s", name.c_str());
 
 	auto stats = Renderer2D::GetStats();
 	ImGui::Text("Renderer2D Stats:");
@@ -281,6 +286,7 @@ void EditorLayer::OnImGuiRender() {
 
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<KeyPressedEvent>(RE_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+		dispatcher.Dispatch<MouseButtonPressedEvent>(RE_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
 	}
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e) {
@@ -339,6 +345,16 @@ void EditorLayer::OnImGuiRender() {
 		}
 		return false;
 	}
+
+	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& e) {
+		if (e.GetMouseButton() == Mouse::ButtonLeft)
+		{
+			if (m_ViewportHovered && !ImGuizmo::IsOver() && !Input::IsKeyPressed(Key::LeftAlt))
+				m_SceneHierarchyPanel.SetSelectedEntity(m_HoveredEntity);
+		}
+		return false;
+	}
+
 
 	void EditorLayer::NewScene() {
 		m_ActiveScene = CreateRef<Scene>();

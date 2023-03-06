@@ -1,4 +1,4 @@
-#include "SceneHierarchyPanel.h"
+	#include "SceneHierarchyPanel.h"
 #include <cstring>
 
 /* The Microsoft C++ compiler is non-compliant with the C++ standard and needs
@@ -54,6 +54,10 @@ namespace RealEngine {
 		}
 
 		ImGui::End();
+	}
+
+	void SceneHierarchyPanel::SetSelectedEntity(Entity entity) {
+		m_SelectionContext = entity;
 	}
 
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity) {
