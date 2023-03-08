@@ -2,7 +2,7 @@
 #include "RealEngine/Renderer/Framebuffer.h"
 
 namespace RealEngine {
-	class OpenGLFramebuffer : public Framebuffer{
+	class OpenGLFramebuffer : public Framebuffer {
 	public:
 		OpenGLFramebuffer(const FramebufferSpecification& spec);
 		virtual ~OpenGLFramebuffer();
