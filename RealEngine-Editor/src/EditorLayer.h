@@ -1,6 +1,7 @@
 #pragma once
 #include "RealEngine.h"
 #include "Panels/SceneHierarchyPanel.h"
+#include "Panels/ContentBrowserPanel.h"
 
 #include "RealEngine/Renderer/EditorCamera.h"
 
@@ -21,6 +22,7 @@ namespace RealEngine {
 
 		void NewScene();
 		void OpenScene();
+		void OpenScene(const std::filesystem::path& path);
 		void SaveSceneAs();
 		void SaveScene();
 	private:
@@ -44,6 +46,7 @@ namespace RealEngine {
 
 		//Panels
 		SceneHierarchyPanel m_SceneHierarchyPanel;
+		ContentBrowserPanel m_ContentBrowserPanel;
 
 		Entity m_HoveredEntity;
 	};

@@ -1,4 +1,4 @@
-	#include "SceneHierarchyPanel.h"
+#include "SceneHierarchyPanel.h"
 #include <cstring>
 
 /* The Microsoft C++ compiler is non-compliant with the C++ standard and needs
