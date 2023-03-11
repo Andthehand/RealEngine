@@ -24,8 +24,16 @@ namespace RealEngine {
 		void OpenScene();
 		void OpenScene(const std::filesystem::path& path);
 		void SaveSceneAs();
-		void SaveScene();
+		void SaveScene();	
+
+		void OnScenePlay();
+		void OnSceneStop();
+
+		// UI Panels
+		void UI_Toolbar();
 	private:
+		RealEngine::OrthographicCameraController m_CameraController;
+
 		Ref<RealEngine::Framebuffer> m_Framebuffer;
 
 		Ref<Scene> m_ActiveScene;
@@ -38,6 +46,11 @@ namespace RealEngine {
 
 		int m_GizmoType = -1;
 
+		enum class SceneState {
+			Edit = 0, Play = 1
+		};
+		SceneState m_SceneState = SceneState::Edit;
+
 		//FPS counter
 		float deltaTime = 0.0f;
 		float fps = 0.0f;
@@ -47,6 +60,9 @@ namespace RealEngine {
 		//Panels
 		SceneHierarchyPanel m_SceneHierarchyPanel;
 		ContentBrowserPanel m_ContentBrowserPanel;
+
+		// Editor resources
+		Ref<Texture2D> m_IconPlay, m_IconStop;
 
 		Entity m_HoveredEntity;
 	};

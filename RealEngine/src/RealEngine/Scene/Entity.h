@@ -8,6 +8,7 @@ namespace RealEngine {
 		Entity(entt::entity handle, Scene* scene);
 		Entity(const Entity& other) = default;
 
+		//Args is passed into the constructor of the component struct
 		template<typename T, typename ... Args>
 		T& AddComponent(Args&&... args) {
 			RE_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");

@@ -290,7 +290,7 @@ namespace RealEngine {
 			glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &ExtensionCount);
 
 			GLuint shaderID = shaderIDs.emplace_back(glCreateShader(stage));
-			glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V, spirv.data(), spirv.size() * sizeof(uint32_t));
+			glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V, spirv.data(), (GLsizei)(spirv.size() * sizeof(uint32_t)));
 			glSpecializeShader(shaderID, "main", 0, nullptr, nullptr);
 			glAttachShader(program, shaderID);
 		}

@@ -16,7 +16,11 @@
 #include "RealEngine/Scene/Components.h"
 #include "RealEngine/Scene/SceneCamera.h"
 
+#include "RealEngine/Utils/PlatformUtils.h"
+
+
 namespace RealEngine {
+	extern const std::filesystem::path g_AssetPath;
 
 	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& context) {
 		SetContext(context);
@@ -41,7 +45,15 @@ namespace RealEngine {
 		// Right-click on blank space
 		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
 			if (ImGui::MenuItem("Create Empty Entity"))
-				m_Context->CreateEntity("Empty Entity");
+				m_SelectionContext = m_Context->CreateEntity("Empty Entity");
+			if (ImGui::MenuItem("Create Sprite")) {
+				m_SelectionContext = m_Context->CreateEntity("Sprite");
+				m_SelectionContext.AddComponent<SpriteRendererComponent>();
+			}
+			if (ImGui::MenuItem("Create Camera")) {
+				m_SelectionContext = m_Context->CreateEntity("Camera");
+				m_SelectionContext.AddComponent<CameraComponent>();
+			}
 
 			ImGui::EndPopup();
 		}
@@ -290,6 +302,23 @@ namespace RealEngine {
 
 		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component) {
 			ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+
+			if (ImGui::Button("Texture", ImVec2(100.0f, 0.0f))) {
+				std::string texturePath = FileDialogs::OpenFile("Image Files");
+				if(!texturePath.empty())
+					component.Texture = Texture2D::Create(texturePath);
+			}
+			
+			if (ImGui::BeginDragDropTarget()) {
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_IMAGE")) {
+					const wchar_t* path = (const wchar_t*)payload->Data;
+					std::filesystem::path texturePath = std::filesystem::path(g_AssetPath) / path;
+					component.Texture = Texture2D::Create(texturePath.string());
+				}
+				ImGui::EndDragDropTarget();
+			}
+
+			ImGui::DragFloat("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
 		});
 
 	}

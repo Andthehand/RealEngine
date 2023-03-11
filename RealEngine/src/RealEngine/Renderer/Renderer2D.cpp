@@ -321,8 +321,7 @@ namespace RealEngine {
 
 		float textureIndex = 0.0f;
 		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++) {
-			if (*s_Data.TextureSlots[i].get() == *texture.get())
-			{
+			if (*s_Data.TextureSlots[i].get() == *texture.get()) {
 				textureIndex = (float)i;
 				break;
 			}
@@ -356,7 +355,10 @@ namespace RealEngine {
 	}
 
 	void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID) {
-		DrawQuad(transform, src.Color, entityID);
+		if (src.Texture)
+			DrawQuad(transform, src.Texture, src.TilingFactor, src.Color, entityID);
+		else
+			DrawQuad(transform, src.Color, entityID);
 	}
 
 	void Renderer2D::ResetStats() {

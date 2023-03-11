@@ -13,6 +13,7 @@ namespace RealEngine {
 		~Scene();
 
 		Entity CreateEntity(const std::string& name = std::string());
+		
 		void DestroyEntity(Entity entity);
 
 		void OnUpdateEditor(Timestep ts, EditorCamera& editorCamera);
