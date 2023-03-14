@@ -29,8 +29,9 @@ namespace RealEngine {
 	
 	void Renderer::Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform) {
 		shader->Bind();
-		shader->SetMat4("u_ViewProjection", s_SceneData->ViewProjectionMatrix);
-		shader->SetMat4("u_Transform", transform);
+		//TODO: Change this to a uniform buffer
+		//shader->SetMat4("u_ViewProjection", s_SceneData->ViewProjectionMatrix);
+		//shader->SetMat4("u_Transform", transform);
 
 		vertexArray->Bind();
 		RenderCommand::DrawIndexed(vertexArray);
