@@ -1,10 +1,7 @@
 #pragma once
 
 #include "RealEngine/Renderer/Shader.h"
-#include <glm/glm.hpp>
-
-//TODO: Remove
-typedef unsigned int GLenum;
+#include <glad/glad.h>
 
 namespace RealEngine {
 	class OpenGLShader : public Shader {

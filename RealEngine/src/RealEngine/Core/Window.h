@@ -26,6 +26,8 @@ namespace RealEngine {
 
 		virtual void OnUpdate() = 0;
 
+		virtual double GetTime() = 0;
+
 		virtual uint32_t GetWidth() const = 0;
 		virtual uint32_t GetHeight() const = 0;
 

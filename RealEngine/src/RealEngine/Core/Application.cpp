@@ -69,7 +69,7 @@ namespace RealEngine {
 		while (m_Running) {
 			RE_PROFILE_SCOPE("Run Loop");
 
-			float time = (float)glfwGetTime(); //TODO: Move to Platform
+			float time = (float)m_Window->GetTime();
 			Timestep timestep = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 

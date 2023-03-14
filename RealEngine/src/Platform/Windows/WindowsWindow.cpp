@@ -161,6 +161,10 @@ namespace RealEngine {
 		glfwPollEvents();
 		m_Context->SwapBuffers();
 	}
+
+	double WindowsWindow::GetTime(){
+		return glfwGetTime();
+	}
 	
 	void WindowsWindow::SetVSync(bool enabled) {
 		RE_PROFILE_FUNCTION();

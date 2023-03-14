@@ -5,7 +5,6 @@
 #include <string>
 #include <unordered_map>
 
-#include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <shaderc/shaderc.hpp>
@@ -54,7 +53,6 @@ namespace RealEngine {
 		}
 
 		static const char* GetCacheDirectory() {
-			// TODO: make sure the assets directory is valid
 			return "assets/cache/shader/opengl";
 		}
 
