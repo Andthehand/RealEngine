@@ -15,7 +15,7 @@ namespace RealEngine {
 		glm::vec3 Position;
 		glm::vec4 Color;
 		glm::vec2 TexCoord;
-		float TexIndex;
+		uint32_t TexIndex;
 		float TilingFactor;
 		
 		// Editor-only
@@ -63,7 +63,7 @@ namespace RealEngine {
 			{ ShaderDataType::Float3, "a_Position" },
 			{ ShaderDataType::Float4, "a_Color" },
 			{ ShaderDataType::Float2, "a_TexCoord" },
-			{ ShaderDataType::Float, "a_TexIndex" },
+			{ ShaderDataType::UInt, "a_TexIndex" },
 			{ ShaderDataType::Float, "a_TilingFactor" },
 			{ ShaderDataType::Int, "a_EntityID" }
 		});
@@ -210,7 +210,7 @@ namespace RealEngine {
 		RE_PROFILE_FUNCTION();
 
 		constexpr size_t quadVertexCount = 4;
-		const float textureIndex = 0.0f; // White Texture
+		const uint32_t textureIndex = 0; // White Texture
 		constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
 		const float tilingFactor = 1.0f;
 
@@ -245,10 +245,10 @@ namespace RealEngine {
 		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
 			NextBatch();
 
-		float textureIndex = 0.0f;
+		uint32_t textureIndex = 0;
 		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++) {
 			if (*s_Data.TextureSlots[i] == *texture) {
-				textureIndex = (float)i;
+				textureIndex = i;
 				break;
 			}
 		}
@@ -257,7 +257,7 @@ namespace RealEngine {
 			if (s_Data.TextureSlotIndex >= Renderer2DData::MaxTextureSlots)
 				NextBatch();
 
-			textureIndex = (float)s_Data.TextureSlotIndex;
+			textureIndex = s_Data.TextureSlotIndex;
 			s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
 			s_Data.TextureSlotIndex++;
 		}
@@ -281,7 +281,7 @@ namespace RealEngine {
 		RE_PROFILE_FUNCTION();
 
 		constexpr size_t quadVertexCount = 4;
-		const float textureIndex = 0.0f; // White Texture
+		const uint32_t textureIndex = 0; // White Texture
 		constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
 		const float tilingFactor = 1.0f;
 
@@ -319,10 +319,10 @@ namespace RealEngine {
 		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
 			NextBatch();
 
-		float textureIndex = 0.0f;
+		uint32_t textureIndex = 0;
 		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++) {
 			if (*s_Data.TextureSlots[i].get() == *texture.get()) {
-				textureIndex = (float)i;
+				textureIndex = i;
 				break;
 			}
 		}
@@ -331,7 +331,7 @@ namespace RealEngine {
 			if (s_Data.TextureSlotIndex >= Renderer2DData::MaxTextureSlots)
 				NextBatch();
 
-			textureIndex = (float)s_Data.TextureSlotIndex;
+			textureIndex = s_Data.TextureSlotIndex;
 			s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
 			s_Data.TextureSlotIndex++;
 		}

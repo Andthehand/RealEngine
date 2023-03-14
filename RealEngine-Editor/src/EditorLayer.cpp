@@ -407,8 +407,7 @@ namespace RealEngine {
 	}
 
 	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& e) {
-		if (e.GetMouseButton() == Mouse::ButtonLeft)
-		{
+		if (e.GetMouseButton() == Mouse::ButtonLeft) {
 			if (m_ViewportHovered && !ImGuizmo::IsOver() && !Input::IsKeyPressed(Key::LeftAlt))
 				m_SceneHierarchyPanel.SetSelectedEntity(m_HoveredEntity);
 		}
@@ -419,7 +418,6 @@ namespace RealEngine {
 	void EditorLayer::NewScene() {
 		m_ActiveScene = CreateRef<Scene>();
 		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-		m_ActiveScene->savePath = std::string();
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 	}
 	
