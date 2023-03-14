@@ -100,7 +100,7 @@ namespace RealEngine {
 			}
 		}
 
-		static const char* GLShaderStageCachedOpenGLFileExtension(uint32_t stage) {
+		static const std::filesystem::path GLShaderStageCachedOpenGLFileExtension(uint32_t stage) {
 			switch (stage) {
 				case GL_VERTEX_SHADER:    return ".cached_opengl.vert";
 				case GL_FRAGMENT_SHADER:  return ".cached_opengl.frag";
@@ -111,7 +111,7 @@ namespace RealEngine {
 			return "";
 		}
 
-		static const char* GLShaderStageCachedVulkanFileExtension(uint32_t stage) {
+		static const std::filesystem::path GLShaderStageCachedVulkanFileExtension(uint32_t stage) {
 			switch (stage) {
 				case GL_VERTEX_SHADER:    return ".cached_vulkan.vert";
 				case GL_FRAGMENT_SHADER:  return ".cached_vulkan.frag";
@@ -122,7 +122,7 @@ namespace RealEngine {
 			return "";
 		}
 
-		static const char* GLShaderStageCachedStringHashFileExtension(uint32_t stage) {
+		static const std::filesystem::path GLShaderStageCachedStringHashFileExtension(uint32_t stage) {
 			switch (stage) {
 				case GL_VERTEX_SHADER:    return ".string_hash.vert";
 				case GL_FRAGMENT_SHADER:  return ".string_hash.frag";
@@ -134,7 +134,7 @@ namespace RealEngine {
 		}
 	}
 
-	OpenGLShader::OpenGLShader(const std::string& filepath)
+	OpenGLShader::OpenGLShader(const std::filesystem::path& filepath)
 		: m_FilePath(filepath) {
 		RE_PROFILE_FUNCTION();
 
@@ -151,12 +151,7 @@ namespace RealEngine {
 			RE_CORE_WARN("Shader creation took {0} ms", timer.ElapsedMillis());
 		}
 
-		// Extract name from filepath
-		auto lastSlash = filepath.find_last_of("/\\");
-		lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
-		auto lastDot = filepath.rfind('.');
-		auto count = lastDot == std::string::npos ? filepath.size() - lastSlash : lastDot - lastSlash;
-		m_Name = filepath.substr(lastSlash, count);
+		m_Name = filepath.stem().string();
 	}
 
 	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
@@ -178,7 +173,7 @@ namespace RealEngine {
 		glDeleteProgram(m_RendererID);
 	}
 
-	std::string OpenGLShader::ReadFile(const std::string& filepath) {
+	std::string OpenGLShader::ReadFile(const std::filesystem::path& filepath) {
 		RE_PROFILE_FUNCTION();
 
 		std::string result;
@@ -243,8 +238,8 @@ namespace RealEngine {
 		shaderData.clear();
 		for (auto&& [stage, source] : shaderSources) {
 			std::filesystem::path shaderFilePath = m_FilePath;
-			std::filesystem::path stringHashPath = cacheDirectory / (shaderFilePath.filename().string() + Utils::GLShaderStageCachedStringHashFileExtension(stage));
-			std::filesystem::path cachedPath = cacheDirectory / (shaderFilePath.filename().string() + Utils::GLShaderStageCachedVulkanFileExtension(stage));
+			std::filesystem::path stringHashPath = cacheDirectory / (shaderFilePath.stem() += Utils::GLShaderStageCachedStringHashFileExtension(stage));
+			std::filesystem::path cachedPath = cacheDirectory / (shaderFilePath.stem() += Utils::GLShaderStageCachedVulkanFileExtension(stage));
 
 			//Check if the bianary already exists or if the file changed
 			m_DontRecompile[stage] = Utils::CompareFileHashes(stringHashPath, stage, source);
@@ -259,7 +254,7 @@ namespace RealEngine {
 				in.read((char*)data.data(), size);
 			}
 			else {
-				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), m_FilePath.c_str(), options);
+				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), m_FilePath.string().c_str(), options);
 				if (module.GetCompilationStatus() != shaderc_compilation_status_success) {
 					RE_CORE_ERROR(module.GetErrorMessage());
 					RE_CORE_ASSERT(false);
@@ -297,7 +292,7 @@ namespace RealEngine {
 		m_OpenGLSourceCode.clear();
 		for (auto&& [stage, spirv] : m_VulkanSPIRV) {
 			std::filesystem::path shaderFilePath = m_FilePath;
-			std::filesystem::path cachedPath = cacheDirectory / (shaderFilePath.filename().string() + Utils::GLShaderStageCachedOpenGLFileExtension(stage));
+			std::filesystem::path cachedPath = cacheDirectory / shaderFilePath.stem() += Utils::GLShaderStageCachedOpenGLFileExtension(stage);
 
 			std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
 			if (m_DontRecompile[stage] && in.is_open()) {
@@ -314,7 +309,7 @@ namespace RealEngine {
 				m_OpenGLSourceCode[stage] = glslCompiler.compile();
 				auto& source = m_OpenGLSourceCode[stage];
 
-				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), m_FilePath.c_str());
+				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), m_FilePath.string().c_str());
 				if (module.GetCompilationStatus() != shaderc_compilation_status_success) {
 					RE_CORE_ERROR(module.GetErrorMessage());
 					RE_CORE_ASSERT(false);
@@ -371,6 +366,12 @@ namespace RealEngine {
 		}
 
 		m_RendererID = program;
+
+		//Cleanup
+		m_DontRecompile.clear();
+		m_VulkanSPIRV.clear();
+		m_OpenGLSPIRV.clear();
+		m_OpenGLSourceCode.clear();
 	}
 
 	void OpenGLShader::Reflect(GLenum stage, const std::vector<uint32_t>& shaderData) {
