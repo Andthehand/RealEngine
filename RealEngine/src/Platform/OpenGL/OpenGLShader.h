@@ -31,6 +31,7 @@ namespace RealEngine {
 		std::string m_FilePath;
 		std::string m_Name;
 
+		std::unordered_map<GLenum, bool> m_DontRecompile;
 		std::unordered_map<GLenum, std::vector<uint32_t>> m_VulkanSPIRV;
 		std::unordered_map<GLenum, std::vector<uint32_t>> m_OpenGLSPIRV;
 

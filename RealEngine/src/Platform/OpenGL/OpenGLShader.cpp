@@ -2,6 +2,8 @@
 #include "OpenGLShader.h"
 
 #include <fstream>
+#include <string>
+#include <unordered_map>
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -62,6 +64,42 @@ namespace RealEngine {
 				std::filesystem::create_directories(cacheDirectory);
 		}
 
+		//Returns false if the file doesn't exist or if the hash is different
+		static const bool CompareFileHashes(const std::filesystem::path& filepath, uint32_t stage, const std::string& source) {
+			size_t hashCompare = std::hash<std::string>{}(source);
+			
+			std::ifstream in(filepath, std::ios::in | std::ios::binary);
+			if (in.is_open()) {
+				in.seekg(0, std::ios::end);
+				auto size = in.tellg();
+				in.seekg(0, std::ios::beg);
+
+				size_t hashRead = 0;
+				in.read((char*)&hashRead, size);
+
+				if (hashRead == hashCompare)
+					return true;
+				else {
+					std::ofstream out(filepath, std::ios::out | std::ios::binary);
+					if (out.is_open()) {
+						out.write((char*)&hashCompare, sizeof(hashCompare));
+						out.flush();
+						out.close();
+					}
+					return false;
+				}
+			}
+			else {
+				std::ofstream out(filepath, std::ios::out | std::ios::binary);
+				if (out.is_open()) {
+					out.write((char*)&hashCompare, sizeof(hashCompare));
+					out.flush();
+					out.close();
+				}
+				return false;
+			}
+		}
+
 		static const char* GLShaderStageCachedOpenGLFileExtension(uint32_t stage) {
 			switch (stage) {
 				case GL_VERTEX_SHADER:    return ".cached_opengl.vert";
@@ -79,6 +117,17 @@ namespace RealEngine {
 				case GL_FRAGMENT_SHADER:  return ".cached_vulkan.frag";
 				case GL_GEOMETRY_SHADER:  return ".cached_vulkan.geo";
 				case GL_COMPUTE_SHADER:   return ".cached_vulkan.comp";
+			}
+			RE_CORE_ASSERT(false);
+			return "";
+		}
+
+		static const char* GLShaderStageCachedStringHashFileExtension(uint32_t stage) {
+			switch (stage) {
+				case GL_VERTEX_SHADER:    return ".string_hash.vert";
+				case GL_FRAGMENT_SHADER:  return ".string_hash.frag";
+				case GL_GEOMETRY_SHADER:  return ".string_hash.geo";
+				case GL_COMPUTE_SHADER:   return ".string_hash.comp";
 			}
 			RE_CORE_ASSERT(false);
 			return "";
@@ -194,10 +243,13 @@ namespace RealEngine {
 		shaderData.clear();
 		for (auto&& [stage, source] : shaderSources) {
 			std::filesystem::path shaderFilePath = m_FilePath;
+			std::filesystem::path stringHashPath = cacheDirectory / (shaderFilePath.filename().string() + Utils::GLShaderStageCachedStringHashFileExtension(stage));
 			std::filesystem::path cachedPath = cacheDirectory / (shaderFilePath.filename().string() + Utils::GLShaderStageCachedVulkanFileExtension(stage));
 
+			//Check if the bianary already exists or if the file changed
+			m_DontRecompile[stage] = Utils::CompareFileHashes(stringHashPath, stage, source);
 			std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
-			if (in.is_open()) {
+			if (m_DontRecompile[stage] && in.is_open()) {
 				in.seekg(0, std::ios::end);
 				auto size = in.tellg();
 				in.seekg(0, std::ios::beg);
@@ -215,7 +267,7 @@ namespace RealEngine {
 
 				shaderData[stage] = std::vector<uint32_t>(module.cbegin(), module.cend());
 
-				std::ofstream out(cachedPath, std::ios::out | std::ios::binary);
+				std::ofstream out(cachedPath, std::ios::out | std::ios::binary | std::ios::trunc);
 				if (out.is_open()) {
 					auto& data = shaderData[stage];
 					out.write((char*)data.data(), data.size() * sizeof(uint32_t));
@@ -248,7 +300,7 @@ namespace RealEngine {
 			std::filesystem::path cachedPath = cacheDirectory / (shaderFilePath.filename().string() + Utils::GLShaderStageCachedOpenGLFileExtension(stage));
 
 			std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
-			if (in.is_open()) {
+			if (m_DontRecompile[stage] && in.is_open()) {
 				in.seekg(0, std::ios::end);
 				auto size = in.tellg();
 				in.seekg(0, std::ios::beg);
@@ -270,7 +322,7 @@ namespace RealEngine {
 
 				shaderData[stage] = std::vector<uint32_t>(module.cbegin(), module.cend());
 
-				std::ofstream out(cachedPath, std::ios::out | std::ios::binary);
+				std::ofstream out(cachedPath, std::ios::out | std::ios::binary| std::ios::trunc);
 				if (out.is_open()) {
 					auto& data = shaderData[stage];
 					out.write((char*)data.data(), data.size() * sizeof(uint32_t));
