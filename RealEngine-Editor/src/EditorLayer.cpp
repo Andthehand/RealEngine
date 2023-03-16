@@ -275,12 +275,6 @@ namespace RealEngine {
 			ImGuizmo::SetOrthographic(false);
 			ImGuizmo::SetDrawlist();
 			ImGuizmo::SetRect(m_ViewportBounds[0].x, m_ViewportBounds[0].y, m_ViewportBounds[1].x - m_ViewportBounds[0].x, m_ViewportBounds[1].y - m_ViewportBounds[0].y);
-			
-			// Runtime camera from entity
-			// auto cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
-			// const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
-			// const glm::mat4& cameraProjection = camera.GetProjection();
-			// glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
 
 			// Editor camera
 			const glm::mat4& cameraProjection = m_EditorCamera.GetProjection();
@@ -343,6 +337,7 @@ namespace RealEngine {
 
 	void EditorLayer::OnEvent(Event& e) {
 		m_EditorCamera.OnEvent(e);
+		m_SceneHierarchyPanel.OnEvent(e);
 
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<KeyPressedEvent>(RE_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
@@ -408,7 +403,8 @@ namespace RealEngine {
 
 	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& e) {
 		if (e.GetMouseButton() == Mouse::ButtonLeft) {
-			if (m_ViewportHovered && !ImGuizmo::IsOver() && !Input::IsKeyPressed(Key::LeftAlt))
+			Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
+			if (m_ViewportHovered && (!ImGuizmo::IsOver() || !selectedEntity) && !Input::IsKeyPressed(Key::LeftAlt))
 				m_SceneHierarchyPanel.SetSelectedEntity(m_HoveredEntity);
 		}
 		return false;

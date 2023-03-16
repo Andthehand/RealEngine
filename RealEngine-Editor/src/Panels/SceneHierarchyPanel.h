@@ -2,6 +2,7 @@
 #include "RealEngine/Core/Core.h"
 #include "RealEngine/Scene/Scene.h"
 #include "RealEngine/Scene/Entity.h"
+#include "RealEngine/Events/KeyEvent.h"
 
 namespace RealEngine {
 	struct ComponentCopyBuffer {
@@ -17,10 +18,13 @@ namespace RealEngine {
 		void SetContext(const Ref<Scene>& context);
 
 		void OnImGuiRender();
+		void OnEvent(Event& event);
 
 		Entity GetSelectedEntity() const { return m_SelectionContext;  }
 		void SetSelectedEntity(Entity entity);
 	private:
+		bool OnKeyPressed(KeyPressedEvent& e);
+
 		template<typename T>
 		void DisplayAddComponentEntry(const std::string& entryName);
 
