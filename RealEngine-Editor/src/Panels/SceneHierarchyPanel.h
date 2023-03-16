@@ -4,6 +4,11 @@
 #include "RealEngine/Scene/Entity.h"
 
 namespace RealEngine {
+	struct ComponentCopyBuffer {
+		size_t ComponentID = 0;
+		Entity EntityID;
+	};
+
 	class SceneHierarchyPanel {
 	public:
 		SceneHierarchyPanel() = default;

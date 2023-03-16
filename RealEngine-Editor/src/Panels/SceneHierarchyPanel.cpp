@@ -170,6 +170,7 @@ namespace RealEngine {
 		ImGui::PopID();
 	}
 
+	struct ComponentCopyBuffer m_ComponentCopyBuffer;
 	template<typename T, typename UIFunction>
 	static void DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction) {
 		const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
@@ -197,6 +198,16 @@ namespace RealEngine {
 			if (ImGui::BeginPopup("ComponentSettings")) {
 				if (ImGui::MenuItem("Remove component"))
 					removeComponent = true;
+
+				if (ImGui::MenuItem(("Copy " + name).c_str())) {
+					m_ComponentCopyBuffer.ComponentID = typeid(T).hash_code();
+					m_ComponentCopyBuffer.EntityID = entity; //TODO change this to get the Entity ID
+				}
+
+				if (m_ComponentCopyBuffer.ComponentID == typeid(T).hash_code() 
+					&& ImGui::MenuItem(("Paste " + name).c_str())) {
+					entity.GetComponent<T>() = m_ComponentCopyBuffer.EntityID.GetComponent<T>(); //TODO change this to get the Entity ID
+				}
 
 				ImGui::EndPopup();
 			}
