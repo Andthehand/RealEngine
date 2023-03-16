@@ -424,12 +424,17 @@ namespace RealEngine {
 	}
 
 	void EditorLayer::OpenScene(const std::filesystem::path& path) {
-		m_ActiveScene = CreateRef<Scene>();
-		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+		Ref<Scene> newScene = CreateRef<Scene>();
+		newScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 
-		SceneSerializer serializer(m_ActiveScene);
-		serializer.Deserialize(path.string());
+		SceneSerializer serializer(newScene);
+		if (serializer.Deserialize(path.string())) {
+			m_ActiveScene = newScene;
+			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+		}
+		else {
+			RE_ASSERT(false, "Failed to Open Scene");
+		}
 	}
 	
 	void EditorLayer::SaveSceneAs(){
@@ -453,9 +458,11 @@ namespace RealEngine {
 
 	void EditorLayer::OnScenePlay() {
 		m_SceneState = SceneState::Play;
+		m_ActiveScene->OnRuntimeStart();
 	}
 
 	void EditorLayer::OnSceneStop() {
 		m_SceneState = SceneState::Edit;
+		m_ActiveScene->OnRuntimeStop();
 	}
 }
