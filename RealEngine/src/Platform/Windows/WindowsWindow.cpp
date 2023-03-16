@@ -169,10 +169,7 @@ namespace RealEngine {
 	void WindowsWindow::SetVSync(bool enabled) {
 		RE_PROFILE_FUNCTION();
 
-		if (enabled)
-			glfwSwapInterval(1);
-		else
-			glfwSwapInterval(0);
+		glfwSwapInterval(enabled);
 
 		m_Data.VSync = enabled;
 	}

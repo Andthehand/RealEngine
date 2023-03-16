@@ -65,7 +65,6 @@ namespace RealEngine {
 	struct NativeScriptComponent {
 		ScriptableEntity* Instance = nullptr;
 
-
 		ScriptableEntity*(*InstantiateScript)();
 		void(*DestroyScript)(NativeScriptComponent*);
 
