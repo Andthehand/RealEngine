@@ -11,7 +11,7 @@ namespace RealEngine {
 	class OpenGLTexture2D : public Texture2D{
 	public:
 		OpenGLTexture2D(const uint32_t width, const uint32_t height);
-		OpenGLTexture2D(const std::string& path);
+		OpenGLTexture2D(const std::filesystem::path& path);
 		virtual ~OpenGLTexture2D();
 
 		virtual uint32_t GetWidth() const override { return m_Width; }
@@ -26,7 +26,7 @@ namespace RealEngine {
 			return m_RendererID == ((OpenGLTexture2D&)other).m_RendererID;
 		}
 	private:
-		std::string m_Path;
+		std::filesystem::path m_Path;
 		uint32_t m_Width, m_Height;
 
 		uint32_t m_RendererID;

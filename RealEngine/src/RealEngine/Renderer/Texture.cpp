@@ -15,7 +15,7 @@ namespace RealEngine {
 		return nullptr;
 	}
 
-	Ref<Texture2D> Texture2D::Create(const std::string& path) {
+	Ref<Texture2D> Texture2D::Create(const std::filesystem::path& path) {
 		switch (Renderer::GetAPI()) {
 			case RendererAPI::API::None:    RE_CORE_ASSERT(false, "RenderAPI::None is currently not supported!"); return nullptr;
 			case RendererAPI::API::OpenGL:  return CreateRef<OpenGLTexture2D>(path);

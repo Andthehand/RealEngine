@@ -270,6 +270,12 @@ namespace RealEngine {
 					RE_CORE_WARN("You can only change the scene in scene editing mode");
 				}
 			}
+			else if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_IMAGE")) {
+				std::filesystem::path path = std::filesystem::path(g_AssetPath) / (const wchar_t*)payload->Data;
+					
+				if (m_HoveredEntity && m_HoveredEntity.HasComponent<SpriteRendererComponent>())
+					m_HoveredEntity.GetComponent<SpriteRendererComponent>().Texture = Texture2D::Create(path);
+			}
 			ImGui::EndDragDropTarget();
 		}
 
