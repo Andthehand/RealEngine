@@ -15,6 +15,18 @@ namespace RealEngine {
 		m_FileIcon = Texture2D::Create("Resources/Icons/ContentBrowser/FileIcon.png");
 	}
 
+	static inline const char* GetPayloadType(std::string& str) {
+		if (FileExtenstion::DoesExtensionExist(FileExtenstion::STBI_IMAGE_EXTENSTIONS, str)) {
+			return "CONTENT_BROWSER_IMAGE";
+		}
+		else if (FileExtenstion::DoesExtensionExist(FileExtenstion::REALENGINE_SCENE_EXTENTIONS, str)) {
+			return "CONTENT_BROWSER_SCENE";
+		}
+		else {
+			return "CONTENT_BROWSER_ITEM";
+		}
+	}
+
 	void ContentBrowserPanel::OnImGuiRender() {
 		ImGui::Begin("Content Browser");
 
@@ -40,6 +52,7 @@ namespace RealEngine {
 			const std::filesystem::path& path = directoryEntry.path();
 			auto relativePath = std::filesystem::relative(path, g_AssetPath);
 			std::string filenameString = relativePath.filename().string();
+			std::string extensionString = relativePath.extension().string();
 
 			ImGui::PushID(filenameString.c_str());
 			Ref<Texture2D> icon = directoryEntry.is_directory() ? m_DirectoryIcon : m_FileIcon;
@@ -50,13 +63,10 @@ namespace RealEngine {
 			if (ImGui::BeginDragDropSource()) {
 				const wchar_t* itemPath = relativePath.c_str();
 
-				if (FileExtenstion::STBI_IMAGE_EXTENSTIONS.find(path.extension().string()) != FileExtenstion::STBI_IMAGE_EXTENSTIONS.end())
-					ImGui::SetDragDropPayload("CONTENT_BROWSER_IMAGE", itemPath, (wcslen(itemPath) + 1) * sizeof(wchar_t));
-				else if (FileExtenstion::REALENGINE_SCENE_EXTENTIONS.find(path.extension().string()) != FileExtenstion::REALENGINE_SCENE_EXTENTIONS.end())
-					ImGui::SetDragDropPayload("CONTENT_BROWSER_SCENE", itemPath, (wcslen(itemPath) + 1) * sizeof(wchar_t));
-				else
-					ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itemPath, (wcslen(itemPath) + 1) * sizeof(wchar_t));
+				//This is the payload
+				ImGui::SetDragDropPayload(GetPayloadType(path.extension().string()), itemPath, (wcslen(itemPath) + 1) * sizeof(wchar_t));
 
+				//Thumbnail
 				ImGui::Image((ImTextureID)icon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
 
 				ImGui::EndDragDropSource();

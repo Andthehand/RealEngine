@@ -5,6 +5,11 @@
 
 namespace RealEngine {
 	namespace FileExtenstion {
+		template<typename T>
+		static inline bool DoesExtensionExist(T& map, std::string& str) {
+			return map.find(str) != map.end();
+		}
+
 		static const std::unordered_set<std::string> STBI_IMAGE_EXTENSTIONS {
 			".jpg", ".jpeg", ".jfif", ".pjpeg", ".pjp",
 			".png",								
