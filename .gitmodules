@@ -22,6 +22,9 @@
 [submodule "RealEngine/vendor/ImPlot"]
 	path = RealEngine/vendor/ImPlot
 	url = https://github.com/epezent/implot.git
+[submodule "RealEngine/vendor/Box2D"]
+	path = RealEngine/vendor/Box2D
+	url = https://github.com/Andthehand/box2d.git
 [submodule "RealEngine/vendor/imgui"]
 	path = RealEngine/vendor/imgui
-	url = https://github.com/Andthehand/imgui.git
+	url = https://github.com/TheCherno/imgui.git
