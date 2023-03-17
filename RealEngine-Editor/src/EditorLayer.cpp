@@ -261,9 +261,14 @@ namespace RealEngine {
 
 		if (ImGui::BeginDragDropTarget()) {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_SCENE")) {
-				std::filesystem::path path = std::filesystem::path(g_AssetPath) / (const wchar_t*)payload->Data;
-
-				OpenScene(path);
+				if (m_SceneState == SceneState::Edit) {
+					std::filesystem::path path = std::filesystem::path(g_AssetPath) / (const wchar_t*)payload->Data;
+					
+					OpenScene(path);
+				}
+				else {
+					RE_CORE_WARN("You can only change the scene in scene editing mode");
+				}
 			}
 			ImGui::EndDragDropTarget();
 		}
