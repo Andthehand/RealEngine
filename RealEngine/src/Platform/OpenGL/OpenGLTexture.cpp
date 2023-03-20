@@ -104,8 +104,9 @@ namespace RealEngine {
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	}
 	
-	OpenGLTexture2DArray::OpenGLTexture2DArray(const std::string* path, const uint32_t numTextures, uint32_t mipLevels) {
-		RE_ASSERT(numTextures != 0, "Can't make Texuture without any textures")
+	OpenGLTexture2DArray::OpenGLTexture2DArray(const std::initializer_list<std::filesystem::path> paths, uint32_t mipLevels) {
+		uint32_t numTextures = (uint32_t)paths.size();
+		RE_ASSERT(numTextures != 0, "Can't make Texuture without any textures");
 
 		TextureData* textureData = new TextureData[numTextures];
 		stbi_uc** data = new stbi_uc*[numTextures];
@@ -113,21 +114,24 @@ namespace RealEngine {
 		int checkChannel = -1;
 		stbi_set_flip_vertically_on_load(1);
 		//Load all of the images into memory
-		for (uint32_t i = 0; i < numTextures; i++) {
-			data[i] = stbi_load(path[i].c_str(), &textureData[i].Width, &textureData[i].Height, &textureData[i].Channels, 0);
+		uint32_t i = 0;
+		for (auto& path : paths) {
+			RE_ASSERT(i >= numTextures, "I is outside the range of allocated memory");
+			data[i] = stbi_load(path.string().c_str(), &textureData[i].Width, &textureData[i].Height, &textureData[i].Channels, 0);
 			RE_CORE_ASSERT(data[i], "Failed to load image!");
-			
+
 			//Set data only on the first texture upload
 			if (checkChannel == -1) {
-				checkChannel =	textureData[i].Channels;
-				m_Width =	textureData[i].Width;
-				m_Height =	textureData[i].Height;
+				checkChannel = textureData[i].Channels;
+				m_Width = textureData[i].Width;
+				m_Height = textureData[i].Height;
 			}
 
 			//Make sure the channels, width, and height are the same
-			RE_ASSERT(checkChannel   == textureData[i].Channels &&
-							m_Width  == textureData[i].Width    &&
-							m_Height == textureData[i].Height, "Channel, Width, or height do not match while creating TextureArray");
+			RE_ASSERT(checkChannel == textureData[i].Channels &&
+				m_Width == textureData[i].Width &&
+				m_Height == textureData[i].Height, "Channel, Width, or height do not match while creating TextureArray");
+			i++;
 		}
 
 		if (checkChannel == 4) {

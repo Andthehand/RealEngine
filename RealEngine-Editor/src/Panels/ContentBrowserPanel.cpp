@@ -77,6 +77,7 @@ namespace RealEngine {
 			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
 				if (directoryEntry.is_directory())
 					m_CurrentDirectory /= path.filename();
+				//TODO: Implement more stuff to be used when double clicked liek a scene
 			}
 			ImGui::TextWrapped(filenameString.c_str());
 

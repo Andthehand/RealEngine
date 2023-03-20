@@ -16,6 +16,8 @@ namespace RealEngine {
 		virtual uint32_t GetHeight() const = 0;
 		virtual uint32_t GetRendererID() const = 0;
 
+		virtual const std::filesystem::path& GetPath() const = 0;
+
 		virtual void SetData(void* data, uint32_t size) = 0;
 		
 		virtual void Bind(uint32_t slot = 0) const = 0;
@@ -32,6 +34,6 @@ namespace RealEngine {
 	class Texture2DArray : public Texture {
 	public:
 		static Ref<Texture2DArray> Create(uint32_t width, uint32_t height, uint32_t numTextures, uint32_t mipLevels = 1);
-		static Ref<Texture2DArray> Create(const std::string* path, uint32_t numTextures, uint32_t mipLevels = 1);
+		static Ref<Texture2DArray> Create(const std::initializer_list<std::filesystem::path> paths, uint32_t mipLevels = 1);
 	};
 }
