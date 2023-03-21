@@ -38,8 +38,6 @@ namespace RealEngine {
 			serializer.Deserialize(sceneFilePath);
 		}
 
-        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-
 		m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.01f, 1000.0f);
 		
 		RenderCommand::SetClearColor({ 0.1, 0.1, 0.1, 1 });
@@ -261,14 +259,9 @@ namespace RealEngine {
 
 		if (ImGui::BeginDragDropTarget()) {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_SCENE")) {
-				if (m_SceneState == SceneState::Edit) {
-					std::filesystem::path path = std::filesystem::path(g_AssetPath) / (const wchar_t*)payload->Data;
+				std::filesystem::path path = std::filesystem::path(g_AssetPath) / (const wchar_t*)payload->Data;
 					
-					OpenScene(path);
-				}
-				else {
-					RE_CORE_WARN("You can only change the scene in scene editing mode");
-				}
+				OpenScene(path);
 			}
 			else if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_IMAGE")) {
 				std::filesystem::path path = std::filesystem::path(g_AssetPath) / (const wchar_t*)payload->Data;
@@ -363,29 +356,41 @@ namespace RealEngine {
 
 		switch (e.GetKeyCode()) {
 			//Saze Shortcuts
-		case Key::N:
-			if (control)
-				//Ctrl+N
-				NewScene();
-			break;
-
-		case Key::O:
-			if (control)
-				//Ctrl+O
-				OpenScene();
-			break;
-
-		case Key::S:
-			if (control) {
-				if (shift) {
-					//Ctrl+Shift+S
-					SaveSceneAs();
-					break;
-				}
-				//Ctrl+S
-				SaveScene();
+			case Key::N: {
+				if (control)
+					//Ctrl+N
+					NewScene();
+				break;
 			}
-			break;
+
+			case Key::O: {
+				if (control)
+					//Ctrl+O
+					OpenScene();
+				break;
+			}
+			
+
+			case Key::S: {
+				if (control) {
+					if (shift) {
+						//Ctrl+Shift+S
+						SaveSceneAs();
+					}
+					else {
+						//Ctrl+S
+						SaveScene();
+					}
+				}
+				break;
+			}
+
+			// Scene Commands
+			case Key::D: {
+				if (control)
+					OnDuplicateEntity();
+				break;
+			}
 
 			// Gizmos
 			case Key::Q: {
@@ -426,6 +431,8 @@ namespace RealEngine {
 		m_ActiveScene = CreateRef<Scene>();
 		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+
+		m_EditorScenePath = std::filesystem::path();
 	}
 	
 	void EditorLayer::OpenScene() {
@@ -435,45 +442,70 @@ namespace RealEngine {
 	}
 
 	void EditorLayer::OpenScene(const std::filesystem::path& path) {
+		if (m_SceneState != SceneState::Edit)
+			OnSceneStop();
+
 		Ref<Scene> newScene = CreateRef<Scene>();
 		newScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 
 		SceneSerializer serializer(newScene);
 		if (serializer.Deserialize(path.string())) {
-			m_ActiveScene = newScene;
-			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+			m_EditorScene = newScene;
+			m_EditorScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_SceneHierarchyPanel.SetContext(m_EditorScene);
+
+			m_ActiveScene = m_EditorScene;
+			m_EditorScenePath = path;
 		}
 		else {
 			RE_ASSERT(false, "Failed to Open Scene");
 		}
 	}
+
+	void EditorLayer::SaveScene() {
+		if (!m_EditorScenePath.empty())
+			SerializeScene(m_ActiveScene, m_EditorScenePath);
+		else
+			SaveSceneAs();
+	}
 	
 	void EditorLayer::SaveSceneAs(){
 		std::string filepath = FileDialogs::SaveFile("RealEnigne Scene (*.scene)\0*.scene\0");
 		if (!filepath.empty()) {
-			SceneSerializer serializer(m_ActiveScene);
-			serializer.Serialize(filepath);
+			SerializeScene(m_ActiveScene, filepath);
+			m_EditorScenePath = filepath;
 		}
 	}
-	
-	void EditorLayer::SaveScene() {		
-		if (!m_ActiveScene->savePath.empty()) {
-			RE_CORE_INFO("Scene saved in: {}", m_ActiveScene->savePath);
-			SceneSerializer serializer(m_ActiveScene);
-			serializer.Serialize(m_ActiveScene->savePath);
-		}
-		else {
-			SaveSceneAs();
-		}
+
+	void EditorLayer::SerializeScene(Ref<Scene> scene, const std::filesystem::path& path) {
+		SceneSerializer serializer(scene);
+		serializer.Serialize(path.string());
 	}
 
 	void EditorLayer::OnScenePlay() {
 		m_SceneState = SceneState::Play;
+
+		m_ActiveScene = Scene::Copy(m_EditorScene);
 		m_ActiveScene->OnRuntimeStart();
+
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 	}
 
 	void EditorLayer::OnSceneStop() {
 		m_SceneState = SceneState::Edit;
+
 		m_ActiveScene->OnRuntimeStop();
+		m_ActiveScene = m_EditorScene;
+
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+	}
+
+	void EditorLayer::OnDuplicateEntity() {
+		if (m_SceneState != SceneState::Edit)
+			return;
+
+		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
+		if (selectedEntity)
+			m_EditorScene->DuplicateEntity(selectedEntity);
 	}
 }

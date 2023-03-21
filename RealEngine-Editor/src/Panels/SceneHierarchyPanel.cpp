@@ -34,35 +34,37 @@ namespace RealEngine {
 	void SceneHierarchyPanel::OnImGuiRender() {
 		ImGui::Begin("Scene Hierarchy");
 
-		m_Context->m_Registry.each([&](auto entityID) {
-			Entity entity{ entityID , m_Context.get() };
-			DrawEntityNode(entity);
-		});
+		if (m_Context) {
+			m_Context->m_Registry.each([&](auto entityID) {
+				Entity entity{ entityID , m_Context.get() };
+				DrawEntityNode(entity);
+			});
 
-		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-			m_SelectionContext = {};
+			if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+				m_SelectionContext = {};
 
-		// Right-click on blank space
-		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
-			if (ImGui::MenuItem("Create Empty Entity"))
-				m_SelectionContext = m_Context->CreateEntity("Empty Entity");
-			if (ImGui::MenuItem("Create Sprite")) {
-				m_SelectionContext = m_Context->CreateEntity("Sprite");
-				m_SelectionContext.AddComponent<SpriteRendererComponent>();
+			// Right-click on blank space
+			if (ImGui::BeginPopupContextWindow(0, 1, false)) {
+				if (ImGui::MenuItem("Create Empty Entity"))
+					m_SelectionContext = m_Context->CreateEntity("Empty Entity");
+				if (ImGui::MenuItem("Create Sprite")) {
+					m_SelectionContext = m_Context->CreateEntity("Sprite");
+					m_SelectionContext.AddComponent<SpriteRendererComponent>();
+				}
+				if (ImGui::MenuItem("Create Camera")) {
+					m_SelectionContext = m_Context->CreateEntity("Camera");
+					m_SelectionContext.AddComponent<CameraComponent>();
+				}
+
+				ImGui::EndPopup();
 			}
-			if (ImGui::MenuItem("Create Camera")) {
-				m_SelectionContext = m_Context->CreateEntity("Camera");
-				m_SelectionContext.AddComponent<CameraComponent>();
+
+			ImGui::End();
+
+			ImGui::Begin("Properties");
+			if (m_SelectionContext) {
+				DrawComponents(m_SelectionContext);
 			}
-
-			ImGui::EndPopup();
-		}
-
-		ImGui::End();
-
-		ImGui::Begin("Properties");
-		if (m_SelectionContext) {
-			DrawComponents(m_SelectionContext);
 		}
 
 		ImGui::End();
@@ -357,7 +359,7 @@ namespace RealEngine {
 
 		DrawComponent<BoxCollider2DComponent>("Box Collider 2D", entity, [](auto& component) {
 			ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset));
-			ImGui::DragFloat2("Size", glm::value_ptr(component.Offset));
+			ImGui::DragFloat2("Size", glm::value_ptr(component.Size));
 			ImGui::DragFloat("Density", &component.Density, 0.01f, 0.0f, 1.0f);
 			ImGui::DragFloat("Friction", &component.Friction, 0.01f, 0.0f, 1.0f);
 			ImGui::DragFloat("Restitution", &component.Restitution, 0.01f, 0.0f, 1.0f);

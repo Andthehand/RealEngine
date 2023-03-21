@@ -1,33 +1,6 @@
 Scene: Untitled
 Entities:
-  - Entity: 12837192831273
-    TagComponent:
-      Tag: Blue Square
-    TransformComponent:
-      Translation: [-1.10000002, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [0.150266111, 0.601365864, 0.972972989, 1]
-  - Entity: 12837192831273
-    TagComponent:
-      Tag: Green Square
-    TransformComponent:
-      Translation: [0, 1.10000002, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [0, 1, 0, 1]
-  - Entity: 12837192831273
-    TagComponent:
-      Tag: Yellow Square
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [1, 0.972972929, 0, 1]
-  - Entity: 12837192831273
+  - Entity: 5374624382672846380
     TagComponent:
       Tag: Orange Square
     TransformComponent:
@@ -36,3 +9,34 @@ Entities:
       Scale: [1, 1, 1]
     SpriteRendererComponent:
       Color: [0.911196887, 0.27510491, 0.0562901385, 1]
+      TilingFactor: 1
+  - Entity: 9415345903197328234
+    TagComponent:
+      Tag: Yellow Square
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [1, 0.972972929, 0, 1]
+      TilingFactor: 1
+  - Entity: 1090107901621748194
+    TagComponent:
+      Tag: Green Square
+    TransformComponent:
+      Translation: [0, 1.10000002, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0, 1, 0, 1]
+      TilingFactor: 1
+  - Entity: 8771909333862910826
+    TagComponent:
+      Tag: Blue Square
+    TransformComponent:
+      Translation: [-1.10000002, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.150266111, 0.601365864, 0.972972989, 1]
+      TilingFactor: 1

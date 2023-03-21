@@ -120,8 +120,10 @@ namespace RealEngine {
 		: m_Scene(scene) { }
 
 	static void SerializeEntity(YAML::Emitter& out, Entity entity) {
+		RE_CORE_ASSERT(entity.HasComponent<IDComponent>());
+
 		out << YAML::BeginMap; // Entity
-		out << YAML::Key << "Entity" << YAML::Value << "12837192831273"; // TODO: Entity ID goes here
+		out << YAML::Key << "Entity" << YAML::Value << entity.GetUUID(); // TODO: Entity ID goes here
 
 		if (entity.HasComponent<TagComponent>()) {
 			out << YAML::Key << "TagComponent";
@@ -238,8 +240,6 @@ namespace RealEngine {
 	}
 
 	bool SceneSerializer::Deserialize(const std::filesystem::path& filepath) {
-		m_Scene->savePath = (std::filesystem::current_path() / filepath).string();
-
 		YAML::Node data;
 		try {
 			data = YAML::LoadFile(filepath.string());
@@ -266,7 +266,7 @@ namespace RealEngine {
 
 				RE_CORE_TRACE("Deserialized entity with ID = {0}, name = {1}", uuid, name);
 
-				Entity deserializedEntity = m_Scene->CreateEntity(name);
+				Entity deserializedEntity = m_Scene->CreateEntityWithUUID(uuid, name);
 
 				auto transformComponent = entity["TransformComponent"];
 				if (transformComponent) {

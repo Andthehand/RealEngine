@@ -1,16 +1,23 @@
 #pragma once
 
+#include "SceneCamera.h"
+#include "RealEngine/Core/UUID.h"
+#include "RealEngine/Renderer/Texture.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
-#include "SceneCamera.h"
-#include "ScriptableEntity.h"
-#include "RealEngine/Renderer/Texture.h"
-
 namespace RealEngine {
+	struct IDComponent {
+		UUID ID;
+
+		IDComponent() = default;
+		IDComponent(const IDComponent&) = default;
+	};
+
 	struct TagComponent {
 		std::string Tag;
 
@@ -62,6 +69,7 @@ namespace RealEngine {
 		CameraComponent(const CameraComponent&) = default;
 	};
 	
+	class ScriptableEntity;
 	struct NativeScriptComponent {
 		ScriptableEntity* Instance = nullptr;
 
@@ -103,4 +111,12 @@ namespace RealEngine {
 		BoxCollider2DComponent() = default;
 		BoxCollider2DComponent(const BoxCollider2DComponent&) = default;
 	};
+
+	template<typename... Component>
+	struct ComponentGroup { };
+
+	using AllComponents =
+		ComponentGroup<TransformComponent, SpriteRendererComponent,
+		CameraComponent, NativeScriptComponent,
+		Rigidbody2DComponent, BoxCollider2DComponent>;
 }

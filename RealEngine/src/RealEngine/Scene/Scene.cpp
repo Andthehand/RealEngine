@@ -1,16 +1,18 @@
 #include "repch.h"
 #include "Scene.h"
 
+#include "Components.h"
+#include "RealEngine/Renderer/Renderer2D.h"
+
+#include "ScriptableEntity.h"
+#include "Entity.h"
+
 // Box2D
 #include <box2d/b2_world.h>
 #include <box2d/b2_body.h>
 #include <box2d/b2_fixture.h>
 #include <box2d/b2_polygon_shape.h>
 
-#include "Components.h"
-#include "RealEngine/Renderer/Renderer2D.h"
-
-#include "Entity.h"
 
 namespace RealEngine {
 	static b2BodyType Rigidbody2DTypeToBox2DBody(Rigidbody2DComponent::BodyType bodyType) {
@@ -28,9 +30,70 @@ namespace RealEngine {
 
 	Scene::~Scene() { }
 
-	Entity Scene::CreateEntity(const std::string& name) {
-		Entity entity = { m_Registry.create(), this };
+	template<typename... Component>
+	static void CopyComponent(entt::registry& dst, entt::registry& src, const std::unordered_map<UUID, entt::entity>& enttMap) {
+		([&]() {
+			auto view = src.view<Component>();
+			for (auto srcEntity : view) {
+				entt::entity dstEntity = enttMap.at(src.get<IDComponent>(srcEntity).ID);
+
+				auto& srcComponent = src.get<Component>(srcEntity);
+				dst.emplace_or_replace<Component>(dstEntity, srcComponent);
+			}
+		}(), ...);
+	}
+
+	template<typename... Component>
+	static void CopyComponent(ComponentGroup<Component...>, entt::registry& dst, entt::registry& src, const std::unordered_map<UUID, entt::entity>& enttMap) {
+		CopyComponent<Component...>(dst, src, enttMap);
+	}
+
+	template<typename... Component>
+	static void CopyComponentIfExists(Entity dst, Entity src) {
+		([&]() {
+			if (src.HasComponent<Component>())
+				dst.AddOrReplaceComponent<Component>(src.GetComponent<Component>());
+		}(), ...);
+	}
+
+	template<typename... Component>
+	static void CopyComponentIfExists(ComponentGroup<Component...>, Entity dst, Entity src) {
+		CopyComponentIfExists<Component...>(dst, src);
+	}
+
+	Ref<Scene> Scene::Copy(Ref<Scene> other) {
+		Ref<Scene> newScene = CreateRef<Scene>();
+
+		newScene->m_ViewportWidth = other->m_ViewportWidth;
+		newScene->m_ViewportHeight = other->m_ViewportHeight;
 		
+		auto& srcSceneRegistry = other->m_Registry;
+		auto& dstSceneRegistry = newScene->m_Registry;
+		std::unordered_map<UUID, entt::entity> enttMap;
+		
+		// Create entities in new scene
+		auto idView = srcSceneRegistry.view<IDComponent>();
+		for (auto e : idView) {
+			UUID uuid = srcSceneRegistry.get<IDComponent>(e).ID;
+			const auto& name = srcSceneRegistry.get<TagComponent>(e).Tag;
+			Entity newEntity = newScene->CreateEntityWithUUID(uuid, name);
+			enttMap[uuid] = (entt::entity)newEntity;
+		}
+
+		// Copy components (except IDComponent and TagComponent)
+		CopyComponent(AllComponents{}, dstSceneRegistry, srcSceneRegistry, enttMap);
+
+		return newScene;
+	}
+
+	Entity Scene::CreateEntity(const std::string& name) {
+		return CreateEntityWithUUID(UUID(), name);
+	}
+
+	Entity Scene::CreateEntityWithUUID(UUID uuid, const std::string& name) {
+		Entity entity = { m_Registry.create(), this };
+
+		entity.AddComponent<IDComponent>(uuid);
 		entity.AddComponent<TransformComponent>();
 
 		auto& tag = entity.AddComponent<TagComponent>();
@@ -176,6 +239,12 @@ namespace RealEngine {
 		}
 	}
 
+	void Scene::DuplicateEntity(Entity entity) {
+		Entity newEntity = CreateEntity(entity.GetName());
+		CopyComponentIfExists(AllComponents{}, newEntity, entity);
+	}
+
+
 	Entity Scene::GetPrimaryComponentEntity() {
 		auto view = m_Registry.view<CameraComponent>();
 		for (auto& entity : view) {
@@ -193,6 +262,10 @@ namespace RealEngine {
 	}
 
 	template<>
+	void Scene::OnComponentAdded<IDComponent>(Entity entity, IDComponent& component) {
+	}
+
+	template<>
 	void Scene::OnComponentAdded<TagComponent>(Entity entity, TagComponent& component) {
 	}
 
@@ -202,7 +275,8 @@ namespace RealEngine {
 
 	template<>
 	void Scene::OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& component) {
-		component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+		if (m_ViewportWidth > 0 && m_ViewportHeight > 0)
+			component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
 	}
 
 	template<>

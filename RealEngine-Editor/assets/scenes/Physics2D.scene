@@ -1,25 +1,26 @@
 Scene: Untitled
 Entities:
-  - Entity: 12837192831273
+  - Entity: 9430224950265994128
     TagComponent:
-      Tag: Platform
+      Tag: Player
     TransformComponent:
-      Translation: [0, -1.5, 0]
-      Rotation: [0, 0, 0]
-      Scale: [5.98688602, 0.434246838, 1]
+      Translation: [0, 1, 0]
+      Rotation: [0, 0, 0.767944872]
+      Scale: [0.999995112, 0.999995112, 1]
     SpriteRendererComponent:
       Color: [1, 1, 1, 1]
+      TilingFactor: 1
     Rigidbody2DComponent:
-      BodyType: Static
+      BodyType: Dynamic
       FixedRotation: false
     BoxCollider2DComponent:
       Offset: [0, 0]
       Size: [0.5, 0.5]
       Density: 1
       Friction: 0.5
-      Restitution: 0
+      Restitution: 0.5
       RestitutionThreshold: 0.5
-  - Entity: 12837192831273
+  - Entity: 4654624188650350973
     TagComponent:
       Tag: Camera
     TransformComponent:
@@ -37,22 +38,23 @@ Entities:
         OrthographicFar: 1000
       Primary: true
       FixedAspectRatio: false
-  - Entity: 12837192831273
+  - Entity: 17987055983763595476
     TagComponent:
-      Tag: Player
+      Tag: Platform
     TransformComponent:
-      Translation: [0, 1, 0]
-      Rotation: [0, 0, 0.767944872]
-      Scale: [0.999995112, 0.999995112, 1]
+      Translation: [0, -1.5, 0]
+      Rotation: [0, 0, 0]
+      Scale: [5.98688602, 0.434246838, 1]
     SpriteRendererComponent:
       Color: [1, 1, 1, 1]
+      TilingFactor: 1
     Rigidbody2DComponent:
-      BodyType: Dynamic
+      BodyType: Static
       FixedRotation: false
     BoxCollider2DComponent:
       Offset: [0, 0]
       Size: [0.5, 0.5]
       Density: 1
       Friction: 0.5
-      Restitution: 0.5
+      Restitution: 0
       RestitutionThreshold: 0.5

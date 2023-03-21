@@ -1,6 +1,7 @@
 #pragma once
 #include <entt.hpp>
 
+#include "RealEngine/Core/UUID.h"
 #include "RealEngine/Core/TimeStep.h"
 #include "RealEngine/Renderer/EditorCamera.h"
 
@@ -14,7 +15,10 @@ namespace RealEngine {
 		Scene();
 		~Scene();
 
+		static Ref<Scene> Copy(Ref<Scene> other);
+
 		Entity CreateEntity(const std::string& name = std::string());
+		Entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
 		
 		void DestroyEntity(Entity entity);
 
@@ -24,10 +28,10 @@ namespace RealEngine {
 		void OnUpdateEditor(Timestep ts, EditorCamera& editorCamera);
 		void OnUpdateRuntime(Timestep ts);
 		void OnViewportResize(uint32_t width, uint32_t height);
+
+		void DuplicateEntity(Entity entity);
 	
 		Entity GetPrimaryComponentEntity();
-	public:
-		std::string savePath = std::string();
 	private:
 		template<typename T>
 		void OnComponentAdded(Entity entity, T& component);
