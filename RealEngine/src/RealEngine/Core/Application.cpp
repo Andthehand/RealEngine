@@ -3,10 +3,10 @@
 
 #include "RealEngine/Renderer/Renderer.h"
 
+#include "RealEngine/Utils/PlatformUtils.h"
 #include "RealEngine/Core/Log.h"
 
 #include "Input.h"
-#include <GLFW/glfw3.h>
 
 namespace RealEngine {
 
@@ -69,7 +69,7 @@ namespace RealEngine {
 		while (m_Running) {
 			RE_PROFILE_SCOPE("Run Loop");
 
-			float time = (float)m_Window->GetTime();
+			float time = Time::GetTime();
 			Timestep timestep = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 

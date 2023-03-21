@@ -340,7 +340,9 @@ namespace RealEngine {
 	}
 
 	void EditorLayer::OnEvent(Event& e) {
-		m_EditorCamera.OnEvent(e);
+		if (m_SceneState == SceneState::Edit) {
+			m_EditorCamera.OnEvent(e);
+		}
 		m_SceneHierarchyPanel.OnEvent(e);
 
 		EventDispatcher dispatcher(e);
@@ -483,12 +485,14 @@ namespace RealEngine {
 	}
 
 	void EditorLayer::OnScenePlay() {
-		m_SceneState = SceneState::Play;
+		if (m_EditorScene) {
+			m_SceneState = SceneState::Play;
 
-		m_ActiveScene = Scene::Copy(m_EditorScene);
-		m_ActiveScene->OnRuntimeStart();
+			m_ActiveScene = Scene::Copy(m_EditorScene);
+			m_ActiveScene->OnRuntimeStart();
 
-		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+		}
 	}
 
 	void EditorLayer::OnSceneStop() {

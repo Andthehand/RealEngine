@@ -383,12 +383,16 @@ namespace RealEngine {
 	}
 
 	bool SceneHierarchyPanel::OnKeyPressed(KeyPressedEvent& e) {
-		if (e.GetKeyCode() == Key::Delete 
-			&& m_SelectionContext) {
-			m_Context->DestroyEntity(m_SelectionContext);
-			m_SelectionContext = {};
-		}
+		switch (e.GetKeyCode()) {
+			case Key::Delete: {
+				if (m_SelectionContext) {
+					m_Context->DestroyEntity(m_SelectionContext);
+					m_SelectionContext = {};
+				}
+				break;
 
+			}
+		}
 		return false;
 	}
 }

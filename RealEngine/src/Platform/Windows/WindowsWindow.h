@@ -14,8 +14,6 @@ namespace RealEngine {
 
 		void OnUpdate() override;
 
-		virtual double GetTime() override;
-
 		unsigned int GetWidth() const override { return m_Data.Width; };
 		unsigned int GetHeight() const override { return m_Data.Height; };
 
