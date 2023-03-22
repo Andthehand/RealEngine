@@ -23,7 +23,10 @@ namespace RealEngine {
 
 		virtual void DrawArrays(const Ref<VertexArray>& vertexArray, uint32_t count, BufferMode mode = BufferMode::Triangles, uint32_t start = 0) = 0;
 		virtual void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount = 0) = 0;
-		
+		virtual void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount) = 0;
+
+		virtual void SetLineWidth(float width) = 0;
+
 		virtual void DrawArraysInstanced(const Ref<VertexArray>& vertexArray, BufferMode mode, uint32_t verticeCount, uint32_t instanceCount, uint32_t start = 0) = 0;
 		virtual void DrawIndexedInstanced(const Ref<VertexArray>& vertexArray, uint32_t instanceCount, uint32_t indexCount = 0) = 0;
 

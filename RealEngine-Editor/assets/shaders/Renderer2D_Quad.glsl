@@ -37,8 +37,8 @@ void main() {
 #type fragment
 #version 450 core
 
-layout(location = 0) out vec4 color;
-layout(location = 1) out int color2;
+layout(location = 0) out vec4 o_Color;
+layout(location = 1) out int o_EntityID;
 
 struct VertexOutput {
 	vec4 Color;
@@ -57,7 +57,6 @@ void main() {
 	
 	texColor *= texture(u_Textures[v_TexIndex], Input.TexCoord * Input.TilingFactor);
 	
-	color = texColor;
-
-	color2 = v_EntityID;
+	o_Color = texColor;
+	o_EntityID = v_EntityID;
 }

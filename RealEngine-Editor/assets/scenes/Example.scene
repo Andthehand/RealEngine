@@ -1,23 +1,37 @@
 Scene: Untitled
 Entities:
-  - Entity: 530249400144060757
+  - Entity: 11402273472627202911
     TagComponent:
-      Tag: Camera A
+      Tag: Circle
     TransformComponent:
-      Translation: [0, 0, 0]
+      Translation: [0, 1.16849995, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    CameraComponent:
-      Camera:
-        ProjectionType: 1
-        PerspectiveFOV: 0.785398185
-        PerspectiveNear: 0.00999999978
-        PerspectiveFar: 1000
-        OrthographicSize: 10
-        OrthographicNear: -1
-        OrthographicFar: 100
-      Primary: false
-      FixedAspectRatio: false
+    CircleRendererComponent:
+      Color: [1, 0.347490311, 0, 1]
+      Thickness: 1
+      Fade: 0.00499999989
+  - Entity: 10428535352445035635
+    TagComponent:
+      Tag: Green Square
+    TransformComponent:
+      Translation: [-0.550000012, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0, 1, 0, 1]
+      TexturePath: D:\RealEngine\RealEngine-Editor\assets\textures\Checkerboard.png
+      TilingFactor: 1
+  - Entity: 8810558651042546670
+    TagComponent:
+      Tag: Red Square
+    TransformComponent:
+      Translation: [1, 0, -10]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [1, 0, 0, 1]
+      TilingFactor: 1
   - Entity: 7658440893859924732
     TagComponent:
       Tag: Camera B
@@ -36,24 +50,21 @@ Entities:
         OrthographicFar: 1
       Primary: true
       FixedAspectRatio: false
-  - Entity: 8810558651042546670
+  - Entity: 530249400144060757
     TagComponent:
-      Tag: Red Square
+      Tag: Camera A
     TransformComponent:
-      Translation: [1, 0, -10]
+      Translation: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [1, 0, 0, 1]
-      TilingFactor: 1
-  - Entity: 10428535352445035635
-    TagComponent:
-      Tag: Green Square
-    TransformComponent:
-      Translation: [-0.550000012, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [0, 1, 0, 1]
-      TexturePath: D:\RealEngine\RealEngine-Editor\assets\textures\Checkerboard.png
-      TilingFactor: 1
+    CameraComponent:
+      Camera:
+        ProjectionType: 1
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 100
+      Primary: false
+      FixedAspectRatio: false

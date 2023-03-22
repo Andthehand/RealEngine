@@ -40,6 +40,14 @@ namespace RealEngine {
 		inline static void DrawIndexedInstanced(const Ref<VertexArray>& vertexArray, uint32_t instanceCount, uint32_t indexCount = 0) {
 			s_RendererAPI->DrawIndexedInstanced(vertexArray, instanceCount, indexCount);
 		}
+
+		static void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount) {
+			s_RendererAPI->DrawLines(vertexArray, vertexCount);
+		}
+
+		static void SetLineWidth(float width) {
+			s_RendererAPI->SetLineWidth(width);
+		}
 	private:
 		static Scope<RendererAPI> s_RendererAPI;
 	};

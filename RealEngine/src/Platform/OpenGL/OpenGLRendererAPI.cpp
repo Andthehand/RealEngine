@@ -38,6 +38,7 @@ namespace RealEngine {
 	#endif
 
 		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_LINE_SMOOTH);
 
 		//MSAA
 		glEnable(GL_MULTISAMPLE);
@@ -64,22 +65,28 @@ namespace RealEngine {
 
 	void OpenGLRendererAPI::DrawArrays(const Ref<VertexArray>& vertexArray, uint32_t count, BufferMode mode, uint32_t start) {
 		glDrawArrays(BufferModeTypeToOpenGLBaseType(mode), start, count);
-		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount) {
+		vertexArray->Bind(); 
 		uint32_t count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();
 		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
-		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	void OpenGLRendererAPI::DrawArraysInstanced(const Ref<VertexArray>& vertexArray, BufferMode mode, uint32_t verticeCount, uint32_t instanceCount, uint32_t start) {
 		glDrawArraysInstanced(BufferModeTypeToOpenGLBaseType(mode), start, verticeCount, instanceCount);
-		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	void OpenGLRendererAPI::DrawIndexedInstanced(const Ref<VertexArray>& vertexArray, uint32_t instanceCount, uint32_t indexCount) {
 		uint32_t count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();
 		glDrawElementsInstanced(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr, instanceCount);
-		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+	void OpenGLRendererAPI::DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount) {
+		vertexArray->Bind();
+		glDrawArrays(GL_LINES, 0, vertexCount);
+	}
+
+	void OpenGLRendererAPI::SetLineWidth(float width) {
+		glLineWidth(width);
 	}
 }

@@ -112,6 +112,27 @@ Entities:
     TagComponent:
       Tag: Player
     TransformComponent:
+      Translation: [1.00928009, 1.97465038, 0]
+      Rotation: [0, 0, 0.767944813]
+      Scale: [0.999995112, 0.999995112, 1]
+    CircleRendererComponent:
+      Color: [1, 1, 1, 1]
+      Thickness: 1
+      Fade: 0.00499999989
+    Rigidbody2DComponent:
+      BodyType: Dynamic
+      FixedRotation: false
+    CircleCollider2DComponent:
+      Offset: [0, 0]
+      Radius: 0.5
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 3804882869482030191
+    TagComponent:
+      Tag: Player
+    TransformComponent:
       Translation: [0, 1, 0]
       Rotation: [0, 0, 0.767944872]
       Scale: [0.999995112, 0.999995112, 1]
