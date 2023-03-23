@@ -25,7 +25,11 @@ namespace RealEngine {
 		void OnRuntimeStart();
 		void OnRuntimeStop();
 
+		void OnSimulationStart();
+		void OnSimulationStop();
+
 		void OnUpdateEditor(Timestep ts, EditorCamera& editorCamera);
+		void OnUpdateSimulation(Timestep ts, EditorCamera& camera); 
 		void OnUpdateRuntime(Timestep ts);
 		void OnViewportResize(uint32_t width, uint32_t height);
 
@@ -40,6 +44,11 @@ namespace RealEngine {
 	private:
 		template<typename T>
 		void OnComponentAdded(Entity entity, T& component);
+
+		void OnPhysics2DStart();
+		void OnPhysics2DStop();
+
+		void RenderScene(EditorCamera& camera);
 	private:
 		entt::registry m_Registry;
 		uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
