@@ -43,6 +43,7 @@ namespace RealEngine {
 		m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.01f, 1000.0f);
 		
 		RenderCommand::SetClearColor({ 0.1, 0.1, 0.1, 1 });
+		Renderer2D::SetLineWidth(4.0f);
 	}
 
     void EditorLayer::OnDetach() {
@@ -495,7 +496,7 @@ namespace RealEngine {
 				auto view = m_ActiveScene->GetAllEntitiesWith<TransformComponent, CircleCollider2DComponent>();
 
 				// Calculate z index for translation
-				float zIndex = 0.001f;
+				float zIndex = 0.01f;
 				glm::vec3 cameraForwardDirection = m_EditorCamera.GetForwardDirection();
 				glm::vec3 projectionCollider = cameraForwardDirection * glm::vec3(zIndex);
 
@@ -516,22 +517,28 @@ namespace RealEngine {
 
 		// Draw selected entity outline 
 		if (Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity()) {
-			TransformComponent tc = selectedEntity.GetComponent<TransformComponent>();
+			const TransformComponent& tc = selectedEntity.GetComponent<TransformComponent>();
 
 			if (selectedEntity.HasComponent<CircleRendererComponent>()) {
 				// Calculate z index for translation
-				float zIndex = 0.001f;
+				float zIndex = 0.01f;
 				glm::vec3 cameraForwardDirection = m_EditorCamera.GetForwardDirection();
-				glm::vec3 projectionCollider = cameraForwardDirection * glm::vec3(zIndex);
+				float projectionCollider = cameraForwardDirection.z * zIndex;
 
 				glm::mat4 transform = glm::translate(glm::mat4(1.0f), tc.Translation)
-					* glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -projectionCollider.z))
-					* glm::rotate(glm::mat4(1.0f), tc.Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+					* glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -projectionCollider))
+					* glm::rotate(glm::mat4(1.0f), tc.Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f))
+					* glm::scale(glm::mat4(1.0f), tc.Scale);
 
-				Renderer2D::DrawCircle(transform, glm::vec4(1, 0, 0, 1), 0.03f);
+				Renderer2D::DrawCircle(transform, glm::vec4(1.0f, 0.5f, 0.0f, 1.0f), 0.03f);
 			}
-			else {
-				Renderer2D::DrawRect(tc.GetTransform(), glm::vec4(1, 0, 0, 1));
+			else if (selectedEntity.HasComponent<SpriteRendererComponent>()) {
+				glm::mat4 transform = glm::translate(glm::mat4(1.0f), tc.Translation)
+					* glm::rotate(glm::mat4(1.0f), tc.Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f))
+					* glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.001f))
+					* glm::scale(glm::mat4(1.0f), tc.Scale);
+
+				Renderer2D::DrawRect(transform, glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
 			}
 		}
 
