@@ -110,18 +110,18 @@ Entities:
       RestitutionThreshold: 0.5
   - Entity: 9430224950265994128
     TagComponent:
-      Tag: Player
+      Tag: Circle
     TransformComponent:
-      Translation: [1.00928009, 1.97465038, 0]
+      Translation: [1, 2, 0]
       Rotation: [0, 0, 0.767944813]
       Scale: [0.999995112, 0.999995112, 1]
     CircleRendererComponent:
-      Color: [1, 1, 1, 1]
+      Color: [0.293436289, 0.0702434406, 0.0702434406, 1]
       Thickness: 1
       Fade: 0.00499999989
     Rigidbody2DComponent:
       BodyType: Dynamic
-      FixedRotation: false
+      FixedRotation: true
     CircleCollider2DComponent:
       Offset: [0, 0]
       Radius: 0.5
@@ -131,13 +131,13 @@ Entities:
       RestitutionThreshold: 0.5
   - Entity: 3804882869482030191
     TagComponent:
-      Tag: Player
+      Tag: Square
     TransformComponent:
       Translation: [0, 1, 0]
       Rotation: [0, 0, 0.767944872]
       Scale: [0.999995112, 0.999995112, 1]
     SpriteRendererComponent:
-      Color: [1, 1, 1, 1]
+      Color: [0.362934351, 0.0378348529, 0.0378348529, 1]
       TilingFactor: 1
     Rigidbody2DComponent:
       BodyType: Dynamic
