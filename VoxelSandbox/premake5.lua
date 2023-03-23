@@ -42,10 +42,6 @@ project "VoxelSandbox"
 			"vendor/FastNoise2/lib/FastNoiseD.lib"
 		}
 
-		postbuildcommands {
-			"{COPYDIR} \"%{LibraryDir.VulkanSDK_DebugDLL}\" \"%{cfg.targetdir}\""
-		}
-
 	filter "configurations:Release"
 		defines "RE_RELEASE"
 		runtime "Release"

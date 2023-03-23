@@ -35,10 +35,6 @@ project "RealEngine-Editor"
 		runtime "Debug"
 		symbols "on"
 
-		postbuildcommands {
-			"{COPYDIR} \"%{LibraryDir.VulkanSDK_DebugDLL}\" \"%{cfg.targetdir}\""
-		}
-
 		debugargs { 
 			"assets\\scenes\\Physics2D.scene" 
 		}
