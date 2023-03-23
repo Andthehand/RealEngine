@@ -2,6 +2,7 @@
 #include "Application.h"
 
 #include "RealEngine/Renderer/Renderer.h"
+#include "RealEngine/Scripting/ScriptEngine.h"
 
 #include "RealEngine/Utils/PlatformUtils.h"
 #include "RealEngine/Core/Log.h"
@@ -29,10 +30,18 @@ namespace RealEngine {
 		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
 
 		Renderer::Init();
+		ScriptEngine::Init();
 
 		//Pushes the ImGuiLayer to the layer stack so that it's easier to deal with
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
+	}
+
+	Application::~Application() {
+		RE_PROFILE_FUNCTION();
+
+		ScriptEngine::Shutdown();
+		Renderer::Shutdown();
 	}
 
 	void Application::PushLayer(Layer* layer) {

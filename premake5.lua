@@ -1,4 +1,4 @@
-include "./vendor/premake/premake_customization/solution_items.lua"
+ include "./vendor/premake/premake_customization/solution_items.lua"
 include "Dependencies.lua"
 
 workspace "RealEngine"
@@ -30,8 +30,17 @@ group "Dependencies"
 	include "RealEngine/vendor/Box2D"
 group ""
 
-include "RealEngine"
-include "Sandbox"
-include "RealEngine-Editor"
-include "MachineLearningSandbox"
-include "VoxelSandbox"
+group "Core"
+	include "RealEngine"
+	include "RealEngine-ScriptCore"
+group ""
+
+group "Tools"
+	include "RealEngine-Editor"
+group ""
+
+group "Misc"
+	include "Sandbox"
+	include "MachineLearningSandbox"
+	include "VoxelSandbox"
+group ""

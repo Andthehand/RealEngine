@@ -1,6 +1,7 @@
 # Binaries
 bin/
 bin-int/
+Intermediates/
 
 # RealEngine files
 *.log
@@ -14,6 +15,7 @@ VoxelSandbox/assets/chunks
 **.vcxproj
 **.vcxproj.filters
 **.vcxproj.user
+**.csproj
 
 # Directories
 RealEngine/vendor/VulkanSDK

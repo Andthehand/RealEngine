@@ -33,7 +33,7 @@ namespace RealEngine {
 	class Application {
 	public:
 		Application(const ApplicationSpecification& specification);
-		virtual ~Application() = default;
+		virtual ~Application();
 
 		void OnEvent(Event& e);
 
