@@ -39,6 +39,10 @@ project "RealEngine-Editor"
 			"{COPYDIR} \"%{LibraryDir.VulkanSDK_DebugDLL}\" \"%{cfg.targetdir}\""
 		}
 
+		debugargs { 
+			"assets\\scenes\\Physics2D.scene" 
+		}
+
 	filter "configurations:Release"
 		defines "RE_RELEASE"
 		runtime "Release"
