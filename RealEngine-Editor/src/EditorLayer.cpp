@@ -482,7 +482,7 @@ namespace RealEngine {
 						* glm::translate(glm::mat4(1.0f), glm::vec3(cc2d.Offset, -projectionCollider.z))
 						* glm::scale(glm::mat4(1.0f), scale);
 
-					Renderer2D::DrawCircle(transform, glm::vec4(0, 1, 0, 1), 0.01f);
+					Renderer2D::DrawCircle(transform, glm::vec4(0, 1, 0, 1), 0.03f);
 				}
 			}
 		}
