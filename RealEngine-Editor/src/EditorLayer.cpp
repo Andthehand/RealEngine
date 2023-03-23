@@ -33,7 +33,7 @@ namespace RealEngine {
 		// Initialize blank scene
 		NewScene();
 
-		auto commandLineArgs = Application::Get().GetCommandLineArgs();
+		auto commandLineArgs = Application::Get().GetSpecification().CommandLineArgs;
 		if (commandLineArgs.Count > 1) {
 			auto sceneFilePath = commandLineArgs[1];
 			SceneSerializer serializer(m_ActiveScene);

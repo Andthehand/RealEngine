@@ -6,8 +6,8 @@
 namespace RealEngine {
 	class RealEngineEditor : public Application {
 	public:
-		RealEngineEditor(ApplicationCommandLineArgs args)
-			: Application("RealEngine Editor", args) {
+		RealEngineEditor(const RealEngine ::ApplicationSpecification& specification)
+			: Application(specification) {
 			PushLayer(new EditorLayer());
 		}
 
@@ -17,6 +17,10 @@ namespace RealEngine {
 	};
 
 	Application* CreateApplication(ApplicationCommandLineArgs args) {
-		return new RealEngineEditor(args);
+		ApplicationSpecification spec;
+		spec.Name = "RealEngine Editor";
+		spec.CommandLineArgs = args;
+
+		return new RealEngineEditor(spec);
 	}
 }
