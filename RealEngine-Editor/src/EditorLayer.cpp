@@ -514,6 +514,27 @@ namespace RealEngine {
 			}
 		}
 
+		// Draw selected entity outline 
+		if (Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity()) {
+			TransformComponent tc = selectedEntity.GetComponent<TransformComponent>();
+
+			if (selectedEntity.HasComponent<CircleRendererComponent>()) {
+				// Calculate z index for translation
+				float zIndex = 0.001f;
+				glm::vec3 cameraForwardDirection = m_EditorCamera.GetForwardDirection();
+				glm::vec3 projectionCollider = cameraForwardDirection * glm::vec3(zIndex);
+
+				glm::mat4 transform = glm::translate(glm::mat4(1.0f), tc.Translation)
+					* glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -projectionCollider.z))
+					* glm::rotate(glm::mat4(1.0f), tc.Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+
+				Renderer2D::DrawCircle(transform, glm::vec4(1, 0, 0, 1), 0.03f);
+			}
+			else {
+				Renderer2D::DrawRect(tc.GetTransform(), glm::vec4(1, 0, 0, 1));
+			}
+		}
+
 		Renderer2D::EndScene();
 	}
 
