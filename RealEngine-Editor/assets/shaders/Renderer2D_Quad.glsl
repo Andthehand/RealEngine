@@ -57,6 +57,9 @@ void main() {
 	
 	texColor *= texture(u_Textures[v_TexIndex], Input.TexCoord * Input.TilingFactor);
 	
+	if (texColor.a == 0.0)
+		discard;
+
 	o_Color = texColor;
 	o_EntityID = v_EntityID;
 }
