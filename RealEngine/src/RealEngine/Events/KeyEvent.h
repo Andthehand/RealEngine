@@ -17,19 +17,19 @@ namespace RealEngine {
 
 	class  KeyPressedEvent : public KeyEvent {
 	public:
-		KeyPressedEvent(const KeyCode keycode, const uint16_t repeatCount) : KeyEvent(keycode), m_RepeatCount(repeatCount) {}
+		KeyPressedEvent(const KeyCode keycode, const bool isRepeat) : KeyEvent(keycode), m_IsRepeat(isRepeat) {}
 
-		uint16_t GetRepeatCount() const { return m_RepeatCount; }
+		bool IsRepeatCount() const { return m_IsRepeat; }
 
 		std::string ToString() const override {
 			std::stringstream ss;
-			ss << "KeyPressedEvent: " << m_KeyCode << " (" << m_RepeatCount << ")";
+			ss << "KeyPressedEvent: " << m_KeyCode << m_IsRepeat ? "(Repeated)" : "(Not Repeated)";
 			return ss.str();
 		}
 
 		EVENT_CLASS_TYPE(KeyPressed)
 	private:
-		uint16_t m_RepeatCount;
+		bool m_IsRepeat;
 	};
 
 	class  KeyReleasedEvent : public KeyEvent {

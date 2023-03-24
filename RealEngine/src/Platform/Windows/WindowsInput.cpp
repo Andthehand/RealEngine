@@ -5,7 +5,6 @@
 #include <GLFW/glfw3.h>
 
 namespace RealEngine{
-
 	bool Input::IsKeyPressed(const KeyCode key) {
 		auto* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		auto state = glfwGetKey(window, static_cast<int32_t>(key));
