@@ -3,8 +3,8 @@ project "RealEngine-ScriptCore"
 	language "C#"
 	dotnetframework "4.7.2"
 
-	targetdir ("%{wks.location}/RealEngine-Editor/Resources/Scripts")
-	objdir ("%{wks.location}/RealEngine-Editor/Resources/Scripts/Intermediates")
+	targetdir ("../RealEngine-Editor/Resources/Scripts")
+	objdir ("../RealEngine-Editor/Resources/Scripts/Intermediates")
 
 	files {
 		"Source/**.cs",

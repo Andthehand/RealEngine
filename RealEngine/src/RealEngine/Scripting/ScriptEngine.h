@@ -18,7 +18,7 @@ namespace RealEngine {
 	class ScriptClass {
 	public:
 		ScriptClass() = default;
-		ScriptClass(const std::string& classNamespace, const std::string& className);
+		ScriptClass(const std::string& classNamespace, const std::string& className, bool isCore = false);;
 
 		MonoObject* Instantiate();
 		MonoMethod* GetMethod(const std::string& name, int parameterCount);
@@ -51,6 +51,7 @@ namespace RealEngine {
 		static void Shutdown();
 
 		static void LoadAssembly(const std::filesystem::path& filepath);
+		static void LoadAppAssembly(const std::filesystem::path& filepath);
 
 		static void OnRuntimeStart(Scene* scene);
 		static void OnRuntimeStop();
@@ -68,7 +69,7 @@ namespace RealEngine {
 		static void ShutdownMono();
 
 		static MonoObject* InstantiateClass(MonoClass* monoClass);
-		static void LoadAssemblyClasses(MonoAssembly* assembly);
+		static void LoadAssemblyClasses();
 
 		friend class ScriptClass;
 		friend class ScriptGlue;
