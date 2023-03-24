@@ -77,6 +77,13 @@ namespace RealEngine {
 		CameraComponent() = default;
 		CameraComponent(const CameraComponent&) = default;
 	};
+
+	struct ScriptComponent {
+		std::string ClassName;
+
+		ScriptComponent() = default;
+		ScriptComponent(const ScriptComponent&) = default;
+	};
 	
 	class ScriptableEntity;
 	struct NativeScriptComponent {
@@ -143,6 +150,6 @@ namespace RealEngine {
 
 	using AllComponents =
 		ComponentGroup<TransformComponent, SpriteRendererComponent, CircleRendererComponent,
-		CameraComponent, NativeScriptComponent,
+		CameraComponent, NativeScriptComponent, ScriptComponent,
 		Rigidbody2DComponent, BoxCollider2DComponent, CircleCollider2DComponent>;
 }
