@@ -39,6 +39,8 @@ namespace RealEngine {
 
 		Entity GetPrimaryCameraEntity();
 
+		bool IsRunning() const { return m_IsRunning; }
+
 		template<typename... Components>
 		auto GetAllEntitiesWith() {
 			return m_Registry.view<Components...>();
@@ -54,6 +56,7 @@ namespace RealEngine {
 	private:
 		entt::registry m_Registry;
 		uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
+		bool m_IsRunning = false;
 
 		b2World* m_PhysicsWorld = nullptr;
 

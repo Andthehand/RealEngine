@@ -12,7 +12,7 @@ namespace RealEngine {
 		}
 
 		~RealEngineEditor() {
-
+			
 		}
 	};
 
