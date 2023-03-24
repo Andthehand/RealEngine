@@ -360,7 +360,7 @@ namespace RealEngine {
 			return false;
 
 		std::string sceneName = data["Scene"].as<std::string>();
-		RE_CORE_TRACE("Deserializing scene '{0}'", sceneName);
+		//RE_CORE_TRACE("Deserializing scene '{0}'", sceneName);
 
 		auto entities = data["Entities"];
 		if (entities) {
@@ -372,7 +372,7 @@ namespace RealEngine {
 				if (tagComponent)
 					name = tagComponent["Tag"].as<std::string>();
 
-				RE_CORE_TRACE("Deserialized entity with ID = {0}, name = {1}", uuid, name);
+				//RE_CORE_TRACE("Deserialized entity with ID = {0}, name = {1}", uuid, name);
 
 				Entity deserializedEntity = m_Scene->CreateEntityWithUUID(uuid, name);
 

@@ -146,7 +146,7 @@ namespace RealEngine {
 			CompileOrGetVulkanBinaries(shaderSources);
 			CompileOrGetOpenGLBinaries();
 			CreateProgram();
-			RE_CORE_WARN("Shader creation took {0} ms", timer.ElapsedMillis());
+			RE_CORE_WARN("Shader {0} took {1} ms to create", filepath.stem().string(), timer.ElapsedMillis());
 		}
 
 		m_Name = filepath.stem().string();
@@ -270,8 +270,8 @@ namespace RealEngine {
 			}
 		}
 
-		for (auto&& [stage, data] : shaderData)
-			Reflect(stage, data);
+		//for (auto&& [stage, data] : shaderData)
+		//	Reflect(stage, data);
 	}
 
 	void OpenGLShader::CompileOrGetOpenGLBinaries() {
