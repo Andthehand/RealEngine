@@ -40,6 +40,7 @@ project "RealEngine"
 		"%{IncludeDir.mono}",
 		"%{IncludeDir.yaml_cpp}",
 		"%{IncludeDir.Box2D}",
+		"%{IncludeDir.filewatch}",
 		"%{IncludeDir.ImGuizmo}",
 		"%{IncludeDir.ImPlot}",
 		"%{IncludeDir.VulkanSDK}"

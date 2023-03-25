@@ -6,6 +6,7 @@ IncludeDir = {}
 IncludeDir["stb_image"] = "%{wks.location}/RealEngine/vendor/stb_image"
 IncludeDir["yaml_cpp"] = "%{wks.location}/RealEngine/vendor/yaml-cpp/include"
 IncludeDir["Box2D"] = "%{wks.location}/RealEngine/vendor/Box2D/include"
+IncludeDir["filewatch"] = "%{wks.location}/RealEngine/vendor/filewatch"
 IncludeDir["GLFW"] = "%{wks.location}/RealEngine/vendor/GLFW/include"
 IncludeDir["Glad"] = "%{wks.location}/RealEngine/vendor/Glad/include"
 IncludeDir["ImGui"] = "%{wks.location}/RealEngine/vendor/ImGui"

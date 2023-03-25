@@ -454,8 +454,13 @@ namespace RealEngine {
 				break;
 			}
 			case Key::R: {
-				if (!ImGuizmo::IsUsing())
-					m_GizmoType = ImGuizmo::OPERATION::SCALE;
+				if (control) {
+					ScriptEngine::ReloadAssembly();
+				}
+				else {
+					if (!ImGuizmo::IsUsing())
+						m_GizmoType = ImGuizmo::OPERATION::SCALE;
+				}
 				break;
 			}
 		}
