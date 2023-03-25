@@ -7,6 +7,7 @@
 #include "RealEngine/Scene/SceneSerializer.h"
 #include "RealEngine/Utils/PlatformUtils.h"
 #include "RealEngine/Math/Math.h"
+#include "RealEngine/Scripting/ScriptEngine.h"
 
 #include "ImGuizmo.h"
 #include "implot.h"
@@ -192,7 +193,16 @@ namespace RealEngine {
 					}
 				}
 
-				if (ImGui::MenuItem("Exit")) Application::Get().Close();
+				if (ImGui::MenuItem("Exit"))
+					Application::Get().Close();
+
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Script")) {
+				if (ImGui::MenuItem("Reload assembly", "Ctrl+R"))
+					ScriptEngine::ReloadAssembly();
+
 				ImGui::EndMenu();
 			}
 

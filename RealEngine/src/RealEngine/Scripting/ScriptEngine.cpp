@@ -120,6 +120,9 @@ namespace RealEngine {
 		MonoAssembly* AppAssembly = nullptr;
 		MonoImage* AppAssemblyImage = nullptr;
 
+		std::filesystem::path CoreAssemblyFilepath;
+		std::filesystem::path AppAssemblyFilepath;
+
 		ScriptClass EntityClass;
 
 		std::unordered_map<std::string, Ref<ScriptClass>> EntityClasses;
@@ -136,12 +139,12 @@ namespace RealEngine {
 		s_Data = new ScriptEngineData();
 
 		InitMono();
+		ScriptGlue::RegisterFunctions();
 		LoadAssembly("Resources/Scripts/RealEngine-ScriptCore.dll");
 		LoadAppAssembly("SandboxProject/Assets/Scripts/Binaries/Sandbox.dll");
 		LoadAssemblyClasses();
 
 		ScriptGlue::RegisterComponents();
-		ScriptGlue::RegisterFunctions();
 
 		// Retrieve and instantiate class (with constructor)
 		s_Data->EntityClass = ScriptClass("RealEngine", "Entity", true);
@@ -164,17 +167,18 @@ namespace RealEngine {
 	}
 
 	void ScriptEngine::ShutdownMono() {
-		// NOTE(Yan): mono is a little confusing to shutdown, so maybe come back to this
+		mono_domain_set(mono_get_root_domain(), false);
 
-		// mono_domain_unload(s_Data->AppDomain);
+		mono_domain_unload(s_Data->AppDomain);
 		s_Data->AppDomain = nullptr;
 
-		// mono_jit_cleanup(s_Data->RootDomain);
+		mono_jit_cleanup(s_Data->RootDomain);
 		s_Data->RootDomain = nullptr;
 	}
 
 	void ScriptEngine::LoadAssembly(const std::filesystem::path& filepath) {
 		// Create an App Domain
+		s_Data->CoreAssemblyFilepath = filepath;
 		s_Data->AppDomain = mono_domain_create_appdomain("RealEngineScriptRuntime", nullptr);
 		mono_domain_set(s_Data->AppDomain, true);
 
@@ -186,9 +190,25 @@ namespace RealEngine {
 
 	void ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath) {
 		// Move this maybe
+		s_Data->AppAssemblyFilepath = filepath;
 		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath);
 		s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
 		// Utils::PrintAssemblyTypes(s_Data->AppAssembly);
+	}
+
+	void ScriptEngine::ReloadAssembly() {
+		mono_domain_set(mono_get_root_domain(), false);
+
+		mono_domain_unload(s_Data->AppDomain);
+
+		LoadAssembly(s_Data->CoreAssemblyFilepath);
+		LoadAppAssembly(s_Data->AppAssemblyFilepath);
+		LoadAssemblyClasses();
+
+		ScriptGlue::RegisterComponents();
+
+		// Retrieve and instantiate class
+		s_Data->EntityClass = ScriptClass("Hazel", "Entity", true);
 	}
 
 	void ScriptEngine::OnRuntimeStart(Scene* scene) {
