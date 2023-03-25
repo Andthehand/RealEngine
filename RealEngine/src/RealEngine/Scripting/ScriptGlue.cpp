@@ -36,6 +36,10 @@ namespace RealEngine {
 		return glm::dot(*parameter, *parameter);
 	}
 
+	static MonoObject* GetScriptInstance(UUID entityID) {
+		return ScriptEngine::GetManagedInstance(entityID);
+	}
+
 	static bool Entity_HasComponent(UUID entityID, MonoReflectionType* componentType) {
 		Scene* scene = ScriptEngine::GetSceneContext();
 		RE_CORE_ASSERT(scene);
@@ -45,6 +49,20 @@ namespace RealEngine {
 		MonoType* managedType = mono_reflection_type_get_type(componentType);
 		RE_CORE_ASSERT(s_EntityHasComponentFuncs.find(managedType) != s_EntityHasComponentFuncs.end());
 		return s_EntityHasComponentFuncs.at(managedType)(entity);
+	}
+
+	static uint64_t Entity_FindEntityByName(MonoString* name) {
+		char* nameCStr = mono_string_to_utf8(name);
+
+		Scene* scene = ScriptEngine::GetSceneContext();
+		RE_CORE_ASSERT(scene);
+		Entity entity = scene->FindEntityByName(nameCStr);
+		mono_free(nameCStr);
+
+		if (!entity)
+			return 0;
+
+		return entity.GetUUID();
 	}
 
 	static void TransformComponent_GetTranslation(UUID entityID, glm::vec3* outTranslation) {
@@ -94,18 +112,18 @@ namespace RealEngine {
 	template<typename... Component>
 	static void RegisterComponent() {
 		([]() {
-				std::string_view typeName = typeid(Component).name();
-				size_t pos = typeName.find_last_of(':');
-				std::string_view structName = typeName.substr(pos + 1);
-				std::string managedTypename = fmt::format("RealEngine.{}", structName);
+			std::string_view typeName = typeid(Component).name();
+			size_t pos = typeName.find_last_of(':');
+			std::string_view structName = typeName.substr(pos + 1);
+			std::string managedTypename = fmt::format("RealEngine.{}", structName);
 
-				MonoType* managedType = mono_reflection_type_from_name(managedTypename.data(), ScriptEngine::GetCoreAssemblyImage());
-				if (!managedType) {
-					RE_CORE_ERROR("Could not find component type {}", managedTypename);
-					return;
-				}
-				s_EntityHasComponentFuncs[managedType] = [](Entity entity) { return entity.HasComponent<Component>(); };
-			}(), ...);
+			MonoType* managedType = mono_reflection_type_from_name(managedTypename.data(), ScriptEngine::GetCoreAssemblyImage());
+			if (!managedType) {
+				RE_CORE_ERROR("Could not find component type {}", managedTypename);
+				return;
+			}
+			s_EntityHasComponentFuncs[managedType] = [](Entity entity) { return entity.HasComponent<Component>(); };
+		}(), ...);
 	}
 
 	template<typename... Component>
@@ -122,7 +140,11 @@ namespace RealEngine {
 		RE_ADD_INTERNAL_CALL(NativeLog_Vector);
 		RE_ADD_INTERNAL_CALL(NativeLog_VectorDot);
 
+		RE_ADD_INTERNAL_CALL(GetScriptInstance);
+
 		RE_ADD_INTERNAL_CALL(Entity_HasComponent);
+		RE_ADD_INTERNAL_CALL(Entity_FindEntityByName);
+
 		RE_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
 		RE_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);
 

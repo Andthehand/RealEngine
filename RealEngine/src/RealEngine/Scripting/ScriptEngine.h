@@ -109,6 +109,8 @@ namespace RealEngine {
 			SetFieldValueInternal(name, &value);
 		}
 	private:
+		MonoObject* GetManagedObject() { return m_Instance; }
+
 		bool GetFieldValueInternal(const std::string& name, void* buffer);
 		bool SetFieldValueInternal(const std::string& name, const void* value);
 	private:
@@ -148,6 +150,8 @@ namespace RealEngine {
 		static ScriptFieldMap& GetScriptFieldMap(Entity entity);
 
 		static MonoImage* GetCoreAssemblyImage();
+
+		static MonoObject* GetManagedInstance(UUID uuid);
 	private:
 		static void InitMono();
 		static void ShutdownMono();
