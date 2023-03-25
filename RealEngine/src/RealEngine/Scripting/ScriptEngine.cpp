@@ -23,11 +23,11 @@ namespace RealEngine {
 		{ "System.UInt32", ScriptFieldType::UInt },
 		{ "System.UInt64", ScriptFieldType::ULong },
 
-		{ "Hazel.Vector2", ScriptFieldType::Vector2 },
-		{ "Hazel.Vector3", ScriptFieldType::Vector3 },
-		{ "Hazel.Vector4", ScriptFieldType::Vector4 },
+		{ "RealEngine.Vector2", ScriptFieldType::Vector2 },
+		{ "RealEngine.Vector3", ScriptFieldType::Vector3 },
+		{ "RealEngine.Vector4", ScriptFieldType::Vector4 },
 
-		{ "Hazel.Entity", ScriptFieldType::Entity },
+		{ "RealEngine.Entity", ScriptFieldType::Entity },
 	};
 
 	namespace Utils {
@@ -181,15 +181,13 @@ namespace RealEngine {
 		// Move this maybe
 		s_Data->CoreAssembly = Utils::LoadMonoAssembly(filepath);
 		s_Data->CoreAssemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
-		// Utils::PrintAssemblyTypes(s_Data->CoreAssembly);
+		//Utils::PrintAssemblyTypes(s_Data->CoreAssembly);
 	}
 
 	void ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath) {
 		// Move this maybe
 		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath);
-		auto assemb = s_Data->AppAssembly;
 		s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
-		auto assembi = s_Data->AppAssemblyImage;
 		// Utils::PrintAssemblyTypes(s_Data->AppAssembly);
 	}
 
@@ -303,12 +301,10 @@ namespace RealEngine {
 			int fieldCount = mono_class_num_fields(monoClass);
 			RE_CORE_WARN("{} has {} fields:", className, fieldCount);
 			void* iterator = nullptr;
-			while (MonoClassField* field = mono_class_get_fields(monoClass, &iterator))
-			{
+			while (MonoClassField* field = mono_class_get_fields(monoClass, &iterator)) {
 				const char* fieldName = mono_field_get_name(field);
 				uint32_t flags = mono_field_get_flags(field);
-				if (flags & FIELD_ATTRIBUTE_PUBLIC)
-				{
+				if (flags & FIELD_ATTRIBUTE_PUBLIC) {
 					MonoType* type = mono_field_get_type(field);
 					ScriptFieldType fieldType = Utils::MonoTypeToScriptFieldType(type);
 					RE_CORE_WARN("  {} ({})", fieldName, Utils::ScriptFieldTypeToString(fieldType));
