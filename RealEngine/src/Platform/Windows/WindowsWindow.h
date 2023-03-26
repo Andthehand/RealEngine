@@ -21,6 +21,8 @@ namespace RealEngine {
 		void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; };
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;
+			
+		void SetTitle(const std::string& title) override;
 
 		void SetCursorEnabled(bool enabled) override;
 

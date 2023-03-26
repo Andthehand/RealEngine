@@ -1,6 +1,8 @@
 #include "repch.h"
 #include "ProjectSerializer.h"
 
+#include "RealEngine/Core/Application.h"
+
 #include <fstream>
 #include <yaml-cpp/yaml.h>
 
@@ -49,6 +51,8 @@ namespace RealEngine {
 			return false;
 
 		config.Name = projectNode["Name"].as<std::string>();
+		Application::Get().GetWindow().SetTitle(config.Name);
+
 		config.StartScene = projectNode["StartScene"].as<std::string>();
 		config.AssetDirectory = projectNode["AssetDirectory"].as<std::string>();
 		config.ScriptModulePath = projectNode["ScriptModulePath"].as<std::string>();
