@@ -93,6 +93,8 @@ namespace RealEngine {
 
 			ExecuteMainThreadQueue();
 
+			m_Window->OnUpdate();
+
 			if (!m_Minimized) {
 				RE_PROFILE_SCOPE("LayerStack OnUpdate");
 
@@ -110,7 +112,7 @@ namespace RealEngine {
 			}
 			m_ImGuiLayer->End();
 
-			m_Window->OnUpdate();
+			m_Window->OnRender();
 		}
 	}
 

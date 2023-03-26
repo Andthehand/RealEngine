@@ -13,6 +13,7 @@ namespace RealEngine {
 		virtual ~WindowsWindow();
 
 		void OnUpdate() override;
+		void OnRender() override;
 
 		unsigned int GetWidth() const override { return m_Data.Width; };
 		unsigned int GetHeight() const override { return m_Data.Height; };

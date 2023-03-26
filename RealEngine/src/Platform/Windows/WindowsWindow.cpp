@@ -159,6 +159,11 @@ namespace RealEngine {
 		RE_PROFILE_FUNCTION();
 
 		glfwPollEvents();
+	}
+
+	void WindowsWindow::OnRender() {
+		RE_PROFILE_FUNCTION();
+
 		m_Context->SwapBuffers();
 	}
 	
