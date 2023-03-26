@@ -23,6 +23,7 @@ namespace RealEngine {
 		Bool, Char, Byte, Short, Int, Long,
 		UByte, UShort, UInt, ULong,
 		Vector2, Vector3, Vector4,
+		Color,
 		Entity
 	};
 
@@ -186,6 +187,7 @@ namespace RealEngine {
 				case ScriptFieldType::Vector3: return "Vector3";
 				case ScriptFieldType::Vector4: return "Vector4";
 				case ScriptFieldType::Entity:  return "Entity";
+				case ScriptFieldType::Color:  return "Color";
 			}
 			RE_CORE_ASSERT(false, "Unknown ScriptFieldType");
 			return "None";
@@ -209,6 +211,7 @@ namespace RealEngine {
 			if (fieldType == "Vector3") return ScriptFieldType::Vector3;
 			if (fieldType == "Vector4") return ScriptFieldType::Vector4;
 			if (fieldType == "Entity")  return ScriptFieldType::Entity;
+			if (fieldType == "Color")  return ScriptFieldType::Color;
 
 			RE_CORE_ASSERT(false, "Unknown ScriptFieldType");
 			return ScriptFieldType::None;

@@ -34,6 +34,8 @@ namespace RealEngine {
 		{ "System.UInt32", ScriptFieldType::UInt },
 		{ "System.UInt64", ScriptFieldType::ULong },
 
+		{ "RealEngine.Color", ScriptFieldType::Color },
+
 		{ "RealEngine.Vector2", ScriptFieldType::Vector2 },
 		{ "RealEngine.Vector3", ScriptFieldType::Vector3 },
 		{ "RealEngine.Vector4", ScriptFieldType::Vector4 },
@@ -47,7 +49,7 @@ namespace RealEngine {
 
 			// NOTE: We can't use this image for anything other than loading the assembly because this image doesn't have a reference to the assembly
 			MonoImageOpenStatus status;
-			MonoImage* image = mono_image_open_from_data_full(fileData.As<char>(), fileData.Size(), 1, &status, 0);
+			MonoImage* image = mono_image_open_from_data_full(fileData.As<char>(), (uint32_t)fileData.Size(), 1, &status, 0);
 
 			if (status != MONO_IMAGE_OK) {
 				const char* errorMessage = mono_image_strerror(status);
@@ -61,7 +63,7 @@ namespace RealEngine {
 
 				if (std::filesystem::exists(pdbPath)) {
 					ScopedBuffer pdbFileData = FileSystem::ReadFileBinary(pdbPath);
-					mono_debug_open_image_from_memory(image, pdbFileData.As<const mono_byte>(), pdbFileData.Size());
+					mono_debug_open_image_from_memory(image, pdbFileData.As<const mono_byte>(), (int)pdbFileData.Size());
 					RE_CORE_INFO("Loaded PDB {}", pdbPath);
 				}
 			}

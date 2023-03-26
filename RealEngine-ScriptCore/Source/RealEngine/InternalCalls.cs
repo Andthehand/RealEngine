@@ -14,9 +14,9 @@ namespace RealEngine {
 
 		// SpriteRendererComponent
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		internal extern static void SpriteRendererComponent_GetColor(ulong entityID, out Vector4 color);
+		internal extern static void SpriteRendererComponent_GetColor(ulong entityID, out Color color);
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		internal extern static void SpriteRendererComponent_SetColor(ulong entityID, ref Vector4 color);
+		internal extern static void SpriteRendererComponent_SetColor(ulong entityID, ref Color color);
 		// SpriteRendererComponent
 
 		// TransformComponent

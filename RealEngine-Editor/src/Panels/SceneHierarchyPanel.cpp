@@ -417,6 +417,14 @@ namespace RealEngine {
 								}
 								break;
 							}
+							case ScriptFieldType::Color: {
+								glm::vec4 data = scriptInstance->GetFieldValue<glm::vec4>(name) / glm::vec4(255.0f);
+								if (ImGui::ColorEdit4(name.c_str(), glm::value_ptr(data))) {
+									data *= 255.0f;
+									scriptInstance->SetFieldValue(name, data);
+								}
+								break;
+							}
 						}
 					}
 				}
@@ -479,6 +487,13 @@ namespace RealEngine {
 								case ScriptFieldType::Vector4: {
 									glm::vec4 data = scriptField.GetValue<glm::vec4>();
 									if (ImGui::DragFloat4(name.c_str(), glm::value_ptr(data), 0.01f))
+										scriptField.SetValue(data);
+									break;
+								}
+								case ScriptFieldType::Color: {
+									glm::vec4 data = scriptField.GetValue<glm::vec4>() / glm::vec4(255.0f);
+									if (ImGui::ColorEdit4(name.c_str(), glm::value_ptr(data)))
+										data *= 255.0f;
 										scriptField.SetValue(data);
 									break;
 								}
@@ -556,6 +571,16 @@ namespace RealEngine {
 									if (ImGui::DragFloat4(name.c_str(), glm::value_ptr(data), 0.01f)) {
 										ScriptFieldInstance& fieldInstance = entityFields[name];
 										fieldInstance.Field = field;
+										fieldInstance.SetValue(data);
+									}
+									break;
+								}
+								case ScriptFieldType::Color: {
+									glm::vec4 data = glm::vec4{ 0.0f };
+									if (ImGui::ColorEdit4(name.c_str(), glm::value_ptr(data))) {
+										ScriptFieldInstance& fieldInstance = entityFields[name];
+										fieldInstance.Field = field;
+										data *= 255.0f;
 										fieldInstance.SetValue(data);
 									}
 									break;

@@ -10,13 +10,13 @@ namespace RealEngine {
 	}
 
 	public class SpriteRendererComponent : Component {
-		public Vector4 Color {
+		public Color Color {
 			get {
-				InternalCalls.SpriteRendererComponent_GetColor(Entity.ID, out Vector4 color);
+				InternalCalls.SpriteRendererComponent_GetColor(Entity.ID, out Color color);
 				return color * 255.0f;
 			}
 			set {
-				Vector4 outColor = value / 255.0f;
+				Color outColor = value / 255.0f;
 				InternalCalls.SpriteRendererComponent_SetColor(Entity.ID, ref outColor);
 			}
 		}
