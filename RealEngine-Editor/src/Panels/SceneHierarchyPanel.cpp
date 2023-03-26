@@ -177,9 +177,11 @@ namespace RealEngine {
 		ImGui::PopID();
 	}
 
+	//For some weird fricken reason I can't move this to be a private variable 
+	//because the application crashes when I try to delete the layers on close
 	struct ComponentCopyBuffer m_ComponentCopyBuffer;
 	template<typename T, typename UIFunction>
-	static void DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction) {
+	void SceneHierarchyPanel::DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction) {
 		const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
 		if (entity.HasComponent<T>()) {
 			ImGuiIO& io = ImGui::GetIO();
@@ -208,12 +210,24 @@ namespace RealEngine {
 
 				if (ImGui::MenuItem(("Copy " + name).c_str())) {
 					m_ComponentCopyBuffer.ComponentID = typeid(T).hash_code();
-					m_ComponentCopyBuffer.EntityID = entity; //TODO change this to get the Entity ID
+					m_ComponentCopyBuffer.EntityID = entity.GetUUID();
 				}
 
-				if (m_ComponentCopyBuffer.ComponentID == typeid(T).hash_code() 
-					&& ImGui::MenuItem(("Paste " + name).c_str())) {
-					entity.GetComponent<T>() = m_ComponentCopyBuffer.EntityID.GetComponent<T>(); //TODO change this to get the Entity ID
+				//Checks if EntityID isn't set
+				//Checks if the entity isn't just setting it's own component
+				//Checks if the component hash is the same
+				if (m_ComponentCopyBuffer.EntityID != 0 &&
+					m_ComponentCopyBuffer.EntityID != entity.GetUUID() &&
+					m_ComponentCopyBuffer.ComponentID == typeid(T).hash_code()) {
+					Entity copyEntity = m_Context->GetEntityByUUID(m_ComponentCopyBuffer.EntityID);
+					//Check if not either the entity was deleted or the component was deleted
+					if (!copyEntity || !copyEntity.HasComponent<T>()) {
+						m_ComponentCopyBuffer.ComponentID = 0;
+						m_ComponentCopyBuffer.EntityID = 0;
+					}
+					else if(ImGui::MenuItem(("Paste " + name).c_str())) {
+						entity.GetComponent<T>() = copyEntity.GetComponent<T>(); 
+					}
 				}
 
 				ImGui::EndPopup();
