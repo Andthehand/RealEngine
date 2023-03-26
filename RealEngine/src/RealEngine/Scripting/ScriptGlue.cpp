@@ -85,6 +85,26 @@ namespace RealEngine {
 		entity.GetComponent<TransformComponent>().Translation = *translation;
 	}
 
+	static void SpriteRendererComponent_GetColor(UUID entityID, glm::vec4* outColor) {
+		Scene* scene = ScriptEngine::GetSceneContext();
+		RE_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		RE_CORE_ASSERT(entity);
+
+		*outColor = entity.GetComponent<SpriteRendererComponent>().Color;
+	}
+
+	static void SpriteRendererComponent_SetColor(UUID entityID, glm::vec4* color) {
+		Scene* scene = ScriptEngine::GetSceneContext();
+		RE_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		RE_CORE_ASSERT(entity);
+
+		SpriteRendererComponent& s = entity.GetComponent<SpriteRendererComponent>();
+
+		entity.GetComponent<SpriteRendererComponent>().Color = *color;
+	}
+
 	static void Rigidbody2DComponent_ApplyLinearImpulse(UUID entityID, glm::vec2* impulse, glm::vec2* point, bool wake) {
 		Scene* scene = ScriptEngine::GetSceneContext();
 		RE_CORE_ASSERT(scene);
@@ -184,6 +204,9 @@ namespace RealEngine {
 
 		RE_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
 		RE_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);
+
+		RE_ADD_INTERNAL_CALL(SpriteRendererComponent_GetColor);
+		RE_ADD_INTERNAL_CALL(SpriteRendererComponent_SetColor);
 
 		RE_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulse);
 		RE_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulseToCenter);

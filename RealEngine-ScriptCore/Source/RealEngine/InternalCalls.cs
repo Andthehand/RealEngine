@@ -12,6 +12,13 @@ namespace RealEngine {
 		internal extern static object GetScriptInstance(ulong entityID);
 		// Entity
 
+		// SpriteRendererComponent
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void SpriteRendererComponent_GetColor(ulong entityID, out Vector4 color);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void SpriteRendererComponent_SetColor(ulong entityID, ref Vector4 color);
+		// SpriteRendererComponent
+
 		// TransformComponent
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static void TransformComponent_GetTranslation(ulong entityID, out Vector3 translation);

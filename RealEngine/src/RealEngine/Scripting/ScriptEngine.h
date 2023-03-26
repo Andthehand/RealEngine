@@ -26,6 +26,7 @@ namespace RealEngine {
 		Entity
 	};
 
+		
 	struct ScriptField {
 		ScriptFieldType Type;
 		std::string Name;

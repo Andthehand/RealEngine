@@ -16,6 +16,7 @@
 #include "RealEngine/Scene/Components.h"
 #include "RealEngine/Scene/SceneCamera.h"
 
+
 #include "RealEngine/Scripting/ScriptEngine.h"
 #include "RealEngine/UI/UI.h"
 
@@ -176,6 +177,8 @@ namespace RealEngine {
 
 		ImGui::PopID();
 	}
+
+	
 
 	//For some weird fricken reason I can't move this to be a private variable 
 	//because the application crashes when I try to delete the layers on close
@@ -357,10 +360,62 @@ namespace RealEngine {
 				if (scriptInstance) {
 					const auto& fields = scriptInstance->GetScriptClass()->GetFields();
 					for (const auto& [name, field] : fields) {
-						if (field.Type == ScriptFieldType::Float) {
-							float data = scriptInstance->GetFieldValue<float>(name);
-							if (ImGui::DragFloat(name.c_str(), &data)) {
-								scriptInstance->SetFieldValue(name, data);
+						switch (field.Type) {
+							case ScriptFieldType::Float: {
+								float data = scriptInstance->GetFieldValue<float>(name);
+								if (ImGui::DragFloat(name.c_str(), &data)) {
+									scriptInstance->SetFieldValue(name, data);
+								}
+								break;
+							}
+							case ScriptFieldType::Double: {
+								double data = scriptInstance->GetFieldValue<double>(name);
+								if (ImGui::DragDouble(name.c_str(), &data)) {
+									scriptInstance->SetFieldValue(name, data);
+								}
+								break;
+							}
+							case ScriptFieldType::Bool: {
+								bool data = scriptInstance->GetFieldValue<bool>(name);
+								if (ImGui::Checkbox(name.c_str(), &data)) {
+									scriptInstance->SetFieldValue(name, data);
+								}
+								break;
+							}
+							case ScriptFieldType::Int: {
+								int data = scriptInstance->GetFieldValue<int>(name);
+								if (ImGui::DragInt(name.c_str(), &data)) {
+									scriptInstance->SetFieldValue(name, data);
+								}
+								break;
+							}
+							case ScriptFieldType::UInt: {
+								uint32_t data = scriptInstance->GetFieldValue<uint32_t>(name);
+								if (ImGui::DragU32Int(name.c_str(), &data)) {
+									scriptInstance->SetFieldValue(name, data);
+								}
+								break;
+							}
+							case ScriptFieldType::Vector2: {
+								glm::vec2 data = scriptInstance->GetFieldValue<glm::vec2>(name);
+								if (ImGui::DragFloat2(name.c_str(), glm::value_ptr(data), 0.01f)) {
+									scriptInstance->SetFieldValue(name, data);
+								}
+								break;
+							}
+							case ScriptFieldType::Vector3: {
+								glm::vec3 data = scriptInstance->GetFieldValue<glm::vec3>(name);
+								if (ImGui::DragFloat3(name.c_str(), glm::value_ptr(data), 0.01f)) {
+									scriptInstance->SetFieldValue(name, data);
+								}
+								break;
+							}
+							case ScriptFieldType::Vector4: {
+								glm::vec4 data = scriptInstance->GetFieldValue<glm::vec4>(name);
+								if (ImGui::DragFloat4(name.c_str(), glm::value_ptr(data), 0.01f)) {
+									scriptInstance->SetFieldValue(name, data);
+								}
+								break;
 							}
 						}
 					}
@@ -378,20 +433,132 @@ namespace RealEngine {
 							ScriptFieldInstance& scriptField = entityFields.at(name);
 
 							// Display control to set it maybe
-							if (field.Type == ScriptFieldType::Float) {
-								float data = scriptField.GetValue<float>();
-								if (ImGui::DragFloat(name.c_str(), &data))
-									scriptField.SetValue(data);
+							switch (field.Type) {
+								case ScriptFieldType::Float: {
+									float data = scriptField.GetValue<float>();
+									if (ImGui::DragFloat(name.c_str(), &data))
+										scriptField.SetValue(data);
+									break;
+								}
+								case ScriptFieldType::Double: {
+									double data = scriptField.GetValue<double>();
+									if (ImGui::DragDouble(name.c_str(), &data))
+										scriptField.SetValue(data);
+									break;
+								}
+								case ScriptFieldType::Bool: {
+									bool data = scriptField.GetValue<bool>();
+									if (ImGui::Checkbox(name.c_str(), &data))
+										scriptField.SetValue(data);
+									break;
+								}
+								case ScriptFieldType::Int: {
+									int data = scriptField.GetValue<int>();
+									if (ImGui::DragInt(name.c_str(), &data))
+										scriptField.SetValue(data);
+									break;
+								}
+								case ScriptFieldType::UInt: {
+									uint32_t data = scriptField.GetValue<uint32_t>();
+									if (ImGui::DragU32Int(name.c_str(), &data))
+										scriptField.SetValue(data);
+									break;
+								}
+								case ScriptFieldType::Vector2: {
+									glm::vec2 data = scriptField.GetValue<glm::vec2>();
+									if (ImGui::DragFloat2(name.c_str(), glm::value_ptr(data), 0.01f))
+										scriptField.SetValue(data);
+									break;
+								}
+								case ScriptFieldType::Vector3: {
+									glm::vec3 data = scriptField.GetValue<glm::vec3>();
+									if (ImGui::DragFloat3(name.c_str(), glm::value_ptr(data), 0.01f))
+										scriptField.SetValue(data);
+									break;
+								}
+								case ScriptFieldType::Vector4: {
+									glm::vec4 data = scriptField.GetValue<glm::vec4>();
+									if (ImGui::DragFloat4(name.c_str(), glm::value_ptr(data), 0.01f))
+										scriptField.SetValue(data);
+									break;
+								}
 							}
 						}
 						else {
+							Ref<ScriptInstance> scriptInstance = ScriptEngine::GetEntityScriptInstance(entity.GetUUID());
 							// Display control to set it maybe
-							if (field.Type == ScriptFieldType::Float) {
-								float data = 0.0f;
-								if (ImGui::DragFloat(name.c_str(), &data)) {
-									ScriptFieldInstance& fieldInstance = entityFields[name];
-									fieldInstance.Field = field;
-									fieldInstance.SetValue(data);
+							switch (field.Type) {
+								case ScriptFieldType::Float: {
+									float data = 0.0f;
+									if (ImGui::DragFloat(name.c_str(), &data)) {
+										ScriptFieldInstance& fieldInstance = entityFields[name];
+										fieldInstance.Field = field;
+										fieldInstance.SetValue(data);
+									}
+									break;
+								}
+								case ScriptFieldType::Double: {
+									double data = 0.0;
+									if (ImGui::DragDouble(name.c_str(), &data)) {
+										ScriptFieldInstance& fieldInstance = entityFields[name];
+										fieldInstance.Field = field;
+										fieldInstance.SetValue(data);
+									}
+									break;
+								}
+								case ScriptFieldType::Bool: {
+									bool data = false;
+									if (ImGui::Checkbox(name.c_str(), &data)) {
+										ScriptFieldInstance& fieldInstance = entityFields[name];
+										fieldInstance.Field = field;
+										fieldInstance.SetValue(data);
+									}
+									break;
+								}
+								case ScriptFieldType::Int: {
+									int data = 0;
+									if (ImGui::DragInt(name.c_str(), &data)) {
+										ScriptFieldInstance& fieldInstance = entityFields[name];
+										fieldInstance.Field = field;
+										fieldInstance.SetValue(data);
+									}
+									break;
+								}
+								case ScriptFieldType::UInt: {
+									uint32_t data = 0;
+									if (ImGui::DragU32Int(name.c_str(), &data)) {
+										ScriptFieldInstance& fieldInstance = entityFields[name];
+										fieldInstance.Field = field;
+										fieldInstance.SetValue(data);
+									}
+									break;
+								}
+								case ScriptFieldType::Vector2: {
+									glm::vec2 data = glm::vec2{ 0.0f };
+									if (ImGui::DragFloat2(name.c_str(), glm::value_ptr(data), 0.01f)) {
+										ScriptFieldInstance& fieldInstance = entityFields[name];
+										fieldInstance.Field = field;
+										fieldInstance.SetValue(data);
+									}
+									break;
+								}
+								case ScriptFieldType::Vector3: {
+									glm::vec3 data = glm::vec3{ 0.0f };
+									if (ImGui::DragFloat3(name.c_str(), glm::value_ptr(data), 0.01f)) {
+										ScriptFieldInstance& fieldInstance = entityFields[name];
+										fieldInstance.Field = field;
+										fieldInstance.SetValue(data);
+									}
+									break;
+								}
+								case ScriptFieldType::Vector4: {
+									glm::vec4 data = glm::vec4{ 0.0f };
+									if (ImGui::DragFloat4(name.c_str(), glm::value_ptr(data), 0.01f)) {
+										ScriptFieldInstance& fieldInstance = entityFields[name];
+										fieldInstance.Field = field;
+										fieldInstance.SetValue(data);
+									}
+									break;
 								}
 							}
 						}

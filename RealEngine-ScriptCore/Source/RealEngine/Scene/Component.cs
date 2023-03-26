@@ -9,8 +9,21 @@ namespace RealEngine {
 		public Entity Entity { get; internal set; }
 	}
 
+	public class SpriteRendererComponent : Component {
+		public Vector4 Color {
+			get {
+				InternalCalls.SpriteRendererComponent_GetColor(Entity.ID, out Vector4 color);
+				return color * 255.0f;
+			}
+			set {
+				Vector4 outColor = value / 255.0f;
+				InternalCalls.SpriteRendererComponent_SetColor(Entity.ID, ref outColor);
+			}
+		}
+	}
+
 	public class TransformComponent : Component {
-		public Vector3 Translation {
+	public Vector3 Translation {
 			get {
 				InternalCalls.TransformComponent_GetTranslation(Entity.ID, out Vector3 translation);
 				return translation;
