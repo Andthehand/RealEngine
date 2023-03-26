@@ -18,13 +18,10 @@ namespace RealEngine {
 		void SetContext(const Ref<Scene>& context);
 
 		void OnImGuiRender();
-		void OnEvent(Event& event);
 
 		Entity GetSelectedEntity() const { return m_SelectionContext;  }
 		void SetSelectedEntity(Entity entity);
 	private:
-		bool OnKeyPressed(KeyPressedEvent& e);
-
 		template<typename T>
 		void DisplayAddComponentEntry(const std::string& entryName);
 

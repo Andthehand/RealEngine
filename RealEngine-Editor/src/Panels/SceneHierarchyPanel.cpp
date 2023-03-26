@@ -462,23 +462,4 @@ namespace RealEngine {
 			}
 		}
 	}
-
-	void SceneHierarchyPanel::OnEvent(Event& event) {
-		EventDispatcher dispatcher(event);
-		dispatcher.Dispatch<KeyPressedEvent>(RE_BIND_EVENT_FN(SceneHierarchyPanel::OnKeyPressed));
-	}
-
-	bool SceneHierarchyPanel::OnKeyPressed(KeyPressedEvent& e) {
-		switch (e.GetKeyCode()) {
-			case Key::Delete: {
-				if (m_SelectionContext) {
-					m_Context->DestroyEntity(m_SelectionContext);
-					m_SelectionContext = {};
-				}
-				break;
-
-			}
-		}
-		return false;
-	}
 }

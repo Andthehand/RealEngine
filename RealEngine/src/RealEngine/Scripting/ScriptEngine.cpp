@@ -17,6 +17,8 @@
 #include "RealEngine/Core/Buffer.h"
 #include "RealEngine/Core/FileSystem.h"
 
+#include "RealEngine/Project/Project.h"
+
 namespace RealEngine {
 
 	static std::unordered_map<std::string, ScriptFieldType> s_ScriptFieldTypeMap = {
@@ -156,7 +158,8 @@ namespace RealEngine {
 			RE_CORE_ERROR("[ScriptEngine] Could not load RealEngine-ScriptCore assembly.");
 			return;
 		}
-		status = LoadAppAssembly("SandboxProject/Assets/Scripts/Binaries/Sandbox.dll");
+		auto scriptModulePath = Project::GetAssetDirectory() / Project::GetActive()->GetConfig().ScriptModulePath;
+		status = LoadAppAssembly(scriptModulePath);
 		if (!status) {
 			RE_CORE_ERROR("[ScriptEngine] Could not load app assembly.");
 			return;

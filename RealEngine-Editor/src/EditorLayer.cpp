@@ -215,11 +215,6 @@ namespace RealEngine {
 
 		ImGui::Begin("Stats");
 
-		std::string name = "None";
-		if (m_HoveredEntity)
-			name = m_HoveredEntity.GetComponent<TagComponent>().Tag;
-		ImGui::Text("Hovered Entity: %s", name.c_str());
-
 		auto stats = Renderer2D::GetStats();
 		ImGui::Text("Renderer2D Stats:");
 		ImGui::Text("DrawCalls: %d", stats.DrawCalls);
@@ -416,7 +411,6 @@ namespace RealEngine {
 		if (m_SceneState == SceneState::Edit) {
 			m_EditorCamera.OnEvent(e);
 		}
-		m_SceneHierarchyPanel.OnEvent(e);
 
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<KeyPressedEvent>(RE_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
@@ -490,6 +484,16 @@ namespace RealEngine {
 				else {
 					if (!ImGuizmo::IsUsing())
 						m_GizmoType = ImGuizmo::OPERATION::SCALE;
+				}
+				break;
+			}
+			case Key::Delete: {
+				if (Application::Get().GetImGuiLayer()->GetActiveWidgetID() == 0) {
+					Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
+					if (selectedEntity) {
+						m_SceneHierarchyPanel.SetSelectedEntity({});
+						m_ActiveScene->DestroyEntity(selectedEntity);
+					}
 				}
 				break;
 			}
@@ -605,6 +609,8 @@ namespace RealEngine {
 
 	void EditorLayer::OpenProject(const std::filesystem::path& path) {
 		if (Project::Load(path)) {
+			ScriptEngine::Init();
+
 			auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActive()->GetConfig().StartScene);
 			OpenScene(startScenePath);
 			m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
@@ -728,7 +734,9 @@ namespace RealEngine {
 			return;
 
 		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
-		if (selectedEntity)
-			m_EditorScene->DuplicateEntity(selectedEntity);
+		if (selectedEntity) {
+			Entity newEntity = m_EditorScene->DuplicateEntity(selectedEntity);
+			m_SceneHierarchyPanel.SetSelectedEntity(newEntity);
+		}
 	}
 }
