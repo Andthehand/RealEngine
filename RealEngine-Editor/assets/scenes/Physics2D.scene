@@ -41,7 +41,9 @@ Entities:
     ScriptComponent:
       ClassName: Sandbox.Camera
       ScriptFields:
-        []
+        - Name: DistanceFromPlayer
+          Type: Float
+          Data: 5
   - Entity: 15045535320033348975
     TagComponent:
       Tag: Block
@@ -113,7 +115,9 @@ Entities:
     ScriptComponent:
       ClassName: Sandbox.Player
       ScriptFields:
-        []
+        - Name: Speed
+          Type: Float
+          Data: 2
     SpriteRendererComponent:
       Color: [1, 1, 1, 1]
       TilingFactor: 1
