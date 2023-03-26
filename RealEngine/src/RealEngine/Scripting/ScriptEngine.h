@@ -1,12 +1,7 @@
 #pragma once
 
-
-#include "RealEngine/Core/Application.h"
-#include "RealEngine/Core/Timer.h"
 #include "RealEngine/Scene/Scene.h"
 #include "RealEngine/Scene/Entity.h"
-
-#include <FileWatch.h>
 
 #include <filesystem>
 #include <string>
