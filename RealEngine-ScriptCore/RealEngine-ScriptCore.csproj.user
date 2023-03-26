@@ -3,4 +3,10 @@
   <PropertyGroup>
     <ProjectView>ShowAllFiles</ProjectView>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
+    <StartAction>Project</StartAction>
+    <StartProgram>D:\RealEngine\bin\Debug-windows-x86_64\RealEngine-Editor\RealEngine-Editor.exe</StartProgram>
+    <StartWorkingDirectory>D:\RealEngine\RealEngine-Editor\</StartWorkingDirectory>
+  </PropertyGroup>
 </Project>

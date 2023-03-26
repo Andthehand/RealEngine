@@ -3,4 +3,14 @@
   <PropertyGroup>
     <ProjectView>ShowAllFiles</ProjectView>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
+    <EnableSQLServerDebugging>false</EnableSQLServerDebugging>
+    <StartAction>Project</StartAction>
+    <StartURL>127.0.0.1:2550</StartURL>
+    <RemoteDebugEnabled>false</RemoteDebugEnabled>
+    <StartProgram>D:\RealEngine\bin\Debug-windows-x86_64\RealEngine-Editor\RealEngine-Editor.exe</StartProgram>
+    <StartWorkingDirectory>
+    </StartWorkingDirectory>
+  </PropertyGroup>
 </Project>

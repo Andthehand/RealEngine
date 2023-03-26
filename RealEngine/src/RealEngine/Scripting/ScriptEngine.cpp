@@ -7,6 +7,8 @@
 #include "mono/metadata/assembly.h"
 #include "mono/metadata/object.h"
 #include "mono/metadata/tabledefs.h"
+#include "mono/metadata/mono-debug.h"
+#include "mono/metadata/threads.h"
 
 namespace RealEngine {
 
@@ -57,7 +59,7 @@ namespace RealEngine {
 			return buffer;
 		}
 
-		static MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath) {
+		static MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath, bool loadPDB = false) {
 			uint32_t fileSize = 0;
 			char* fileData = ReadBytes(assemblyPath, &fileSize);
 
@@ -69,6 +71,19 @@ namespace RealEngine {
 				const char* errorMessage = mono_image_strerror(status);
 				// Log some error message using the errorMessage data
 				return nullptr;
+			}
+
+			if (loadPDB) {
+				std::filesystem::path pdbPath = assemblyPath;
+				pdbPath.replace_extension(".pdb");
+
+				if (std::filesystem::exists(pdbPath)) {
+					uint32_t pdbFileSize = 0;
+					char* pdbFileData = ReadBytes(pdbPath, &pdbFileSize);
+					mono_debug_open_image_from_memory(image, (const mono_byte*)pdbFileData, pdbFileSize);
+					RE_CORE_INFO("Loaded PDB {}", pdbPath);
+					delete[] pdbFileData;
+				}
 			}
 
 			std::string pathString = assemblyPath.string();
@@ -132,6 +147,8 @@ namespace RealEngine {
 		Scope<filewatch::FileWatch<std::string>> AppAssemblyFileWatcher;
 		bool AssemblyReloadPending = false;
 
+		bool EnableDebugging = true;
+
 		// Runtime
 		Scene* SceneContext = nullptr;
 	};
@@ -173,11 +190,26 @@ namespace RealEngine {
 	void ScriptEngine::InitMono() {
 		mono_set_assemblies_path("mono/lib");
 
+		if (s_Data->EnableDebugging) {
+			const char* argv[2] = {
+				"--debugger-agent=transport=dt_socket,address=127.0.0.1:2550,server=y,suspend=n,loglevel=3,logfile=MonoDebugger.log",
+				"--soft-breakpoints"
+			};
+
+			mono_jit_parse_options(2, (char**)argv);
+			mono_debug_init(MONO_DEBUG_FORMAT_MONO);
+		}
+
 		MonoDomain* rootDomain = mono_jit_init("RealEngineJITRuntime");
 		RE_CORE_ASSERT(rootDomain);
 
 		// Store the root domain pointer
 		s_Data->RootDomain = rootDomain;
+
+		if (s_Data->EnableDebugging)
+			mono_debug_domain_create(s_Data->RootDomain);
+
+		mono_thread_set_main(mono_thread_current());
 	}
 
 	void ScriptEngine::ShutdownMono() {
@@ -197,7 +229,7 @@ namespace RealEngine {
 		mono_domain_set(s_Data->AppDomain, true);
 
 		// Move this maybe
-		s_Data->CoreAssembly = Utils::LoadMonoAssembly(filepath);
+		s_Data->CoreAssembly = Utils::LoadMonoAssembly(filepath, s_Data->EnableDebugging);
 		s_Data->CoreAssemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
 		//Utils::PrintAssemblyTypes(s_Data->CoreAssembly);
 	}
@@ -205,7 +237,7 @@ namespace RealEngine {
 	void ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath) {
 		// Move this maybe
 		s_Data->AppAssemblyFilepath = filepath;
-		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath);
+		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath, s_Data->EnableDebugging);
 		s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
 		// Utils::PrintAssemblyTypes(s_Data->AppAssembly);
 
@@ -385,7 +417,8 @@ namespace RealEngine {
 	}
 
 	MonoObject* ScriptClass::InvokeMethod(MonoObject* instance, MonoMethod* method, void** params) {
-		return mono_runtime_invoke(method, instance, params, nullptr);
+		MonoObject* exception = nullptr;
+		return mono_runtime_invoke(method, instance, params, &exception);
 	}
 
 	ScriptInstance::ScriptInstance(Ref<ScriptClass> scriptClass, Entity entity)

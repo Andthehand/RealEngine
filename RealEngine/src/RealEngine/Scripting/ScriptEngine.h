@@ -70,9 +70,6 @@ namespace RealEngine {
 	public:
 		ScriptClass() = default;
 		ScriptClass(const std::string& classNamespace, const std::string& className, bool isCore = false);
-		ScriptClass(const ScriptClass&) {
-			RE_ASSERT(false);
-		}
 
 		MonoObject* Instantiate();
 		MonoMethod* GetMethod(const std::string& name, int parameterCount);
