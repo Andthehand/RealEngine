@@ -13,10 +13,8 @@
 #include "implot.h"
 
 namespace RealEngine {
-	extern const std::filesystem::path g_AssetPath;
-
     EditorLayer::EditorLayer() 
-		: Layer("EditorLayer"), m_CameraController((float)RealEngine::Application::Get().GetWindow().GetWidth() / (float)RealEngine::Application::Get().GetWindow().GetHeight()) { }
+		: Layer("EditorLayer") { }
 
     void EditorLayer::OnAttach() {
         RE_PROFILE_FUNCTION();
@@ -38,8 +36,16 @@ namespace RealEngine {
 
 		auto commandLineArgs = Application::Get().GetSpecification().CommandLineArgs;
 		if (commandLineArgs.Count > 1) {
-			auto sceneFilePath = commandLineArgs[1];
-			OpenScene(sceneFilePath);
+			auto projectFilePath = commandLineArgs[1];
+			OpenProject(projectFilePath);
+		}
+		else {
+			// NewProject();
+
+			// If no project is opened, close Hazelnut
+			// NOTE: this is while we don't have a new project path
+			if (!OpenProject())
+				Application::Get().Close();
 		}
 
 		m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.01f, 1000.0f);
@@ -79,9 +85,6 @@ namespace RealEngine {
 
 		switch (m_SceneState) {
 			case SceneState::Edit: {
-				if (m_ViewportFocused)
-					m_CameraController.OnUpdate(ts);
-
 				m_EditorCamera.OnUpdate(ts);
 
 				m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
@@ -169,31 +172,27 @@ namespace RealEngine {
 
 		if (ImGui::BeginMenuBar()) {
 			if (ImGui::BeginMenu("File")) {
-				// Disabling fullscreen would allow the window to be moved to the front of other windows, 
-				// which we can't undo at the moment without finer window depth/z control.
-				//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
+				if (ImGui::MenuItem("Open Project...", "Ctrl+O"))
+					OpenProject();
 
-				if (ImGui::MenuItem("New", "Ctrl+N")) {
+				ImGui::Separator();
+
+				if (ImGui::MenuItem("New Scene", "Ctrl+N"))
 					NewScene();
-				}
 
-				if (ImGui::MenuItem("Open...", "Ctrl+O")) {
-					OpenScene();
-				}
-
-				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S")) {
+				if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S"))
 					SaveSceneAs();
-				}
 
-				if (ImGui::MenuItem("Save", "Ctrl+S")) {
+				ImGui::Separator();
+
+				if (ImGui::MenuItem("Open...", "Ctrl+O"))
+					OpenScene();
+
+				if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
 					SaveScene();
-				}
 
-				if (ImGui::MenuItem("Add 100000 squares")) {
-					for (int i = 0; i < 100000; i++) {
-						m_ActiveScene->CreateEntity("Square").AddComponent<SpriteRendererComponent>();
-					}
-				}
+				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S")) 
+					SaveSceneAs();
 
 				if (ImGui::MenuItem("Exit"))
 					Application::Get().Close();
@@ -212,7 +211,7 @@ namespace RealEngine {
 		}
 
 		m_SceneHierarchyPanel.OnImGuiRender();
-		m_ContentBrowserPanel.OnImGuiRender();
+		m_ContentBrowserPanel->OnImGuiRender();
 
 		ImGui::Begin("Stats");
 
@@ -286,12 +285,12 @@ namespace RealEngine {
 
 		if (ImGui::BeginDragDropTarget()) {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_SCENE")) {
-				std::filesystem::path path = std::filesystem::path(g_AssetPath) / (const wchar_t*)payload->Data;
+				std::filesystem::path path = (const wchar_t*)payload->Data;
 					
 				OpenScene(path);
 			}
 			else if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_IMAGE")) {
-				std::filesystem::path path = std::filesystem::path(g_AssetPath) / (const wchar_t*)payload->Data;
+				std::filesystem::path path = (const wchar_t*)payload->Data;
 					
 				if (m_HoveredEntity && m_HoveredEntity.HasComponent<SpriteRendererComponent>())
 					m_HoveredEntity.GetComponent<SpriteRendererComponent>().Texture = Texture2D::Create(path);
@@ -435,7 +434,7 @@ namespace RealEngine {
 			case Key::N: {
 				if (control)
 					//Ctrl+N
-					NewScene();
+					OpenProject();
 				break;
 			}
 
@@ -591,6 +590,30 @@ namespace RealEngine {
 		Renderer2D::EndScene();
 	}
 
+	void EditorLayer::NewProject() {
+		Project::New();
+	}
+
+	bool EditorLayer::OpenProject() {
+		std::string filepath = FileDialogs::OpenFile("RealEngine Project (*.realproj)\0*.realproj\0");
+		if (filepath.empty())
+			return false;
+
+		OpenProject(filepath);
+		return true;
+	}
+
+	void EditorLayer::OpenProject(const std::filesystem::path& path) {
+		if (Project::Load(path)) {
+			auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActive()->GetConfig().StartScene);
+			OpenScene(startScenePath);
+			m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
+		}
+	}
+
+	void EditorLayer::SaveProject() {
+		// Project::SaveActive();
+	}
 
 	void EditorLayer::NewScene() {
 		if (m_SceneState != SceneState::Edit)

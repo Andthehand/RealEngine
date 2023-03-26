@@ -18,6 +18,8 @@
 #include "RealEngine/Scene/ScriptableEntity.h"
 #include "RealEngine/Scene/Components.h"
 
+#include "RealEngine/Project/Project.h"
+
 #include "RealEngine/Utils/Threads/JobQueue.h"
 
 // ---Renderer------------------------

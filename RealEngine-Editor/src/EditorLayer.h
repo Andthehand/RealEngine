@@ -22,6 +22,11 @@ namespace RealEngine {
 
 		void OnOverlayRender();
 
+		void NewProject();
+		bool OpenProject();
+		void OpenProject(const std::filesystem::path& path);
+		void SaveProject();
+
 		void NewScene();
 		void OpenScene();
 		void OpenScene(const std::filesystem::path& path);
@@ -40,8 +45,6 @@ namespace RealEngine {
 		// UI Panels
 		void UI_Toolbar();
 	private:
-		RealEngine::OrthographicCameraController m_CameraController;
-
 		Ref<RealEngine::Framebuffer> m_Framebuffer;
 
 		Ref<Scene> m_ActiveScene;
@@ -71,7 +74,7 @@ namespace RealEngine {
 
 		//Panels
 		SceneHierarchyPanel m_SceneHierarchyPanel;
-		ContentBrowserPanel m_ContentBrowserPanel;
+		Scope<ContentBrowserPanel> m_ContentBrowserPanel;
 
 		// Editor resources
 		Ref<Texture2D> m_IconPlay, m_IconPause, m_IconStep, m_IconSimulate, m_IconStop;

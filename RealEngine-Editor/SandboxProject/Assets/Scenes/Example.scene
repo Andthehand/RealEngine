@@ -20,7 +20,7 @@ Entities:
       Scale: [1, 1, 1]
     SpriteRendererComponent:
       Color: [0, 1, 0, 1]
-      TexturePath: D:\RealEngine\RealEngine-Editor\assets\textures\Checkerboard.png
+      TexturePath: Textures\Checkerboard.png
       TilingFactor: 1
   - Entity: 8810558651042546670
     TagComponent:

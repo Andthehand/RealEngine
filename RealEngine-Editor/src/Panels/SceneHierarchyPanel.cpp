@@ -17,13 +17,12 @@
 #include "RealEngine/Scene/SceneCamera.h"
 
 #include "RealEngine/Scripting/ScriptEngine.h"
+#include "RealEngine/UI/UI.h"
 
 #include "RealEngine/Utils/PlatformUtils.h"
 
 
 namespace RealEngine {
-	extern const std::filesystem::path g_AssetPath;
-
 	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& context) {
 		SetContext(context);
 	}
@@ -330,11 +329,12 @@ namespace RealEngine {
 			static char buffer[64];
 			strcpy_s(buffer, sizeof(buffer), component.ClassName.c_str());
 
-			if (!scriptClassExists)
-				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f));
+			UI::ScopedStyleColor textColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f), !scriptClassExists);
 
-			if (ImGui::InputText("Class", buffer, sizeof(buffer)))
+			if (ImGui::InputText("Class", buffer, sizeof(buffer))) {
 				component.ClassName = buffer;
+				return;
+			}
 
 			// Fields
 			bool sceneRunning = scene->IsRunning();
@@ -384,11 +384,7 @@ namespace RealEngine {
 					}
 				}
 			}
-
-			if (!scriptClassExists)
-				ImGui::PopStyleColor();
 		});
-
 
 		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component) {
 			ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
@@ -402,7 +398,7 @@ namespace RealEngine {
 			if (ImGui::BeginDragDropTarget()) {
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_IMAGE")) {
 					const wchar_t* path = (const wchar_t*)payload->Data;
-					std::filesystem::path texturePath = std::filesystem::path(g_AssetPath) / path;
+					std::filesystem::path texturePath(path);
 					component.Texture = Texture2D::Create(texturePath.string());
 				}
 				ImGui::EndDragDropTarget();

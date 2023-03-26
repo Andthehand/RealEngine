@@ -37,7 +37,7 @@ project "RealEngine-Editor"
 		symbols "on"
 
 		debugargs { 
-			"assets\\scenes\\Physics2D.scene" 
+			"SandboxProject\\Sandbox.realproj" 
 		}
 
 	filter "configurations:Release"

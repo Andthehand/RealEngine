@@ -1,14 +1,16 @@
 #include "repch.h"
 #include "SceneSerializer.h"
 
-#include <fstream>
-
-#include <yaml-cpp/yaml.h>
-
 #include "Entity.h"
 #include "Components.h"
 #include "RealEngine/Scripting/ScriptEngine.h"
 #include "RealEngine/Core/UUID.h"
+
+#include "RealEngine/Project/Project.h"
+
+#include <fstream>
+
+#include <yaml-cpp/yaml.h>
 
 namespace YAML {
 	template<>
@@ -458,8 +460,11 @@ namespace RealEngine {
 				if (spriteRendererComponent) {
 					auto& src = deserializedEntity.AddComponent<SpriteRendererComponent>();
 					src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
-					if (spriteRendererComponent["TexturePath"])
-						src.Texture = Texture2D::Create(spriteRendererComponent["TexturePath"].as<std::string>());
+					if (spriteRendererComponent["TexturePath"]) {
+						std::string texturePath = spriteRendererComponent["TexturePath"].as<std::string>();
+						auto path = Project::GetAssetFileSystemPath(texturePath);
+						src.Texture = Texture2D::Create(path.string());
+					}
 
 					if (spriteRendererComponent["TilingFactor"])
 						src.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();
