@@ -3,6 +3,19 @@ using System.Runtime.CompilerServices;
 
 namespace RealEngine {
 	public static class InternalCalls {
+		//Logging
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void NativeLog(string text);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void NativeLog_ULong(ulong parameter, string format);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void NativeLog_Vector2(ref Vector2 parameter, string format);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void NativeLog_Vector3(ref Vector3 parameter, string format);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void NativeLog_Vector4(ref Vector4 parameter, string format);
+		//Logging
+
 		// Entity
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool Entity_HasComponent(ulong entityID, Type componentType);
@@ -17,7 +30,26 @@ namespace RealEngine {
 		internal extern static void SpriteRendererComponent_GetColor(ulong entityID, out Color color);
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static void SpriteRendererComponent_SetColor(ulong entityID, ref Color color);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static float SpriteRendererComponent_GetTilingFactor(ulong entityID);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void SpriteRendererComponent_SetTilingFactor(ulong entityID, float tilingFactor);
 		// SpriteRendererComponent
+
+		// CircleRendererComponent
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void CircleRendererComponent_GetColor(ulong entityID, out Color color);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void CircleRendererComponent_SetColor(ulong entityID, ref Color color);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static float CircleRendererComponent_GetThickness(ulong entityID);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void CircleRendererComponent_SetThickness(ulong entityID, float thickness);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static float CircleRendererComponent_GetFade(ulong entityID);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void CircleRendererComponent_SetFade(ulong entityID, float fade);
+		// CircleRendererComponent
 
 		// TransformComponent
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]

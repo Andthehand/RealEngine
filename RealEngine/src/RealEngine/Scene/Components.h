@@ -84,20 +84,6 @@ namespace RealEngine {
 		ScriptComponent() = default;
 		ScriptComponent(const ScriptComponent&) = default;
 	};
-	
-	class ScriptableEntity;
-	struct NativeScriptComponent {
-		ScriptableEntity* Instance = nullptr;
-
-		ScriptableEntity*(*InstantiateScript)();
-		void(*DestroyScript)(NativeScriptComponent*);
-
-		template<typename T>
-		void Bind() {
-			InstantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
-			DestroyScript = [](NativeScriptComponent* nsc) { delete nsc->Instance; nsc->Instance = nullptr; };
-		}
-	};
 
 	// Physics
 	struct Rigidbody2DComponent {
@@ -150,6 +136,6 @@ namespace RealEngine {
 
 	using AllComponents =
 		ComponentGroup<TransformComponent, SpriteRendererComponent, CircleRendererComponent,
-		CameraComponent, NativeScriptComponent, ScriptComponent,
+		CameraComponent, ScriptComponent,
 		Rigidbody2DComponent, BoxCollider2DComponent, CircleCollider2DComponent>;
 }

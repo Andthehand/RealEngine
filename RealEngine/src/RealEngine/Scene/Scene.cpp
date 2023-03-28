@@ -146,17 +146,6 @@ namespace RealEngine {
 					Entity entity = { e, this };
 					ScriptEngine::OnUpdateEntity(entity, ts);
 				}
-
-				m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc) {
-					// TODO: Move to Scene::OnScenePlay
-					if (!nsc.Instance) {
-						nsc.Instance = nsc.InstantiateScript();
-						nsc.Instance->m_Entity = Entity{ entity, this };
-						nsc.Instance->OnCreate();
-					}
-
-					nsc.Instance->OnUpdate(ts);
-				});
 			}
 
 			// Physics
@@ -434,10 +423,6 @@ namespace RealEngine {
 
 	template<>
 	void Scene::OnComponentAdded<CircleRendererComponent>(Entity entity, CircleRendererComponent& component) {
-	}
-
-	template<>
-	void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component) {
 	}
 
 	template<>

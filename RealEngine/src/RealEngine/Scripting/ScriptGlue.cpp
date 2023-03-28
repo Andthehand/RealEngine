@@ -21,21 +21,39 @@ namespace RealEngine {
 
 #define RE_ADD_INTERNAL_CALL(Name) mono_add_internal_call("RealEngine.InternalCalls::" #Name, Name)
 
-	static void NativeLog(MonoString* string, int parameter) {
-		char* cStr = mono_string_to_utf8(string);
+	static void NativeLog(MonoString* text) {
+		char* cStr = mono_string_to_utf8(text);
 		std::string str(cStr);
 		mono_free(cStr);
-		std::cout << str << ", " << parameter << std::endl;
+		RE_CORE_WARN(str);
 	}
 
-	static void NativeLog_Vector(glm::vec3* parameter, glm::vec3* outResult) {
-		RE_CORE_WARN("Value: {0}", glm::to_string(*parameter));
-		*outResult = glm::normalize(*parameter);
+	static void NativeLog_ULong(uint64_t parameter, MonoString* format) {
+		char* cStr = mono_string_to_utf8(format);
+		std::string str(cStr);
+		mono_free(cStr);
+		RE_CORE_WARN(str, parameter);
 	}
 
-	static float NativeLog_VectorDot(glm::vec3* parameter) {
-		RE_CORE_WARN("Value: {0}", glm::to_string(*parameter));
-		return glm::dot(*parameter, *parameter);
+	static void NativeLog_Vector2(glm::vec2* parameter, MonoString* format) {
+		char* cStr = mono_string_to_utf8(format);
+		std::string str(cStr);
+		mono_free(cStr);
+		RE_CORE_WARN(str, glm::to_string(*parameter));
+	}
+
+	static void NativeLog_Vector3(glm::vec3* parameter, MonoString* format) {
+		char* cStr = mono_string_to_utf8(format);
+		std::string str(cStr);
+		mono_free(cStr);
+		RE_CORE_WARN(str, glm::to_string(*parameter));
+	}
+
+	static void NativeLog_Vector4(glm::vec4* parameter, MonoString* format) {
+		char* cStr = mono_string_to_utf8(format);
+		std::string str(cStr);
+		mono_free(cStr);
+		RE_CORE_WARN(str, glm::to_string(*parameter));
 	}
 
 	static MonoObject* GetScriptInstance(UUID entityID) {
@@ -100,9 +118,79 @@ namespace RealEngine {
 		Entity entity = scene->GetEntityByUUID(entityID);
 		RE_CORE_ASSERT(entity);
 
-		SpriteRendererComponent& s = entity.GetComponent<SpriteRendererComponent>();
-
 		entity.GetComponent<SpriteRendererComponent>().Color = *color;
+	}
+
+	static float SpriteRendererComponent_GetTilingFactor(UUID entityID) {
+		Scene* scene = ScriptEngine::GetSceneContext();
+		RE_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		RE_CORE_ASSERT(entity);
+
+		return entity.GetComponent<SpriteRendererComponent>().TilingFactor;
+	}
+
+	static void SpriteRendererComponent_SetTilingFactor(UUID entityID, float tilingFactor) {
+		Scene* scene = ScriptEngine::GetSceneContext();
+		RE_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		RE_CORE_ASSERT(entity);
+
+		entity.GetComponent<SpriteRendererComponent>().TilingFactor = tilingFactor;
+	}
+
+	static void CircleRendererComponent_GetColor(UUID entityID, glm::vec4* outColor) {
+		Scene* scene = ScriptEngine::GetSceneContext();
+		RE_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		RE_CORE_ASSERT(entity);
+
+		*outColor = entity.GetComponent<CircleRendererComponent>().Color;
+	}
+
+	static void CircleRendererComponent_SetColor(UUID entityID, glm::vec4* color) {
+		Scene* scene = ScriptEngine::GetSceneContext();
+		RE_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		RE_CORE_ASSERT(entity);
+
+		entity.GetComponent<CircleRendererComponent>().Color = *color;
+	}
+
+	static float CircleRendererComponent_GetThickness(UUID entityID) {
+		Scene* scene = ScriptEngine::GetSceneContext();
+		RE_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		RE_CORE_ASSERT(entity);
+
+		return entity.GetComponent<CircleRendererComponent>().Thickness;
+	}
+
+	static void CircleRendererComponent_SetThickness(UUID entityID, float thickness) {
+		Scene* scene = ScriptEngine::GetSceneContext();
+		RE_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		RE_CORE_ASSERT(entity);
+
+		entity.GetComponent<CircleRendererComponent>().Thickness = thickness;
+	}
+
+	static float CircleRendererComponent_GetFade(UUID entityID) {
+		Scene* scene = ScriptEngine::GetSceneContext();
+		RE_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		RE_CORE_ASSERT(entity);
+
+		return entity.GetComponent<CircleRendererComponent>().Fade;
+	}
+
+	static void CircleRendererComponent_SetFade(UUID entityID, float fade) {
+		Scene* scene = ScriptEngine::GetSceneContext();
+		RE_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		RE_CORE_ASSERT(entity);
+
+		entity.GetComponent<CircleRendererComponent>().Fade = fade;
 	}
 
 	static void Rigidbody2DComponent_ApplyLinearImpulse(UUID entityID, glm::vec2* impulse, glm::vec2* point, bool wake) {
@@ -194,8 +282,10 @@ namespace RealEngine {
 
 	void ScriptGlue::RegisterFunctions() {
 		RE_ADD_INTERNAL_CALL(NativeLog);
-		RE_ADD_INTERNAL_CALL(NativeLog_Vector);
-		RE_ADD_INTERNAL_CALL(NativeLog_VectorDot);
+		RE_ADD_INTERNAL_CALL(NativeLog_ULong);
+		RE_ADD_INTERNAL_CALL(NativeLog_Vector2);
+		RE_ADD_INTERNAL_CALL(NativeLog_Vector3);
+		RE_ADD_INTERNAL_CALL(NativeLog_Vector4);
 
 		RE_ADD_INTERNAL_CALL(GetScriptInstance);
 
@@ -207,6 +297,15 @@ namespace RealEngine {
 
 		RE_ADD_INTERNAL_CALL(SpriteRendererComponent_GetColor);
 		RE_ADD_INTERNAL_CALL(SpriteRendererComponent_SetColor);
+		RE_ADD_INTERNAL_CALL(SpriteRendererComponent_GetTilingFactor);
+		RE_ADD_INTERNAL_CALL(SpriteRendererComponent_SetTilingFactor);
+
+		RE_ADD_INTERNAL_CALL(CircleRendererComponent_GetColor);
+		RE_ADD_INTERNAL_CALL(CircleRendererComponent_SetColor);
+		RE_ADD_INTERNAL_CALL(CircleRendererComponent_GetThickness);
+		RE_ADD_INTERNAL_CALL(CircleRendererComponent_SetThickness);
+		RE_ADD_INTERNAL_CALL(CircleRendererComponent_GetFade);
+		RE_ADD_INTERNAL_CALL(CircleRendererComponent_SetFade);
 
 		RE_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulse);
 		RE_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulseToCenter);

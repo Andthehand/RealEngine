@@ -16,7 +16,6 @@
 #include "RealEngine/Scene/Components.h"
 #include "RealEngine/Scene/SceneCamera.h"
 
-
 #include "RealEngine/Scripting/ScriptEngine.h"
 #include "RealEngine/UI/UI.h"
 
@@ -86,8 +85,20 @@ namespace RealEngine {
 		ImGuiTreeNodeFlags flags = ((m_SelectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
 		flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
 		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
-		if (ImGui::IsItemClicked()) {
-			m_SelectionContext = entity;
+		if (ImGui::BeginDragDropSource()) {
+			//This is the payload
+			uint64_t id = entity.GetUUID();
+			ImGui::SetDragDropPayload("CONTENT_BROWSER_ENTITY", &id, sizeof(uint64_t));
+
+			//Thumbnail
+			ImGui::Text(entity.GetName().c_str());
+
+			ImGui::EndDragDropSource();
+		}
+
+		if (ImGui::IsMouseReleased(0)) {
+			if(ImGui::IsItemHovered())
+				m_SelectionContext = entity;
 		}
 
 		bool entityDeleted = false;
@@ -176,9 +187,7 @@ namespace RealEngine {
 		ImGui::Columns(1);
 
 		ImGui::PopID();
-	}
-
-	
+	}	
 
 	//For some weird fricken reason I can't move this to be a private variable 
 	//because the application crashes when I try to delete the layers on close
@@ -492,9 +501,10 @@ namespace RealEngine {
 								}
 								case ScriptFieldType::Color: {
 									glm::vec4 data = scriptField.GetValue<glm::vec4>() / glm::vec4(255.0f);
-									if (ImGui::ColorEdit4(name.c_str(), glm::value_ptr(data)))
+									if (ImGui::ColorEdit4(name.c_str(), glm::value_ptr(data))) {
 										data *= 255.0f;
 										scriptField.SetValue(data);
+									}
 									break;
 								}
 							}

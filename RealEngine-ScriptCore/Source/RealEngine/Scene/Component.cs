@@ -20,9 +20,40 @@ namespace RealEngine {
 				InternalCalls.SpriteRendererComponent_SetColor(Entity.ID, ref outColor);
 			}
 		}
+
+		float TilingFactor {
+			get => InternalCalls.SpriteRendererComponent_GetTilingFactor(Entity.ID);
+			set => InternalCalls.SpriteRendererComponent_SetTilingFactor(Entity.ID, value);
+		}
 	}
 
-	public class TransformComponent : Component {
+	public class CircleRendererComponent : Component {
+		public Color Color {
+			get {
+				InternalCalls.CircleRendererComponent_GetColor(Entity.ID, out Color color);
+				return color * 255.0f;
+			}
+			set {
+				Color outColor = value / 255.0f;
+				InternalCalls.CircleRendererComponent_SetColor(Entity.ID, ref outColor);
+			}
+		}
+
+		public float Thickness {
+			get => InternalCalls.CircleRendererComponent_GetThickness(Entity.ID);
+			set => InternalCalls.CircleRendererComponent_SetThickness(Entity.ID, value);
+		}
+
+		public float Fade {
+			get => InternalCalls.CircleRendererComponent_GetFade(Entity.ID);
+			set => InternalCalls.CircleRendererComponent_SetFade(Entity.ID, value);
+		}
+	}
+
+	public class ScriptComponent : Component {
+	}
+
+		public class TransformComponent : Component {
 	public Vector3 Translation {
 			get {
 				InternalCalls.TransformComponent_GetTranslation(Entity.ID, out Vector3 translation);

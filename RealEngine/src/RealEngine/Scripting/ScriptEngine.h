@@ -20,7 +20,7 @@ namespace RealEngine {
 	enum class ScriptFieldType {
 		None = 0,
 		Float, Double,
-		Bool, Char, Byte, Short, Int, Long,
+		Bool, String, Char, Byte, Short, Int, Long,
 		UByte, UShort, UInt, ULong,
 		Vector2, Vector3, Vector4,
 		Color,
@@ -175,6 +175,7 @@ namespace RealEngine {
 				case ScriptFieldType::Double:  return "Double";
 				case ScriptFieldType::Bool:    return "Bool";
 				case ScriptFieldType::Char:    return "Char";
+				case ScriptFieldType::String:  return "String";
 				case ScriptFieldType::Byte:    return "Byte";
 				case ScriptFieldType::Short:   return "Short";
 				case ScriptFieldType::Int:     return "Int";
@@ -187,7 +188,7 @@ namespace RealEngine {
 				case ScriptFieldType::Vector3: return "Vector3";
 				case ScriptFieldType::Vector4: return "Vector4";
 				case ScriptFieldType::Entity:  return "Entity";
-				case ScriptFieldType::Color:  return "Color";
+				case ScriptFieldType::Color:   return "Color";
 			}
 			RE_CORE_ASSERT(false, "Unknown ScriptFieldType");
 			return "None";
@@ -199,6 +200,7 @@ namespace RealEngine {
 			if (fieldType == "Double")  return ScriptFieldType::Double;
 			if (fieldType == "Bool")    return ScriptFieldType::Bool;
 			if (fieldType == "Char")    return ScriptFieldType::Char;
+			if (fieldType == "String")  return ScriptFieldType::String;
 			if (fieldType == "Byte")    return ScriptFieldType::Byte;
 			if (fieldType == "Short")   return ScriptFieldType::Short;
 			if (fieldType == "Int")     return ScriptFieldType::Int;
