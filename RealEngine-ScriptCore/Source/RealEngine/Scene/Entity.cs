@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime;
 
 namespace RealEngine {
 	public class Entity {
@@ -39,6 +40,10 @@ namespace RealEngine {
 				return null;
 
 			return new Entity(entityID);
+		}
+
+		public Entity Instantiate(Entity entity, ref Vector3 translation) {
+			return new Entity(InternalCalls.Entity_InstantiateWithTranslation(entity.ID, ref translation));
 		}
 
 		public T As<T>() where T : Entity, new() {

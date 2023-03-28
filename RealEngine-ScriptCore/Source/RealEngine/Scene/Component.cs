@@ -53,8 +53,8 @@ namespace RealEngine {
 	public class ScriptComponent : Component {
 	}
 
-		public class TransformComponent : Component {
-	public Vector3 Translation {
+	public class TransformComponent : Component {
+		public Vector3 Translation {
 			get {
 				InternalCalls.TransformComponent_GetTranslation(Entity.ID, out Vector3 translation);
 				return translation;

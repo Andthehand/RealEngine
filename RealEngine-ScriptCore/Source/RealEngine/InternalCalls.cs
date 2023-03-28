@@ -22,6 +22,8 @@ namespace RealEngine {
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static ulong Entity_FindEntityByName(string name);
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static ulong Entity_InstantiateWithTranslation(ulong entityID, ref Vector3 translation);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static object GetScriptInstance(ulong entityID);
 		// Entity
 

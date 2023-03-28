@@ -25,35 +25,35 @@ namespace RealEngine {
 		char* cStr = mono_string_to_utf8(text);
 		std::string str(cStr);
 		mono_free(cStr);
-		RE_CORE_WARN(str);
+		RE_WARN(str);
 	}
 
 	static void NativeLog_ULong(uint64_t parameter, MonoString* format) {
 		char* cStr = mono_string_to_utf8(format);
 		std::string str(cStr);
 		mono_free(cStr);
-		RE_CORE_WARN(str, parameter);
+		RE_WARN(str, parameter);
 	}
 
 	static void NativeLog_Vector2(glm::vec2* parameter, MonoString* format) {
 		char* cStr = mono_string_to_utf8(format);
 		std::string str(cStr);
 		mono_free(cStr);
-		RE_CORE_WARN(str, glm::to_string(*parameter));
+		RE_WARN(str, glm::to_string(*parameter));
 	}
 
 	static void NativeLog_Vector3(glm::vec3* parameter, MonoString* format) {
 		char* cStr = mono_string_to_utf8(format);
 		std::string str(cStr);
 		mono_free(cStr);
-		RE_CORE_WARN(str, glm::to_string(*parameter));
+		RE_WARN(str, glm::to_string(*parameter));
 	}
 
 	static void NativeLog_Vector4(glm::vec4* parameter, MonoString* format) {
 		char* cStr = mono_string_to_utf8(format);
 		std::string str(cStr);
 		mono_free(cStr);
-		RE_CORE_WARN(str, glm::to_string(*parameter));
+		RE_WARN(str, glm::to_string(*parameter));
 	}
 
 	static MonoObject* GetScriptInstance(UUID entityID) {
@@ -83,6 +83,21 @@ namespace RealEngine {
 			return 0;
 
 		return entity.GetUUID();
+	}
+
+	static uint64_t Entity_InstantiateWithTranslation(uint64_t entityID, glm::vec3 translation) {
+		Scene* scene = ScriptEngine::GetSceneContext();
+		RE_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		RE_CORE_ASSERT(entity);
+
+		if (!entity)
+			return 0;
+
+		Entity duplicate = scene->DuplicateEntity(entity);
+		duplicate.GetComponent<TransformComponent>().Translation = translation;
+		
+		return duplicate.GetUUID();
 	}
 
 	static void TransformComponent_GetTranslation(UUID entityID, glm::vec3* outTranslation) {
@@ -262,7 +277,7 @@ namespace RealEngine {
 			std::string managedTypename = fmt::format("RealEngine.{}", structName);
 
 			MonoType* managedType = mono_reflection_type_from_name(managedTypename.data(), ScriptEngine::GetCoreAssemblyImage());
-			if (!managedType) {
+			if (!managedType) {	
 				RE_CORE_ERROR("Could not find component type {}", managedTypename);
 				return;
 			}
@@ -291,6 +306,7 @@ namespace RealEngine {
 
 		RE_ADD_INTERNAL_CALL(Entity_HasComponent);
 		RE_ADD_INTERNAL_CALL(Entity_FindEntityByName);
+		RE_ADD_INTERNAL_CALL(Entity_InstantiateWithTranslation);
 
 		RE_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
 		RE_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);
