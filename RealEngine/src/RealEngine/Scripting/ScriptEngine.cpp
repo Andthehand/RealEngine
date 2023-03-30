@@ -462,7 +462,16 @@ namespace RealEngine {
 			return false;
 
 		const ScriptField& field = it->second;
-		mono_field_get_value(m_Instance, field.ClassField, buffer);
+		if (field.Type == ScriptFieldType::Entity) {
+			//TODO: Make this better
+			MonoObject* entity = mono_field_get_value_object(s_Data->AppDomain, field.ClassField, m_Instance);
+			MonoClassField* entityClassField = s_Data->EntityClass.GetField("ID");
+
+			mono_field_get_value(entity, entityClassField, buffer);
+		}
+		else {
+			mono_field_get_value(m_Instance, field.ClassField, buffer);
+		}
 		return true;
 	}
 

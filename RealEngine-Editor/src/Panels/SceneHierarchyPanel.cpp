@@ -435,8 +435,14 @@ namespace RealEngine {
 								break;
 							}
 							case ScriptFieldType::Entity: {
-								uint64_t data = scriptInstance->GetFieldValue<uint64_t>(name);
-								ImGui::Button(name.c_str(), ImVec2(ImGui::CalcItemWidth(), 0));
+								Entity entt = scene->GetEntityByUUID(scriptInstance->GetFieldValue<UUID>(name));
+								std::string& enttName = name + ": ";
+								if (entt)
+									enttName += entt.GetComponent<TagComponent>().Tag;
+								else
+									enttName += "Entity Deleted";
+
+								ImGui::Button(enttName.c_str(), ImVec2(ImGui::CalcItemWidth(), 0));
 								if (ImGui::BeginDragDropTarget()) {
 									if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ENTITY")) {
 										uint64_t* id = (uint64_t*)payload->Data;
@@ -521,8 +527,14 @@ namespace RealEngine {
 									break;
 								}
 								case ScriptFieldType::Entity: {
-									uint64_t data = scriptField.GetValue<uint64_t>();
-									ImGui::Button(name.c_str(), ImVec2(ImGui::CalcItemWidth(), 0));
+									Entity entt = scene->GetEntityByUUID(scriptField.GetValue<UUID>());
+									std::string& enttName = name + ": ";
+									if (entt)
+										enttName += entt.GetComponent<TagComponent>().Tag;
+									else
+										enttName += "Entity Deleted";
+
+									ImGui::Button(enttName.c_str(), ImVec2(ImGui::CalcItemWidth(), 0));
 									if (ImGui::BeginDragDropTarget()) {
 										if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ENTITY")) {
 											uint64_t* id = (uint64_t*)payload->Data;
