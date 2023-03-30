@@ -124,6 +124,17 @@ namespace RealEngine {
 		}
 	}
 
+	static bool DrawButtonLabel(const std::string& buttonLabel, const std::string& textLabel) {
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4.0f, 0.0f));
+		
+		bool isPressed = ImGui::Button(buttonLabel.c_str(), ImVec2(ImGui::CalcItemWidth(), 0));
+		ImGui::SameLine();
+		ImGui::Text(textLabel.c_str());
+		ImGui::PopStyleVar();
+
+		return isPressed;
+	}
+
 	static void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f) {
 		ImGuiIO& io = ImGui::GetIO();
 		auto boldFont = io.Fonts->Fonts[0];
@@ -436,13 +447,13 @@ namespace RealEngine {
 							}
 							case ScriptFieldType::Entity: {
 								Entity entt = scene->GetEntityByUUID(scriptInstance->GetFieldValue<UUID>(name));
-								std::string& enttName = name + ": ";
+								std::string buttonLabel = "Entity: ";
 								if (entt)
-									enttName += entt.GetComponent<TagComponent>().Tag;
+									buttonLabel += entt.GetComponent<TagComponent>().Tag;
 								else
-									enttName += "Entity Deleted";
+									buttonLabel += "Entity Deleted";
 
-								ImGui::Button(enttName.c_str(), ImVec2(ImGui::CalcItemWidth(), 0));
+								DrawButtonLabel(buttonLabel, name);
 								if (ImGui::BeginDragDropTarget()) {
 									if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ENTITY")) {
 										uint64_t* id = (uint64_t*)payload->Data;
@@ -529,12 +540,13 @@ namespace RealEngine {
 								case ScriptFieldType::Entity: {
 									Entity entt = scene->GetEntityByUUID(scriptField.GetValue<UUID>());
 									std::string& enttName = name + ": ";
+									std::string buttonLabel = "Entity: ";
 									if (entt)
-										enttName += entt.GetComponent<TagComponent>().Tag;
+										buttonLabel += entt.GetComponent<TagComponent>().Tag;
 									else
-										enttName += "Entity Deleted";
+										buttonLabel += "Entity Deleted";
 
-									ImGui::Button(enttName.c_str(), ImVec2(ImGui::CalcItemWidth(), 0));
+									DrawButtonLabel(buttonLabel, name);
 									if (ImGui::BeginDragDropTarget()) {
 										if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ENTITY")) {
 											uint64_t* id = (uint64_t*)payload->Data;
@@ -634,7 +646,7 @@ namespace RealEngine {
 									break;
 								}
 								case ScriptFieldType::Entity: {
-									ImGui::Button(name.c_str(), ImVec2(ImGui::CalcItemWidth(), 0));
+									DrawButtonLabel("Entity: None", name);
 									if (ImGui::BeginDragDropTarget()) {
 										if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ENTITY")) {
 											ScriptFieldInstance& fieldInstance = entityFields[name];
