@@ -465,6 +465,8 @@ namespace RealEngine {
 		if (field.Type == ScriptFieldType::Entity) {
 			//TODO: Make this better
 			MonoObject* entity = mono_field_get_value_object(s_Data->AppDomain, field.ClassField, m_Instance);
+			if (!entity)
+				return false;	
 			MonoClassField* entityClassField = s_Data->EntityClass.GetField("ID");
 
 			mono_field_get_value(entity, entityClassField, buffer);
