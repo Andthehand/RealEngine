@@ -423,6 +423,10 @@ namespace RealEngine {
 		return mono_runtime_invoke(method, instance, params, &exception);
 	}
 
+	MonoClassField* ScriptClass::GetField(const char* name) {
+		return mono_class_get_field_from_name(m_MonoClass, name);
+	}
+
 	ScriptInstance::ScriptInstance(Ref<ScriptClass> scriptClass, Entity entity)
 		: m_ScriptClass(scriptClass) {
 		m_Instance = scriptClass->Instantiate();
@@ -469,7 +473,17 @@ namespace RealEngine {
 			return false;
 
 		const ScriptField& field = it->second;
-		mono_field_set_value(m_Instance, field.ClassField, (void*)value);
+		if (field.Type == ScriptFieldType::Entity) {
+			MonoObject* entityInstance = s_Data->EntityClass.Instantiate();
+			MonoClassField* entityClassField = s_Data->EntityClass.GetField("ID");
+
+			mono_field_set_value(entityInstance, entityClassField, (void*)value);
+
+			mono_field_set_value(m_Instance, field.ClassField, entityInstance);
+		}
+		else {
+			mono_field_set_value(m_Instance, field.ClassField, (void*)value);
+		}
 		return true;
 	}
 }

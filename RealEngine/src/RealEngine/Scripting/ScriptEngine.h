@@ -72,6 +72,7 @@ namespace RealEngine {
 		MonoMethod* GetMethod(const std::string& name, int parameterCount);
 		MonoObject* InvokeMethod(MonoObject* instance, MonoMethod* method, void** params = nullptr);
 
+		MonoClassField* GetField(const char* name);
 		const std::map<std::string, ScriptField>& GetFields() const { return m_Fields; }
 	private:
 		std::string m_ClassNamespace;

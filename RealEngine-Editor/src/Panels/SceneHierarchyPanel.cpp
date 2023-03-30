@@ -434,6 +434,19 @@ namespace RealEngine {
 								}
 								break;
 							}
+							case ScriptFieldType::Entity: {
+								uint64_t data = scriptInstance->GetFieldValue<uint64_t>(name);
+								ImGui::Button(name.c_str(), ImVec2(ImGui::CalcItemWidth(), 0));
+								if (ImGui::BeginDragDropTarget()) {
+									if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ENTITY")) {
+										uint64_t* id = (uint64_t*)payload->Data;
+
+										scriptInstance->SetFieldValue(name, *id);
+									}
+									ImGui::EndDragDropTarget();
+								}
+								break;
+							}
 						}
 					}
 				}
@@ -504,6 +517,19 @@ namespace RealEngine {
 									if (ImGui::ColorEdit4(name.c_str(), glm::value_ptr(data))) {
 										data *= 255.0f;
 										scriptField.SetValue(data);
+									}
+									break;
+								}
+								case ScriptFieldType::Entity: {
+									uint64_t data = scriptField.GetValue<uint64_t>();
+									ImGui::Button(name.c_str(), ImVec2(ImGui::CalcItemWidth(), 0));
+									if (ImGui::BeginDragDropTarget()) {
+										if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ENTITY")) {
+											uint64_t* id = (uint64_t*)payload->Data;
+											
+											scriptField.SetValue(*id);
+										}
+										ImGui::EndDragDropTarget();
 									}
 									break;
 								}
@@ -592,6 +618,19 @@ namespace RealEngine {
 										fieldInstance.Field = field;
 										data *= 255.0f;
 										fieldInstance.SetValue(data);
+									}
+									break;
+								}
+								case ScriptFieldType::Entity: {
+									ImGui::Button(name.c_str(), ImVec2(ImGui::CalcItemWidth(), 0));
+									if (ImGui::BeginDragDropTarget()) {
+										if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ENTITY")) {
+											ScriptFieldInstance& fieldInstance = entityFields[name];
+											uint64_t* id = (uint64_t*)payload->Data;
+											
+											fieldInstance.SetValue(*id);
+										}
+										ImGui::EndDragDropTarget();
 									}
 									break;
 								}
