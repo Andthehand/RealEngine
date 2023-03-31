@@ -1,8 +1,10 @@
 #pragma once
-#include <functional>
 
 #include "RealEngine/Debug/Instrumentor.h"
 #include "RealEngine/Core/Core.h"
+
+#include <functional>
+#include <sstream>
 
 namespace RealEngine {
 

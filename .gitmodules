@@ -28,3 +28,6 @@
 [submodule "RealEngine/vendor/imgui"]
 	path = RealEngine/vendor/imgui
 	url = https://github.com/TheCherno/imgui.git
+[submodule "RealEngine/vendor/optick"]
+	path = RealEngine/vendor/optick
+	url = https://github.com/Andthehand/optick.git

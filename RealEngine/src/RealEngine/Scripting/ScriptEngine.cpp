@@ -268,6 +268,8 @@ namespace RealEngine {
 	}
 
 	void ScriptEngine::OnCreateEntity(Entity entity) {
+		RE_PROFILE_FUNCTION();
+		
 		const auto& sc = entity.GetComponent<ScriptComponent>();
 		if (ScriptEngine::EntityClassExists(sc.ClassName)) {
 			UUID entityID = entity.GetUUID();
@@ -287,6 +289,8 @@ namespace RealEngine {
 	}
 
 	void ScriptEngine::OnUpdateEntity(Entity entity, Timestep ts) {
+		RE_PROFILE_FUNCTION();
+		
 		UUID entityUUID = entity.GetUUID();
 		if (s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end()) {
 			Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
@@ -302,6 +306,8 @@ namespace RealEngine {
 	}
 
 	Ref<ScriptInstance> ScriptEngine::GetEntityScriptInstance(UUID entityID) {
+		RE_PROFILE_FUNCTION();
+		
 		auto it = s_Data->EntityInstances.find(entityID);
 		if (it == s_Data->EntityInstances.end())
 			return nullptr;
@@ -310,6 +316,8 @@ namespace RealEngine {
 	}
 
 	Ref<ScriptClass> ScriptEngine::GetEntityClass(const std::string& name) {
+		RE_PROFILE_FUNCTION();
+		
 		if (s_Data->EntityClasses.find(name) == s_Data->EntityClasses.end())
 			return nullptr;
 
@@ -317,6 +325,8 @@ namespace RealEngine {
 	}
 
 	void ScriptEngine::OnRuntimeStop() {
+		RE_PROFILE_FUNCTION();
+		
 		s_Data->SceneContext = nullptr;
 
 		s_Data->EntityInstances.clear();
@@ -327,6 +337,8 @@ namespace RealEngine {
 	}
 
 	ScriptFieldMap& ScriptEngine::GetScriptFieldMap(Entity entity) {
+		RE_PROFILE_FUNCTION();
+		
 		RE_CORE_ASSERT(entity);
 
 		UUID entityID = entity.GetUUID();
@@ -334,6 +346,8 @@ namespace RealEngine {
 	}
 
 	void ScriptEngine::LoadAssemblyClasses() {
+		RE_PROFILE_FUNCTION();
+		
 		s_Data->EntityClasses.clear();
 
 		const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(s_Data->AppAssemblyImage, MONO_TABLE_TYPEDEF);
@@ -395,11 +409,15 @@ namespace RealEngine {
 	}
 
 	MonoObject* ScriptEngine::GetManagedInstance(UUID uuid) {
+		RE_PROFILE_FUNCTION();
+		
 		RE_CORE_ASSERT(s_Data->EntityInstances.find(uuid) != s_Data->EntityInstances.end());
 		return s_Data->EntityInstances.at(uuid)->GetManagedObject();
 	}
 
 	MonoObject* ScriptEngine::InstantiateClass(MonoClass* monoClass) {
+		RE_PROFILE_FUNCTION();
+	
 		MonoObject* instance = mono_object_new(s_Data->AppDomain, monoClass);
 		mono_runtime_object_init(instance);
 		return instance;
@@ -407,28 +425,40 @@ namespace RealEngine {
 
 	ScriptClass::ScriptClass(const std::string& classNamespace, const std::string& className, bool isCore)
 		: m_ClassNamespace(classNamespace), m_ClassName(className) {
+		RE_PROFILE_FUNCTION();
+		
 		m_MonoClass = mono_class_from_name(isCore ? s_Data->CoreAssemblyImage : s_Data->AppAssemblyImage, classNamespace.c_str(), className.c_str());
 	}
 
 	MonoObject* ScriptClass::Instantiate() {
+		RE_PROFILE_FUNCTION();
+	
 		return ScriptEngine::InstantiateClass(m_MonoClass);
 	}
 
 	MonoMethod* ScriptClass::GetMethod(const std::string& name, int parameterCount) {
+		RE_PROFILE_FUNCTION();
+		
 		return mono_class_get_method_from_name(m_MonoClass, name.c_str(), parameterCount);
 	}
 
 	MonoObject* ScriptClass::InvokeMethod(MonoObject* instance, MonoMethod* method, void** params) {
+		RE_PROFILE_FUNCTION();
+	
 		MonoObject* exception = nullptr;
 		return mono_runtime_invoke(method, instance, params, &exception);
 	}
 
 	MonoClassField* ScriptClass::GetField(const char* name) {
+		RE_PROFILE_FUNCTION();
+		
 		return mono_class_get_field_from_name(m_MonoClass, name);
 	}
 
 	ScriptInstance::ScriptInstance(Ref<ScriptClass> scriptClass, Entity entity)
 		: m_ScriptClass(scriptClass) {
+		RE_PROFILE_FUNCTION();
+	
 		m_Instance = scriptClass->Instantiate();
 
 		m_Constructor = s_Data->EntityClass.GetMethod(".ctor", 1);
@@ -444,11 +474,15 @@ namespace RealEngine {
 	}
 
 	void ScriptInstance::InvokeOnCreate() {
+		RE_PROFILE_FUNCTION();
+		
 		if (m_OnCreateMethod)
 			m_ScriptClass->InvokeMethod(m_Instance, m_OnCreateMethod);
 	}
 
 	void ScriptInstance::InvokeOnUpdate(float ts) {
+		RE_PROFILE_FUNCTION();
+
 		if (m_OnUpdateMethod) {
 			void* param = &ts;
 			m_ScriptClass->InvokeMethod(m_Instance, m_OnUpdateMethod, &param);
@@ -456,6 +490,8 @@ namespace RealEngine {
 	}
 
 	bool ScriptInstance::GetFieldValueInternal(const std::string& name, void* buffer) {
+		RE_PROFILE_FUNCTION();
+	
 		const auto& fields = m_ScriptClass->GetFields();
 		auto it = fields.find(name);
 		if (it == fields.end())
@@ -478,6 +514,8 @@ namespace RealEngine {
 	}
 
 	bool ScriptInstance::SetFieldValueInternal(const std::string& name, const void* value) {
+		RE_PROFILE_FUNCTION();
+	
 		const auto& fields = m_ScriptClass->GetFields();
 		auto it = fields.find(name);
 		if (it == fields.end())

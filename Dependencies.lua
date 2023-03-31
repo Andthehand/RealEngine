@@ -17,11 +17,13 @@ IncludeDir["entt"] = "%{wks.location}/RealEngine/vendor/entt/include"
 IncludeDir["mono"] = "%{wks.location}/RealEngine/vendor/mono/include"
 IncludeDir["shaderc"] = "%{wks.location}/RealEngine/vendor/shaderc/include"
 IncludeDir["SPIRV_Cross"] = "%{wks.location}/RealEngine/vendor/SPIRV-Cross"
+IncludeDir["optick"] = "%{wks.location}/RealEngine/vendor/optick/src"
 IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
 
 LibraryDir = {}
 
 LibraryDir["VulkanSDK"] = "%{VULKAN_SDK}/Lib"
+LibraryDir["optick"] = "%{wks.location}/RealEngine/vendor/optick/lib/x64"
 LibraryDir["mono"] = "%{wks.location}/RealEngine/vendor/mono/lib/%{cfg.buildcfg}"
 
 Library = {}

@@ -43,6 +43,7 @@ project "RealEngine"
 		"%{IncludeDir.filewatch}",
 		"%{IncludeDir.ImGuizmo}",
 		"%{IncludeDir.ImPlot}",
+		"%{IncludeDir.optick}",
 		"%{IncludeDir.VulkanSDK}"
 	}
 
@@ -52,6 +53,7 @@ project "RealEngine"
 		"Glad",
 		"ImGui",
 		"yaml-cpp",
+		"optick",
 		"opengl32.lib",
 
 		"%{Library.mono}"

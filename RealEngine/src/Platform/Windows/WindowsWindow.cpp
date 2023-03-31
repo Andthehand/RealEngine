@@ -67,26 +67,29 @@ namespace RealEngine {
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(true);
 
-		//Set Window Event Callback
-		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height) {
-			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-			data.Width = width;
-			data.Height = height;
+		{
+			RE_PROFILE_SCOPE("Setting Window Callback");
 
-			WindowResizeEvent event(width, height);
-			data.EventCallback(event);
-		});
+			//Set Window Event Callback
+			glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height) {
+				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+				data.Width = width;
+				data.Height = height;
 
-		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window) {
-			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+				WindowResizeEvent event(width, height);
+				data.EventCallback(event);
+			});
 
-			WindowCloseEvent event;
-			data.EventCallback(event);
-		});
+			glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window) {
+				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
-		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-			switch (action) {
+				WindowCloseEvent event;
+				data.EventCallback(event);
+			});
+
+			glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+				switch (action) {
 				case GLFW_PRESS: {
 					KeyPressedEvent event(key, false);;
 					data.EventCallback(event);
@@ -102,20 +105,20 @@ namespace RealEngine {
 					data.EventCallback(event);
 					break;
 				}
-			}
-		});
+				}
+			});
 
-		glfwSetCharCallback(m_Window, [](GLFWwindow* window, unsigned int keycode) {
-			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+			glfwSetCharCallback(m_Window, [](GLFWwindow* window, unsigned int keycode) {
+				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
-			KeyTypedEvent event(keycode);
-			data.EventCallback(event);
-		});
+				KeyTypedEvent event(keycode);
+				data.EventCallback(event);
+			});
 
-		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods) {
-			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+			glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods) {
+				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
-			switch (action) {
+				switch (action) {
 				case GLFW_PRESS: {
 					MouseButtonPressedEvent event(button);
 					data.EventCallback(event);
@@ -126,22 +129,23 @@ namespace RealEngine {
 					data.EventCallback(event);
 					break;
 				}
-			}
-		});
+				}
+			});
 
-		glfwSetScrollCallback(m_Window, [](GLFWwindow* window, double xOffset, double yOffset) {
-			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+			glfwSetScrollCallback(m_Window, [](GLFWwindow* window, double xOffset, double yOffset) {
+				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
-			MouseScrolledEvent event((float)xOffset, (float)yOffset);
-			data.EventCallback(event);
-		});
+				MouseScrolledEvent event((float)xOffset, (float)yOffset);
+				data.EventCallback(event);
+			});
 
-		glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double xPos, double yPos) {
-			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+			glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double xPos, double yPos) {
+				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
-			MouseMovedEvent event((float)xPos, (float)yPos);
-			data.EventCallback(event);
-		});
+				MouseMovedEvent event((float)xPos, (float)yPos);
+				data.EventCallback(event);
+			});
+		}
 	}
 
 	void WindowsWindow::Shutdown() {
@@ -157,8 +161,11 @@ namespace RealEngine {
 	
 	void WindowsWindow::OnUpdate() {
 		RE_PROFILE_FUNCTION();
-
-		glfwPollEvents();
+		
+		{
+			RE_PROFILE_SCOPE("Polling events");
+			glfwPollEvents();
+		}
 	}
 
 	void WindowsWindow::OnRender() {
@@ -176,6 +183,8 @@ namespace RealEngine {
 	}
 
 	void WindowsWindow::SetTitle(const std::string& title) {
+		RE_PROFILE_FUNCTION();
+
 		m_Data.Title = title;
 		glfwSetWindowTitle(m_Window, title.c_str());
 	}

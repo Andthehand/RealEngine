@@ -28,6 +28,7 @@ group "Dependencies"
 	include "RealEngine/vendor/imgui"
 	include "RealEngine/vendor/yaml-cpp"
 	include "RealEngine/vendor/Box2D"
+	include "RealEngine/vendor/optick"
 group ""
 
 group "Core"

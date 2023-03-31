@@ -59,6 +59,8 @@ namespace RealEngine {
     }
 
     void EditorLayer::OnUpdate(Timestep ts) {
+		RE_PROFILE_FUNCTION();
+		
 		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 
         // Resize
@@ -334,6 +336,8 @@ namespace RealEngine {
 	}
 
 	void EditorLayer::UI_Toolbar() {
+		RE_PROFILE_FUNCTION();
+		
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
@@ -408,6 +412,8 @@ namespace RealEngine {
 	}
 
 	void EditorLayer::OnEvent(Event& e) {
+		RE_PROFILE_FUNCTION();
+		
 		if (m_SceneState == SceneState::Edit) {
 			m_EditorCamera.OnEvent(e);
 		}
@@ -418,6 +424,8 @@ namespace RealEngine {
 	}
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e) {
+		RE_PROFILE_FUNCTION();
+		
 		if (e.IsRepeatCount())
 			return false;
 		bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
@@ -502,6 +510,8 @@ namespace RealEngine {
 	}
 
 	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& e) {
+		RE_PROFILE_FUNCTION();
+	
 		if (e.GetMouseButton() == Mouse::ButtonLeft) {
 			Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
 			if (m_ViewportHovered && (!ImGuizmo::IsOver() || !selectedEntity) && !Input::IsKeyPressed(Key::LeftAlt))
@@ -510,8 +520,9 @@ namespace RealEngine {
 		return false;
 	}
 
-	void EditorLayer::OnOverlayRender()
-	{
+	void EditorLayer::OnOverlayRender() {
+		RE_PROFILE_FUNCTION();
+		
 		if (m_SceneState == SceneState::Play) {
 			Entity camera = m_ActiveScene->GetPrimaryCameraEntity();
 			if (!camera)
@@ -595,6 +606,8 @@ namespace RealEngine {
 	}
 
 	void EditorLayer::NewProject() {
+		RE_PROFILE_FUNCTION();
+		
 		Project::New();
 	}
 
@@ -608,6 +621,8 @@ namespace RealEngine {
 	}
 
 	void EditorLayer::OpenProject(const std::filesystem::path& path) {
+		RE_PROFILE_FUNCTION();
+		
 		if (Project::Load(path)) {
 			ScriptEngine::Init();
 
@@ -622,6 +637,8 @@ namespace RealEngine {
 	}
 
 	void EditorLayer::NewScene() {
+		RE_PROFILE_FUNCTION();
+		
 		if (m_SceneState != SceneState::Edit)
 			return;
 
@@ -641,6 +658,8 @@ namespace RealEngine {
 	}
 
 	void EditorLayer::OpenScene(const std::filesystem::path& path) {
+		RE_PROFILE_FUNCTION();
+		
 		if (m_SceneState != SceneState::Edit)
 			OnSceneStop();
 
@@ -662,6 +681,8 @@ namespace RealEngine {
 	}
 
 	void EditorLayer::SaveScene() {
+		RE_PROFILE_FUNCTION();
+		
 		if (!m_EditorScenePath.empty())
 			SerializeScene(m_ActiveScene, m_EditorScenePath);
 		else
@@ -669,6 +690,8 @@ namespace RealEngine {
 	}
 	
 	void EditorLayer::SaveSceneAs(){
+		RE_PROFILE_FUNCTION();
+		
 		std::string filepath = FileDialogs::SaveFile("RealEnigne Scene (*.scene)\0*.scene\0");
 		if (!filepath.empty()) {
 			SerializeScene(m_ActiveScene, filepath);
@@ -677,11 +700,15 @@ namespace RealEngine {
 	}
 
 	void EditorLayer::SerializeScene(Ref<Scene> scene, const std::filesystem::path& path) {
+		RE_PROFILE_FUNCTION();
+	
 		SceneSerializer serializer(scene);
 		serializer.Serialize(path.string());
 	}
 
 	void EditorLayer::OnScenePlay() {
+		RE_PROFILE_FUNCTION();
+		
 		if (m_SceneState == SceneState::Simulate)
 			OnSceneStop();
 
@@ -696,6 +723,8 @@ namespace RealEngine {
 	}
 
 	void EditorLayer::OnSceneSimulate() {
+		RE_PROFILE_FUNCTION();
+		
 		if (m_SceneState == SceneState::Play)
 			OnSceneStop();
 
@@ -708,6 +737,8 @@ namespace RealEngine {
 	}
 
 	void EditorLayer::OnSceneStop() {
+		RE_PROFILE_FUNCTION();
+		
 		RE_CORE_ASSERT(m_SceneState == SceneState::Play || m_SceneState == SceneState::Simulate);
 
 		if (m_SceneState == SceneState::Play)
@@ -723,6 +754,8 @@ namespace RealEngine {
 	}
 
 	void EditorLayer::OnScenePause() {
+		RE_PROFILE_FUNCTION();
+		
 		if (m_SceneState == SceneState::Edit)
 			return;
 
@@ -730,6 +763,8 @@ namespace RealEngine {
 	}
 
 	void EditorLayer::OnDuplicateEntity() {
+		RE_PROFILE_FUNCTION();
+		
 		if (m_SceneState != SceneState::Edit)
 			return;
 

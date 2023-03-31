@@ -27,6 +27,8 @@ namespace RealEngine {
 	}
 
 	void ContentBrowserPanel::OnImGuiRender() {
+		RE_PROFILE_FUNCTION();
+		
 		ImGui::Begin("Content Browser");
 
 		if (m_CurrentDirectory != m_BaseDirectory) {

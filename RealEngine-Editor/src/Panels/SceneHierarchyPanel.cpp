@@ -33,6 +33,8 @@ namespace RealEngine {
 	}
 
 	void SceneHierarchyPanel::OnImGuiRender() {
+		RE_PROFILE_FUNCTION();
+		
 		ImGui::Begin("Scene Hierarchy");
 
 		if (m_Context) {
@@ -80,6 +82,8 @@ namespace RealEngine {
 	}
 
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity) {
+		RE_PROFILE_FUNCTION();
+		
 		auto& tag = entity.GetComponent<TagComponent>().Tag;
 
 		ImGuiTreeNodeFlags flags = ((m_SelectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
@@ -125,6 +129,8 @@ namespace RealEngine {
 	}
 
 	static bool DrawButtonLabel(const std::string& buttonLabel, const std::string& textLabel) {
+		RE_PROFILE_FUNCTION();
+		
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4.0f, 0.0f));
 		
 		bool isPressed = ImGui::Button(buttonLabel.c_str(), ImVec2(ImGui::CalcItemWidth(), 0));
@@ -136,6 +142,8 @@ namespace RealEngine {
 	}
 
 	static void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f) {
+		RE_PROFILE_FUNCTION();
+		
 		ImGuiIO& io = ImGui::GetIO();
 		auto boldFont = io.Fonts->Fonts[0];
 
@@ -205,6 +213,8 @@ namespace RealEngine {
 	struct ComponentCopyBuffer m_ComponentCopyBuffer;
 	template<typename T, typename UIFunction>
 	void SceneHierarchyPanel::DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction) {
+		RE_PROFILE_FUNCTION();
+		
 		const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
 		if (entity.HasComponent<T>()) {
 			ImGuiIO& io = ImGui::GetIO();
@@ -267,6 +277,8 @@ namespace RealEngine {
 	}
 
 	void SceneHierarchyPanel::DrawComponents(Entity entity) {
+		RE_PROFILE_FUNCTION();
+	
 		if (entity.HasComponent<TagComponent>()) {
 			auto& tag = entity.GetComponent<TagComponent>().Tag;
 
@@ -734,6 +746,8 @@ namespace RealEngine {
 
 	template<typename T>
 	void SceneHierarchyPanel::DisplayAddComponentEntry(const std::string& entryName) {
+		RE_PROFILE_FUNCTION();
+	
 		if (!m_SelectionContext.HasComponent<T>()) {
 			if (ImGui::MenuItem(entryName.c_str())) {
 				m_SelectionContext.AddComponent<T>();

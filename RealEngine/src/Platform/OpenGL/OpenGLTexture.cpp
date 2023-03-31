@@ -105,6 +105,8 @@ namespace RealEngine {
 	}
 	
 	OpenGLTexture2DArray::OpenGLTexture2DArray(const std::initializer_list<std::filesystem::path> paths, uint32_t mipLevels) {
+		RE_PROFILE_FUNCTION();
+
 		uint32_t numTextures = (uint32_t)paths.size();
 		RE_ASSERT(numTextures != 0, "Can't make Texuture without any textures");
 

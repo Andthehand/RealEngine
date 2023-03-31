@@ -10,16 +10,19 @@ extern RealEngine::Application* RealEngine::CreateApplication(ApplicationCommand
 int main(int argc, char** argv) {
 	RealEngine::Log::Init();
 
-	RE_PROFILE_BEGIN_SESSION("Startup", "RealEngine-Startup.json");
+	RE_PROFILE_BEGIN_SESSION();
 	auto app = RealEngine::CreateApplication({ argc, argv });
 	RE_PROFILE_END_SESSION();
+	//RE_PROFILE_SAVE_SESSION("RealEngine-Startup");
 
-	RE_PROFILE_BEGIN_SESSION("Runtime", "RealEngine-Runtime.json");
+	RE_PROFILE_BEGIN_SESSION();
 	app->Run();
 	RE_PROFILE_END_SESSION();
+	//RE_PROFILE_SAVE_SESSION("RealEngine-Runtime");
 
-	RE_PROFILE_BEGIN_SESSION("Shutdown", "RealEngine-Shutdown.json");
+	RE_PROFILE_BEGIN_SESSION();
 	delete app;
 	RE_PROFILE_END_SESSION();
+	//RE_PROFILE_SAVE_SESSION("RealEngine-Shutdown");
 }
 #endif

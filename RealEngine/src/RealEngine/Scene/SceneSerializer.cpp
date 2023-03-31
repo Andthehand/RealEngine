@@ -152,6 +152,8 @@ namespace RealEngine {
 		: m_Scene(scene) { }
 
 	static void SerializeEntity(YAML::Emitter& out, Entity entity) {
+		RE_PROFILE_FUNCTION();
+		
 		RE_CORE_ASSERT(entity.HasComponent<IDComponent>());
 
 		out << YAML::BeginMap; // Entity
@@ -326,6 +328,8 @@ namespace RealEngine {
 	}
 
 	void SceneSerializer::Serialize(const std::filesystem::path& filepath) {
+		RE_PROFILE_FUNCTION();
+		
 		YAML::Emitter out;
 		out << YAML::BeginMap;
 		out << YAML::Key << "Scene" << YAML::Value << "Untitled";
@@ -350,6 +354,8 @@ namespace RealEngine {
 	}
 
 	bool SceneSerializer::Deserialize(const std::filesystem::path& filepath) {
+		RE_PROFILE_FUNCTION();
+		
 		YAML::Node data;
 		try {
 			data = YAML::LoadFile(filepath.string());

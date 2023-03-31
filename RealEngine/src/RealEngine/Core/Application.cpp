@@ -17,6 +17,8 @@ namespace RealEngine {
 
 	Application::Application(const ApplicationSpecification& specification)
 		: m_Specification(specification) {
+		RE_PROFILE_FUNCTION();
+
 		RE_CORE_ASSERT(!s_Instance, "Application already exists!")
 		s_Instance = this;
 
@@ -62,6 +64,8 @@ namespace RealEngine {
 	}
 
 	void Application::SubmitToMainThread(const std::function<void()>& function) {
+		RE_PROFILE_FUNCTION();
+
 		std::scoped_lock<std::mutex> lock(m_MainThreadQueueMutex);
 
 		m_MainThreadQueue.emplace_back(function);
@@ -85,7 +89,7 @@ namespace RealEngine {
 		RE_PROFILE_FUNCTION();
 
 		while (m_Running) {
-			RE_PROFILE_SCOPE("Run Loop");
+			RE_PROFILE_FRAME("Run Loop");
 
 			float time = Time::GetTime();
 			Timestep timestep = time - m_LastFrameTime;
@@ -136,6 +140,8 @@ namespace RealEngine {
 	}
 
 	void Application::ExecuteMainThreadQueue() {
+		RE_PROFILE_FUNCTION();
+
 		std::scoped_lock<std::mutex> lock(m_MainThreadQueueMutex);
 
 		for (auto& func : m_MainThreadQueue)

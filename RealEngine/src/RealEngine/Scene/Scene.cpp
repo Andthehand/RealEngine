@@ -25,6 +25,8 @@ namespace RealEngine {
 
 	template<typename... Component>
 	static void CopyComponent(entt::registry& dst, entt::registry& src, const std::unordered_map<UUID, entt::entity>& enttMap) {
+		RE_PROFILE_FUNCTION();
+		
 		([&]() {
 			auto view = src.view<Component>();
 			for (auto srcEntity : view) {
@@ -38,11 +40,15 @@ namespace RealEngine {
 
 	template<typename... Component>
 	static void CopyComponent(ComponentGroup<Component...>, entt::registry& dst, entt::registry& src, const std::unordered_map<UUID, entt::entity>& enttMap) {
+		RE_PROFILE_FUNCTION();
+		
 		CopyComponent<Component...>(dst, src, enttMap);
 	}
 
 	template<typename... Component>
 	static void CopyComponentIfExists(Entity dst, Entity src) {
+		RE_PROFILE_FUNCTION();
+		
 		([&]() {
 			if (src.HasComponent<Component>())
 				dst.AddOrReplaceComponent<Component>(src.GetComponent<Component>());
@@ -55,6 +61,8 @@ namespace RealEngine {
 	}
 
 	Ref<Scene> Scene::Copy(Ref<Scene> other) {
+		RE_PROFILE_FUNCTION();
+		
 		Ref<Scene> newScene = CreateRef<Scene>();
 
 		newScene->m_ViewportWidth = other->m_ViewportWidth;
@@ -80,10 +88,14 @@ namespace RealEngine {
 	}
 
 	Entity Scene::CreateEntity(const std::string& name) {
+		RE_PROFILE_FUNCTION();
+		
 		return CreateEntityWithUUID(UUID(), name);
 	}
 
 	Entity Scene::CreateEntityWithUUID(UUID uuid, const std::string& name) {
+		RE_PROFILE_FUNCTION();
+		
 		Entity entity = { m_Registry.create(), this };
 
 		entity.AddComponent<IDComponent>(uuid);
@@ -98,11 +110,15 @@ namespace RealEngine {
 	}
 
 	void Scene::DestroyEntity(Entity entity) {
+		RE_PROFILE_FUNCTION();
+	
 		m_EntityMap.erase(entity.GetUUID());
 		m_Registry.destroy(entity);
 	}
 	
 	void Scene::OnRuntimeStart() {
+		RE_PROFILE_FUNCTION();
+	
 		m_IsRunning = true;
 
 		OnPhysics2DStart();
@@ -121,6 +137,8 @@ namespace RealEngine {
 	}
 
 	void Scene::OnRuntimeStop() {
+		RE_PROFILE_FUNCTION();
+	
 		m_IsRunning = false;
 
 		OnPhysics2DStop();
@@ -129,14 +147,20 @@ namespace RealEngine {
 	}
 
 	void Scene::OnSimulationStart() {
+		RE_PROFILE_FUNCTION();
+		
 		OnPhysics2DStart();
 	}
 
 	void Scene::OnSimulationStop() {
+		RE_PROFILE_FUNCTION();
+		
 		OnPhysics2DStop();
 	}
 
 	void Scene::OnUpdateRuntime(Timestep ts) {
+		RE_PROFILE_FUNCTION();
+		
 		if (!m_IsPaused || m_StepFrames-- > 0) {
 			// Update scripts
 			{
@@ -150,6 +174,8 @@ namespace RealEngine {
 
 			// Physics
 			{
+				RE_PROFILE_SCOPE("Runtime Physics Update")
+
 				const int32_t velocityIterations = 6;
 				const int32_t positionIterations = 2;
 				m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
@@ -189,6 +215,8 @@ namespace RealEngine {
 		}
 
 		if (mainCamera) {
+			RE_PROFILE_SCOPE("Rendering Screen");
+			
 			Renderer2D::BeginScene(*mainCamera, cameraTransform);
 
 			// Draw sprites
@@ -216,8 +244,12 @@ namespace RealEngine {
 	}
 
 	void Scene::OnUpdateSimulation(Timestep ts, EditorCamera& camera) {
+		RE_PROFILE_FUNCTION();
+		
 		// Physics
 		if (!m_IsPaused || m_StepFrames-- > 0) {
+			RE_PROFILE_SCOPE("Physics Simulation Update");
+
 			const int32_t velocityIterations = 6;
 			const int32_t positionIterations = 2;
 			m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
@@ -243,11 +275,15 @@ namespace RealEngine {
 	}
 
 	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& camera) {
+		RE_PROFILE_FUNCTION();
+		
 		// Render
 		RenderScene(camera);
 	}
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height) {
+		RE_PROFILE_FUNCTION();
+		
 		if (m_ViewportWidth == width && m_ViewportHeight == height)
 			return;
 
@@ -265,10 +301,14 @@ namespace RealEngine {
 	}
 
 	void Scene::Step(int frames) {
+		RE_PROFILE_FUNCTION();
+		
 		m_StepFrames = frames;
 	}
 
 	Entity Scene::DuplicateEntity(Entity entity) {
+		RE_PROFILE_FUNCTION();
+		
 		// Copy name because we're going to modify component data structure
 		std::string name = entity.GetName();
 		Entity newEntity = CreateEntity(name);
@@ -278,6 +318,8 @@ namespace RealEngine {
 
 
 	Entity Scene::GetPrimaryCameraEntity() {
+		RE_PROFILE_FUNCTION();
+		
 		auto view = m_Registry.view<CameraComponent>();
 		for (auto& entity : view) {
 			const auto& camera = view.get<CameraComponent>(entity);
@@ -294,6 +336,8 @@ namespace RealEngine {
 	}
 
 	Entity Scene::FindEntityByName(std::string_view name) {
+		RE_PROFILE_FUNCTION();
+		
 		auto view = m_Registry.view<TagComponent>();
 		for (auto entity : view) {
 			const TagComponent& tc = view.get<TagComponent>(entity);
@@ -305,6 +349,8 @@ namespace RealEngine {
 
 
 	Entity Scene::GetEntityByUUID(UUID uuid) {
+		RE_PROFILE_FUNCTION();
+		
 		// TODO(Yan): Maybe should be assert
 		if (m_EntityMap.find(uuid) != m_EntityMap.end())
 			return { m_EntityMap.at(uuid), this };
@@ -313,6 +359,8 @@ namespace RealEngine {
 	}
 
 	void Scene::OnPhysics2DStart() {
+		RE_PROFILE_FUNCTION();
+		
 		m_PhysicsWorld = new b2World({ 0.0f, -9.8f });
 
 		auto view = m_Registry.view<Rigidbody2DComponent>();
@@ -364,11 +412,15 @@ namespace RealEngine {
 	}
 
 	void Scene::OnPhysics2DStop() {
+		RE_PROFILE_FUNCTION();
+	
 		delete m_PhysicsWorld;
 		m_PhysicsWorld = nullptr;
 	}
 
 	void Scene::RenderScene(EditorCamera& camera) {
+		RE_PROFILE_FUNCTION();
+		
 		Renderer2D::BeginScene(camera);
 
 		// Draw sprites
