@@ -10,6 +10,8 @@ namespace RealEngine {
 		}
 
 		static void CreateTextures(bool multisampled, uint32_t* outID, uint32_t count) {
+			RE_PROFILE_FUNCTION();
+		
 			glCreateTextures(TextureTarget(multisampled), count, outID);
 		}
 
@@ -18,6 +20,8 @@ namespace RealEngine {
 		}
 
 		static void AttachColorTexture(uint32_t id, int samples, GLenum internalFormat, GLenum format, uint32_t width, uint32_t height, int index) {
+			RE_PROFILE_FUNCTION();
+			
 			bool multisampled = samples > 1;
 			if (multisampled) {
 				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, internalFormat, width, height, GL_FALSE); 
@@ -36,12 +40,13 @@ namespace RealEngine {
 		}
 
 		static void AttachDepthTexture(uint32_t id, int samples, GLenum format, GLenum attachmentType, uint32_t width, uint32_t height) {
+			RE_PROFILE_FUNCTION();
+			
 			bool multisampled = samples > 1;
 			if (multisampled) {
 				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, format, width, height, GL_FALSE);
 			}
-			else
-			{
+			else {
 				glTexStorage2D(GL_TEXTURE_2D, 1, format, width, height);
 
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -75,6 +80,8 @@ namespace RealEngine {
 
 	OpenGLFramebuffer::OpenGLFramebuffer(const FramebufferSpecification& spec)
 		: m_Specification(spec) {
+		RE_PROFILE_FUNCTION();
+		
 		for (auto spec : m_Specification.Attachments.Attachments) {
 			if (!Utils::IsDepthFormat(spec.TextureFormat))
 				m_ColorAttachmentSpecifications.emplace_back(spec);
@@ -86,12 +93,16 @@ namespace RealEngine {
 	}
 
 	OpenGLFramebuffer::~OpenGLFramebuffer() {
+		RE_PROFILE_FUNCTION();
+	
 		glDeleteFramebuffers(1, &m_RendererID);
 		glDeleteTextures((GLsizei) m_ColorAttachments.size(), m_ColorAttachments.data());
 		glDeleteTextures(1, &m_DepthAttachment);
 	}
 	
 	void OpenGLFramebuffer::Invalidate() {
+		RE_PROFILE_FUNCTION();
+		
 		if (m_RendererID) {
 			glDeleteFramebuffers(1, &m_RendererID);
 			glDeleteTextures((GLsizei)m_ColorAttachments.size(), m_ColorAttachments.data());
@@ -159,12 +170,16 @@ namespace RealEngine {
 	}
 
 	void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height) {
+		RE_PROFILE_FUNCTION();
+		
 		m_Specification.Width = width;
 		m_Specification.Height = height;
 		Invalidate();
 	}
 
 	int OpenGLFramebuffer::ReadPixel(uint32_t attachmentIndex, int x, int y) {
+		RE_PROFILE_FUNCTION();
+		
 		RE_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size());
 
 		glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
@@ -174,6 +189,8 @@ namespace RealEngine {
 	}
 
 	void OpenGLFramebuffer::ClearAttachment(uint32_t attachmentIndex, int value) {
+		RE_PROFILE_FUNCTION();
+		
 		RE_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size());
 
 		auto& spec = m_ColorAttachmentSpecifications[attachmentIndex];

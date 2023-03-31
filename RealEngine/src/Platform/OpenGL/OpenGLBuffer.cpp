@@ -37,6 +37,8 @@ namespace RealEngine {
 	}
 
 	void OpenGLBuffer::SetData(const void* data, uint32_t size) {
+		RE_PROFILE_FUNCTION();
+		
 		glBindBuffer(m_Target, m_RendererID);
 		glBufferSubData(m_Target, 0, size, data);
 	}
@@ -68,14 +70,10 @@ namespace RealEngine {
 	}
 
 	void OpenGLTextureBuffer::Bind() const {
-		RE_PROFILE_FUNCTION();
-
 		glBindTexture(GL_TEXTURE_BUFFER, m_TextureRendererID);
 	}
 
 	void OpenGLTextureBuffer::Unbind() const {
-		RE_PROFILE_FUNCTION();
-
 		glBindTexture(GL_TEXTURE_BUFFER, 0);
 	}
 
@@ -110,14 +108,10 @@ namespace RealEngine {
 	}
 
 	void OpenGLVertexBuffer::Bind() const {
-		RE_PROFILE_FUNCTION();
-
 		glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
 	}
 	
 	void OpenGLVertexBuffer::Unbind() const {
-		RE_PROFILE_FUNCTION();
-
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
@@ -154,20 +148,18 @@ namespace RealEngine {
 	}
 
 	void OpenGLIndexBuffer::SetData(const uint32_t* data, uint32_t count) {
+		RE_PROFILE_FUNCTION();
+
 		m_Count = count;
 		glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(uint32_t), data);
 	}
 
 	void OpenGLIndexBuffer::Bind() const {
-		RE_PROFILE_FUNCTION();
-
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID);
 	}
 
 	void OpenGLIndexBuffer::Unbind() const {
-		RE_PROFILE_FUNCTION();
-
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 }

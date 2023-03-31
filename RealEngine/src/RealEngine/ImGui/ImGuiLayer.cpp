@@ -75,6 +75,8 @@ namespace RealEngine {
 	}
 
 	void ImGuiLayer::OnEvent(Event& e) {
+		RE_PROFILE_FUNCTION();
+
 		if (m_BlockEvents) {
 			ImGuiIO& io = ImGui::GetIO();
 			e.Handled |= e.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
@@ -111,6 +113,8 @@ namespace RealEngine {
 	}
 
 	void ImGuiLayer::SetDarkThemeColors() {
+		RE_PROFILE_FUNCTION();
+
 		auto& colors = ImGui::GetStyle().Colors;
 		colors[ImGuiCol_WindowBg] = ImVec4{ 0.1f, 0.105f, 0.11f, 1.0f };
 

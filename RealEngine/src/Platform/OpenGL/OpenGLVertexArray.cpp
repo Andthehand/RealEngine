@@ -39,14 +39,10 @@ namespace RealEngine {
 	}
 	
 	void OpenGLVertexArray::Bind() const {
-		RE_PROFILE_FUNCTION();
-
 		glBindVertexArray(m_RendererID);
 	}
 	
 	void OpenGLVertexArray::Unbind() const {
-		RE_PROFILE_FUNCTION();
-
 		glBindVertexArray(0);
 	}
 	

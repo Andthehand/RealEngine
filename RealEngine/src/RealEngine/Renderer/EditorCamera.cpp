@@ -18,11 +18,15 @@ namespace RealEngine {
 	}
 
 	void EditorCamera::UpdateProjection() {
+		RE_PROFILE_FUNCTION();
+	
 		m_AspectRatio = m_ViewportWidth / m_ViewportHeight;
 		m_Projection = glm::perspective(glm::radians(m_FOV), m_AspectRatio, m_NearClip, m_FarClip);
 	}
 
 	void EditorCamera::UpdateView() {
+		RE_PROFILE_FUNCTION();
+		
 		// m_Yaw = m_Pitch = 0.0f; // Lock the camera's rotation
 		m_Position = CalculatePosition();
 
@@ -32,6 +36,8 @@ namespace RealEngine {
 	}
 
 	std::pair<float, float> EditorCamera::PanSpeed() const {
+		RE_PROFILE_FUNCTION();
+		
 		float x = std::min(m_ViewportWidth / 1000.0f, 2.4f); // max = 2.4f
 		float xFactor = 0.0366f * (x * x) - 0.1778f * x + 0.3021f;
 
@@ -46,6 +52,8 @@ namespace RealEngine {
 	}
 
 	float EditorCamera::ZoomSpeed() const {
+		RE_PROFILE_FUNCTION();
+		
 		float distance = m_Distance * 0.2f;
 		distance = std::max(distance, 0.0f);
 		float speed = distance * distance;
@@ -54,6 +62,8 @@ namespace RealEngine {
 	}
 
 	void EditorCamera::OnUpdate(Timestep ts) {
+		RE_PROFILE_FUNCTION();
+	
 		if (Input::IsKeyPressed(Key::LeftAlt)) {
 			const glm::vec2& mouse{ Input::GetMouseX(), Input::GetMouseY() };
 			glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
@@ -71,11 +81,15 @@ namespace RealEngine {
 	}
 
 	void EditorCamera::OnEvent(Event& e) {
+		RE_PROFILE_FUNCTION();
+		
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<MouseScrolledEvent>(RE_BIND_EVENT_FN(EditorCamera::OnMouseScroll));
 	}
 
 	bool EditorCamera::OnMouseScroll(MouseScrolledEvent& e) {
+		RE_PROFILE_FUNCTION();
+	
 		float delta = e.GetYOffset() * 0.1f;
 		MouseZoom(delta);
 		UpdateView();
@@ -83,18 +97,24 @@ namespace RealEngine {
 	}
 
 	void EditorCamera::MousePan(const glm::vec2& delta) {
+		RE_PROFILE_FUNCTION();
+		
 		auto [xSpeed, ySpeed] = PanSpeed();
 		m_FocalPoint += -GetRightDirection() * delta.x * xSpeed * m_Distance;
 		m_FocalPoint += GetUpDirection() * delta.y * ySpeed * m_Distance;
 	}
 
 	void EditorCamera::MouseRotate(const glm::vec2& delta) {
+		RE_PROFILE_FUNCTION();
+		
 		float yawSign = GetUpDirection().y < 0 ? -1.0f : 1.0f;
 		m_Yaw += yawSign * delta.x * RotationSpeed();
 		m_Pitch += delta.y * RotationSpeed();
 	}
 
 	void EditorCamera::MouseZoom(float delta) {
+		RE_PROFILE_FUNCTION();
+		
 		m_Distance -= delta * ZoomSpeed();
 		if (m_Distance < 1.0f) {
 			m_FocalPoint += GetForwardDirection();

@@ -5,11 +5,15 @@
 
 namespace RealEngine {
 	Ref<Project> Project::New() {
+		RE_PROFILE_FUNCTION();
+		
 		s_ActiveProject = CreateRef<Project>();
 		return s_ActiveProject;
 	}
 
 	Ref<Project> Project::Load(const std::filesystem::path& path) {
+		RE_PROFILE_FUNCTION();
+		
 		Ref<Project> project = CreateRef<Project>();
 
 		ProjectSerializer serializer(project);
@@ -23,6 +27,8 @@ namespace RealEngine {
 	}
 
 	bool Project::SaveActive(const std::filesystem::path& path) {
+		RE_PROFILE_FUNCTION();
+	
 		ProjectSerializer serializer(s_ActiveProject);
 		if (serializer.Serialize(path)) {
 			s_ActiveProject->m_ProjectDirectory = path.parent_path();

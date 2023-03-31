@@ -270,6 +270,8 @@ namespace RealEngine {
 
 	template<typename... Component>
 	static void RegisterComponent() {
+		RE_PROFILE_FUNCTION();
+		
 		([]() {
 			std::string_view typeName = typeid(Component).name();
 			size_t pos = typeName.find_last_of(':');
@@ -287,15 +289,21 @@ namespace RealEngine {
 
 	template<typename... Component>
 	static void RegisterComponent(ComponentGroup<Component...>) {
+		RE_PROFILE_FUNCTION();
+		
 		RegisterComponent<Component...>();
 	}
 
 	void ScriptGlue::RegisterComponents() {
+		RE_PROFILE_FUNCTION();
+	
 		s_EntityHasComponentFuncs.clear();
 		RegisterComponent(AllComponents{});
 	}
 
 	void ScriptGlue::RegisterFunctions() {
+		RE_PROFILE_FUNCTION();
+		
 		RE_ADD_INTERNAL_CALL(NativeLog);
 		RE_ADD_INTERNAL_CALL(NativeLog_ULong);
 		RE_ADD_INTERNAL_CALL(NativeLog_Vector2);

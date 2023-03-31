@@ -14,6 +14,8 @@ namespace RealEngine {
 	}
 
 	std::string FileDialogs::OpenFile(const char* filter) {
+		RE_PROFILE_FUNCTION();
+	
 		OPENFILENAMEA ofn;
 		CHAR szFile[260] = { 0 };
 		CHAR currentDir[256] = { 0 };
@@ -34,6 +36,8 @@ namespace RealEngine {
 	}
 	
 	std::string FileDialogs::SaveFile(const char* filter) {
+		RE_PROFILE_FUNCTION();
+	
 		OPENFILENAMEA ofn;
 		CHAR szFile[260] = { 0 };
 		CHAR currentDir[256] = { 0 };

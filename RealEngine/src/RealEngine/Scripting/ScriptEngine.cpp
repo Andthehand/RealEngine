@@ -46,6 +46,8 @@ namespace RealEngine {
 
 	namespace Utils {
 		static MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath, bool loadPDB = false) {
+			RE_PROFILE_FUNCTION();
+		
 			ScopedBuffer fileData = FileSystem::ReadFileBinary(assemblyPath);
 
 			// NOTE: We can't use this image for anything other than loading the assembly because this image doesn't have a reference to the assembly
@@ -77,6 +79,8 @@ namespace RealEngine {
 		}
 
 		void PrintAssemblyTypes(MonoAssembly* assembly) {
+			RE_PROFILE_FUNCTION();
+			
 			MonoImage* image = mono_assembly_get_image(assembly);
 			const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(image, MONO_TABLE_TYPEDEF);
 			int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
@@ -93,6 +97,8 @@ namespace RealEngine {
 		}
 
 		ScriptFieldType MonoTypeToScriptFieldType(MonoType* monoType) {
+			RE_PROFILE_FUNCTION();
+			
 			std::string typeName = mono_type_get_name(monoType);
 
 			auto it = s_ScriptFieldTypeMap.find(typeName);
@@ -140,6 +146,8 @@ namespace RealEngine {
 	static ScriptEngineData* s_Data = nullptr;
 
 	static void OnAppAssemblyFileSystemEvent(const std::string& path, const filewatch::Event change_type) {
+		RE_PROFILE_FUNCTION();
+	
 		if (!s_Data->AssemblyReloadPending && change_type == filewatch::Event::modified) {
 			s_Data->AssemblyReloadPending = true;
 
@@ -151,6 +159,8 @@ namespace RealEngine {
 	}
 
 	void ScriptEngine::Init() {
+		RE_PROFILE_FUNCTION();
+		
 		s_Data = new ScriptEngineData();
 
 		InitMono();
@@ -177,12 +187,16 @@ namespace RealEngine {
 	}
 
 	void ScriptEngine::Shutdown() {
+		RE_PROFILE_FUNCTION();
+		
 		ShutdownMono();
 		delete s_Data;
 	}
 
 
 	void ScriptEngine::InitMono() {
+		RE_PROFILE_FUNCTION();
+		
 		mono_set_assemblies_path("mono/lib");
 
 		if (s_Data->EnableDebugging) {
@@ -208,6 +222,8 @@ namespace RealEngine {
 	}
 
 	void ScriptEngine::ShutdownMono() {
+		RE_PROFILE_FUNCTION();
+	
 		mono_domain_set(mono_get_root_domain(), false);
 
 		mono_domain_unload(s_Data->AppDomain);
@@ -218,6 +234,8 @@ namespace RealEngine {
 	}
 
 	bool ScriptEngine::LoadAssembly(const std::filesystem::path& filepath) {
+		RE_PROFILE_FUNCTION();
+	
 		// Create an App Domain
 		s_Data->AppDomain = mono_domain_create_appdomain("RealEngineScriptRuntime", nullptr);
 		mono_domain_set(s_Data->AppDomain, true);
@@ -232,6 +250,8 @@ namespace RealEngine {
 	}
 
 	bool ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath) {
+		RE_PROFILE_FUNCTION();
+		
 		s_Data->AppAssemblyFilepath = filepath;
 		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath, s_Data->EnableDebugging);
 		if (s_Data->AppAssembly == nullptr)
@@ -245,6 +265,8 @@ namespace RealEngine {
 	}
 
 	void ScriptEngine::ReloadAssembly() {
+		RE_PROFILE_FUNCTION();
+		
 		mono_domain_set(mono_get_root_domain(), false);
 
 		mono_domain_unload(s_Data->AppDomain);

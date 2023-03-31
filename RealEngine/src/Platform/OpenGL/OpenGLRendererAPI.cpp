@@ -14,8 +14,9 @@ namespace RealEngine {
 		unsigned severity,
 		int length,
 		const char* message,
-		const void* userParam)
-	{
+		const void* userParam) {
+		RE_PROFILE_FUNCTION();
+		
 		switch (severity) {
 			case GL_DEBUG_SEVERITY_HIGH:         RE_CORE_CRITICAL(message); return;
 			case GL_DEBUG_SEVERITY_MEDIUM:       RE_CORE_ERROR(message); return;
@@ -68,25 +69,35 @@ namespace RealEngine {
 	}
 
 	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount) {
-		vertexArray->Bind(); 
+		RE_PROFILE_FUNCTION();
+		
+		vertexArray->Bind();
 		uint32_t count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();
 		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 	}
 	void OpenGLRendererAPI::DrawArraysInstanced(const Ref<VertexArray>& vertexArray, BufferMode mode, uint32_t verticeCount, uint32_t instanceCount, uint32_t start) {
+		RE_PROFILE_FUNCTION();
+		
 		glDrawArraysInstanced(BufferModeTypeToOpenGLBaseType(mode), start, verticeCount, instanceCount);
 	}
 
 	void OpenGLRendererAPI::DrawIndexedInstanced(const Ref<VertexArray>& vertexArray, uint32_t instanceCount, uint32_t indexCount) {
+		RE_PROFILE_FUNCTION();
+		
 		uint32_t count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();
 		glDrawElementsInstanced(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr, instanceCount);
 	}
 
 	void OpenGLRendererAPI::DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount) {
+		RE_PROFILE_FUNCTION();
+		
 		vertexArray->Bind();
 		glDrawArrays(GL_LINES, 0, vertexCount);
 	}
 
 	void OpenGLRendererAPI::SetLineWidth(float width) {
+		RE_PROFILE_FUNCTION();
+		
 		glLineWidth(width);
 	}
 }

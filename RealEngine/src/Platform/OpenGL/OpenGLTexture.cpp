@@ -81,8 +81,6 @@ namespace RealEngine {
 	}
 
 	void OpenGLTexture2D::Bind(uint32_t slot) const {
-		RE_PROFILE_FUNCTION();
-
 		glBindTextureUnit(slot, m_RendererID);	
 	}
 
@@ -178,7 +176,7 @@ namespace RealEngine {
 	
 	//TODO: Implement
 	void OpenGLTexture2DArray::SetData(void* data, uint32_t size) {
-		
+		assert(false);
 	}
 	
 	void OpenGLTexture2DArray::Bind(uint32_t slot) const {

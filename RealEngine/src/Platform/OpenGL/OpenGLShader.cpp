@@ -29,8 +29,7 @@ namespace RealEngine {
 			return 0;
 		}
 
-		static shaderc_shader_kind GLShaderStageToShaderC(GLenum stage)
-		{
+		static shaderc_shader_kind GLShaderStageToShaderC(GLenum stage) {
 			switch (stage) {
 				case GL_VERTEX_SHADER:   return shaderc_glsl_vertex_shader;
 				case GL_FRAGMENT_SHADER: return shaderc_glsl_fragment_shader;
@@ -64,6 +63,8 @@ namespace RealEngine {
 
 		//Returns false if the file doesn't exist or if the hash is different
 		static const bool CompareFileHashes(const std::filesystem::path& filepath, uint32_t stage, const std::string& source) {
+			RE_PROFILE_FUNCTION();
+			
 			size_t hashCompare = std::hash<std::string>{}(source);
 			
 			std::ifstream in(filepath, std::ios::in | std::ios::binary);
@@ -221,6 +222,8 @@ namespace RealEngine {
 	}
 
 	void OpenGLShader::CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources) {
+		RE_PROFILE_FUNCTION();
+		
 		GLuint program = glCreateProgram();
 
 		shaderc::Compiler compiler;
@@ -275,6 +278,8 @@ namespace RealEngine {
 	}
 
 	void OpenGLShader::CompileOrGetOpenGLBinaries() {
+		RE_PROFILE_FUNCTION();
+		
 		auto& shaderData = m_OpenGLSPIRV;
 
 		shaderc::Compiler compiler;
@@ -327,6 +332,8 @@ namespace RealEngine {
 	}
 
 	void OpenGLShader::CreateProgram() {
+		RE_PROFILE_FUNCTION();
+	
 		GLuint program = glCreateProgram();
 
 		std::vector<GLuint> shaderIDs;
@@ -373,6 +380,8 @@ namespace RealEngine {
 	}
 
 	void OpenGLShader::Reflect(GLenum stage, const std::vector<uint32_t>& shaderData) {
+		RE_PROFILE_FUNCTION();
+		
 		spirv_cross::Compiler compiler(shaderData);
 		spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 
@@ -395,14 +404,10 @@ namespace RealEngine {
 	}
 
 	void OpenGLShader::Bind() const {
-		RE_PROFILE_FUNCTION();
-
 		glUseProgram(m_RendererID);
 	}
 
 	void OpenGLShader::Unbind() const {
-		RE_PROFILE_FUNCTION();
-
 		glUseProgram(0);
 	}
 }
