@@ -6,6 +6,7 @@ Binaries/
 
 # RealEngine files
 *.log
+*.opt
 
 # VoxelSandbox files
 VoxelSandbox/assets/chunks
