@@ -174,7 +174,7 @@ namespace RealEngine {
 
 			// Physics
 			{
-				RE_PROFILE_SCOPE("Runtime Physics Update")
+				RE_PROFILE_FUNCTION("Runtime Physics Update")
 
 				const int32_t velocityIterations = 6;
 				const int32_t positionIterations = 2;
@@ -215,7 +215,7 @@ namespace RealEngine {
 		}
 
 		if (mainCamera) {
-			RE_PROFILE_SCOPE("Rendering Screen");
+			RE_PROFILE_FUNCTION("Rendering Screen");
 			
 			Renderer2D::BeginScene(*mainCamera, cameraTransform);
 
@@ -248,7 +248,7 @@ namespace RealEngine {
 		
 		// Physics
 		if (!m_IsPaused || m_StepFrames-- > 0) {
-			RE_PROFILE_SCOPE("Physics Simulation Update");
+			RE_PROFILE_FUNCTION("Physics Simulation Update");
 
 			const int32_t velocityIterations = 6;
 			const int32_t positionIterations = 2;

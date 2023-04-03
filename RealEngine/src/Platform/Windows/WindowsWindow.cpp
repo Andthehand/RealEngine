@@ -42,7 +42,7 @@ namespace RealEngine {
 		RE_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
 		if (s_GLFWWindowCount == 0) {
-			RE_PROFILE_SCOPE("glfwInit");
+			RE_PROFILE_FUNCTION("glfwInit");
 			int success = glfwInit();
 			RE_CORE_ASSERT(success, "Could not initialize GLFW!");
 			glfwSetErrorCallback(GLFWErrorCallback);
@@ -52,7 +52,7 @@ namespace RealEngine {
 		glfwWindowHint(GLFW_SAMPLES, props.MMSA);
 
 		{
-			RE_PROFILE_SCOPE("glfwCreateWindow");
+			RE_PROFILE_FUNCTION("glfwCreateWindow");
 		#if defined(RE_DEBUG)
 			if (Renderer::GetAPI() == RendererAPI::API::OpenGL)
 				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
@@ -68,7 +68,7 @@ namespace RealEngine {
 		SetVSync(true);
 
 		{
-			RE_PROFILE_SCOPE("Setting Window Callback");
+			RE_PROFILE_FUNCTION("Setting Window Callback");
 
 			//Set Window Event Callback
 			glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height) {
@@ -163,7 +163,7 @@ namespace RealEngine {
 		RE_PROFILE_FUNCTION();
 		
 		{
-			RE_PROFILE_SCOPE("Polling events");
+			RE_PROFILE_FUNCTION("Polling events");
 			glfwPollEvents();
 		}
 	}

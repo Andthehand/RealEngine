@@ -100,7 +100,7 @@ namespace RealEngine {
 			m_Window->OnUpdate();
 
 			if (!m_Minimized) {
-				RE_PROFILE_SCOPE("LayerStack OnUpdate");
+				RE_PROFILE_FUNCTION("LayerStack OnUpdate");
 
 				//Update all layers/Overlays
 				for (Layer* layer : m_LayerStack)
@@ -109,7 +109,7 @@ namespace RealEngine {
 
 			m_ImGuiLayer->Begin();
 			{
-				RE_PROFILE_SCOPE("LayerStack OnImGuiRender");
+				RE_PROFILE_FUNCTION("LayerStack OnImGuiRender");
 
 				for (Layer* layer : m_LayerStack)
 					layer->OnImGuiRender();
