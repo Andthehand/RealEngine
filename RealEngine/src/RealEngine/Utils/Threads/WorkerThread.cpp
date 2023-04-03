@@ -25,11 +25,19 @@ namespace RealEngine {
 	}
 
 	void WorkerThread::Run() {
-		while (m_Running) {
-			std::function<void()> job = m_JobQueue.Pop();
-			//If it returns nullptr then the thread will exit
-			if (job == nullptr) return;
+		std::string name = "WorkerThread: " + std::hash<std::thread::id>{}(std::this_thread::get_id());
+		RE_PROFILE_NEW_THREAD("Worker Thread {}");
 
+		while (m_Running) {
+			std::function<void()> job;
+			{
+				RE_PROFILE_FUNCTION("Waiting for Job");
+				job = m_JobQueue.Pop();
+				//If it returns nullptr then the thread will exit
+				if (job == nullptr) return;
+			}
+
+			RE_PROFILE_FUNCTION("Executing Job");
 			job();
 		}
 	}
