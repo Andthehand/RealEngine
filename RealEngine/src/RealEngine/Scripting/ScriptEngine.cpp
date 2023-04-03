@@ -201,7 +201,7 @@ namespace RealEngine {
 
 		if (s_Data->EnableDebugging) {
 			const char* argv[2] = {
-				"--debugger-agent=transport=dt_socket,address=127.0.0.1:2550,server=y,suspend=n,loglevel=3,logfile=MonoDebugger.log",
+				"--debugger-agent=transport=dt_socket,address=127.0.0.1:2550,server=y,suspend=n,loglevel=3,logfile=logs/MonoDebugger.log",
 				"--soft-breakpoints"
 			};
 

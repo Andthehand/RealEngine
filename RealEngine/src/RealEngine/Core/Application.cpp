@@ -86,8 +86,6 @@ namespace RealEngine {
 	}
 
 	void Application::Run() {
-		RE_PROFILE_FUNCTION();
-
 		while (m_Running) {
 			RE_PROFILE_FRAME("Run Loop");
 
