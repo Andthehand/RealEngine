@@ -87,7 +87,7 @@ namespace RealEngine {
 
 	void Application::Run() {
 		while (m_Running) {
-			RE_PROFILE_FRAME("Run Loop");
+			RE_PROFILE_FRAME("MainThread");
 
 			float time = Time::GetTime();
 			Timestep timestep = time - m_LastFrameTime;
@@ -99,6 +99,8 @@ namespace RealEngine {
 
 			if (!m_Minimized) {
 				RE_PROFILE_FUNCTION("LayerStack OnUpdate");
+
+				RE_PROFILE_TAG("Frame Time", (float)timestep);
 
 				//Update all layers/Overlays
 				for (Layer* layer : m_LayerStack)

@@ -20,6 +20,12 @@
 
 	#define RE_PROFILE_NEW_THREAD(THREAD_NAME)	::Optick::ThreadScope brofilerThreadScope(THREAD_NAME);	\
 													OPTICK_UNUSED(brofilerThreadScope);
+
+	#define RE_PROFILE_TAG(NAME, ...) static ::Optick::EventDescription* OPTICK_CONCAT(autogen_tag_, __LINE__) = nullptr; \
+									if (OPTICK_CONCAT(autogen_tag_, __LINE__) == nullptr) OPTICK_CONCAT(autogen_tag_, __LINE__) = ::Optick::EventDescription::Create( NAME, __FILE__, __LINE__ ); \
+									::Optick::Tag::Attach(*OPTICK_CONCAT(autogen_tag_, __LINE__), __VA_ARGS__);
+
+	#define RE_PROFILE_SHUTDOWN() ::Optick::Shutdown();
 #else
     #define RE_PROFILE_BEGIN_SESSION(...) OPTICK_THREAD()
     #define RE_PROFILE_END_SESSION(...)
