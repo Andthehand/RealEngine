@@ -53,6 +53,10 @@ namespace RealEngine {
 
 		{
 			RE_PROFILE_FUNCTION("glfwCreateWindow");
+
+			if (props.Maximized)
+				glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+
 		#if defined(RE_DEBUG)
 			if (Renderer::GetAPI() == RendererAPI::API::OpenGL)
 				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);

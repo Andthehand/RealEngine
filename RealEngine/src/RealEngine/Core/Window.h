@@ -10,6 +10,7 @@ namespace RealEngine {
 		std::string Title;
 		uint32_t Width;
 		uint32_t Height;
+		bool Maximized = true;
 		int MMSA = 4;
 
 		WindowProps(const std::string& title = "RealEngine",
