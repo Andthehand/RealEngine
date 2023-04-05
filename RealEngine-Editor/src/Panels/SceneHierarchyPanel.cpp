@@ -128,12 +128,14 @@ namespace RealEngine {
 		}
 	}
 
-	static bool DrawButtonLabel(const std::string& buttonLabel, const std::string& textLabel) {
+	template<typename UIPayload>
+	static bool DrawButtonLabel(const std::string& buttonLabel, const std::string& textLabel, UIPayload uiPayload) {
 		RE_PROFILE_FUNCTION();
 		
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4.0f, 0.0f));
 		
 		bool isPressed = ImGui::Button(buttonLabel.c_str(), ImVec2(ImGui::CalcItemWidth(), 0));
+		uiPayload();
 		ImGui::SameLine();
 		ImGui::Text(textLabel.c_str());
 		ImGui::PopStyleVar();
@@ -465,15 +467,16 @@ namespace RealEngine {
 								else
 									buttonLabel += "Entity Deleted";
 
-								DrawButtonLabel(buttonLabel, name);
-								if (ImGui::BeginDragDropTarget()) {
-									if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ENTITY")) {
-										uint64_t* id = (uint64_t*)payload->Data;
+								DrawButtonLabel(buttonLabel, name, [scriptInstance, name]() {
+									if (ImGui::BeginDragDropTarget()) {
+										if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ENTITY")) {
+											uint64_t* id = (uint64_t*)payload->Data;
 
-										scriptInstance->SetFieldValue(name, *id);
+											scriptInstance->SetFieldValue(name, *id);
+										}
+										ImGui::EndDragDropTarget();
 									}
-									ImGui::EndDragDropTarget();
-								}
+								});
 								break;
 							}
 						}
@@ -558,15 +561,16 @@ namespace RealEngine {
 									else
 										buttonLabel += "Entity Deleted";
 
-									DrawButtonLabel(buttonLabel, name);
-									if (ImGui::BeginDragDropTarget()) {
-										if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ENTITY")) {
-											uint64_t* id = (uint64_t*)payload->Data;
-											
-											scriptField.SetValue(*id);
+									DrawButtonLabel(buttonLabel, name, [&scriptField]() {
+										if (ImGui::BeginDragDropTarget()) {
+											if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ENTITY")) {
+												uint64_t* id = (uint64_t*)payload->Data;
+
+												scriptField.SetValue(*id);
+											}
+											ImGui::EndDragDropTarget();
 										}
-										ImGui::EndDragDropTarget();
-									}
+									});
 									break;
 								}
 							}
@@ -658,16 +662,16 @@ namespace RealEngine {
 									break;
 								}
 								case ScriptFieldType::Entity: {
-									DrawButtonLabel("Entity: None", name);
-									if (ImGui::BeginDragDropTarget()) {
-										if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ENTITY")) {
-											ScriptFieldInstance& fieldInstance = entityFields[name];
-											uint64_t* id = (uint64_t*)payload->Data;
-											
-											fieldInstance.SetValue(*id);
+									DrawButtonLabel("Entity: None", name, [&fieldInstance = entityFields[name], name]() {
+										if (ImGui::BeginDragDropTarget()) {
+											if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ENTITY")) {
+												uint64_t* id = (uint64_t*)payload->Data;
+
+												fieldInstance.SetValue(*id);
+											}
+											ImGui::EndDragDropTarget();
 										}
-										ImGui::EndDragDropTarget();
-									}
+									});
 									break;
 								}
 							}
