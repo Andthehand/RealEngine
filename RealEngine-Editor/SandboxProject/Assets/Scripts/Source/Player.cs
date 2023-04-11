@@ -39,9 +39,6 @@ namespace Sandbox {
 		}
 
 		void OnUpdate(float ts) {
-			//if(testEntity != null)
-				Console.WriteLine($"ID: {testEntity.ID}");
-
 			// Console.WriteLine($"Player.OnUpdate: {ts}");
 			Time += ts;
 

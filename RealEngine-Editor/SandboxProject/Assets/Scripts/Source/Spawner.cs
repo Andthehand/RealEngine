@@ -9,9 +9,11 @@ using RealEngine;
 namespace Sandbox {
 	public class Spawner : Entity {
 		public Vector3 translation;
+		public Entity copy;
 
 		void OnCreate() {
-			Instantiate(this, ref translation);
+			if(copy)
+				Instantiate(copy, ref translation);
 		}
 	}
 }

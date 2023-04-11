@@ -50,6 +50,9 @@ namespace RealEngine {
 			object instance = InternalCalls.GetScriptInstance(ID);
 			return instance as T;
 		}
-	}
 
+		public static implicit operator bool(Entity entity) {
+			return entity.ID != 0;
+		}
+	}
 }

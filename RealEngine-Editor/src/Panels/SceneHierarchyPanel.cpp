@@ -132,7 +132,7 @@ namespace RealEngine {
 	static bool DrawButtonLabel(const std::string& buttonLabel, const std::string& textLabel, UIPayload uiPayload) {
 		RE_PROFILE_FUNCTION();
 		
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4.0f, 0.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4.0f, 4.0f));
 		
 		bool isPressed = ImGui::Button(buttonLabel.c_str(), ImVec2(ImGui::CalcItemWidth(), 0));
 		uiPayload();

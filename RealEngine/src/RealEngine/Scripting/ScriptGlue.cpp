@@ -104,9 +104,9 @@ namespace RealEngine {
 		Scene* scene = ScriptEngine::GetSceneContext();
 		RE_CORE_ASSERT(scene);
 		Entity entity = scene->GetEntityByUUID(entityID);
-		RE_CORE_ASSERT(entity);
+		//RE_CORE_ASSERT(entity);
 
-		*outTranslation = entity.GetComponent<TransformComponent>().Translation;
+		*outTranslation = entity ? entity.GetComponent<TransformComponent>().Translation : glm::vec3(0.0f);
 	}
 
 	static void TransformComponent_SetTranslation(UUID entityID, glm::vec3* translation) {

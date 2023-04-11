@@ -313,6 +313,10 @@ namespace RealEngine {
 		std::string name = entity.GetName();
 		Entity newEntity = CreateEntity(name);
 		CopyComponentIfExists(AllComponents{}, newEntity, entity);
+
+		if (m_IsRunning)
+			ScriptEngine::OnCreateEntity(newEntity);
+
 		return newEntity;
 	}
 
