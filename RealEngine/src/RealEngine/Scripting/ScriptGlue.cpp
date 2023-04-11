@@ -268,6 +268,10 @@ namespace RealEngine {
 		return Input::IsKeyPressed(keycode);
 	}
 
+	static void Input_GetMousePosition(glm::vec2* outPosition) {
+		*outPosition = Input::GetMousePosition();
+	}
+
 	template<typename... Component>
 	static void RegisterComponent() {
 		RE_PROFILE_FUNCTION();
@@ -338,5 +342,6 @@ namespace RealEngine {
 		RE_ADD_INTERNAL_CALL(Rigidbody2DComponent_SetType);
 
 		RE_ADD_INTERNAL_CALL(Input_IsKeyDown);
+		RE_ADD_INTERNAL_CALL(Input_GetMousePosition);
 	}
 }

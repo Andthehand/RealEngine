@@ -42,6 +42,9 @@ namespace Sandbox {
 			// Console.WriteLine($"Player.OnUpdate: {ts}");
 			Time += ts;
 
+			Vector2 mousePos = Input.GetMousePosition();
+			Logging.Log(ref mousePos);
+
 			Vector3 velocity = Vector3.Zero;
 
 			if (Input.IsKeyDown(KeyCode.W))
