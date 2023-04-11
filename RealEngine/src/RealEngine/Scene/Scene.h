@@ -4,6 +4,7 @@
 #include "RealEngine/Core/UUID.h"
 #include "RealEngine/Core/TimeStep.h"
 #include "RealEngine/Renderer/EditorCamera.h"
+#include "RealEngine/Scene/Components.h"	
 
 class b2World;
 
@@ -37,6 +38,7 @@ namespace RealEngine {
 
 		Entity FindEntityByName(std::string_view name);
 		Entity GetEntityByUUID(UUID uuid);
+		Relationship& GetRelationshipByUUID(UUID uuid);
 
 		Entity GetPrimaryCameraEntity();
 

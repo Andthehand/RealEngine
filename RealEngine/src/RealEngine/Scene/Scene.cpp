@@ -98,6 +98,7 @@ namespace RealEngine {
 		
 		Entity entity = { m_Registry.create(), this };
 
+		entity.AddComponent<Relationship>();
 		entity.AddComponent<IDComponent>(uuid);
 		entity.AddComponent<TransformComponent>();
 
@@ -362,6 +363,10 @@ namespace RealEngine {
 		return {};
 	}
 
+	Relationship& Scene::GetRelationshipByUUID(UUID uuid) {
+		return GetEntityByUUID(uuid).GetRelationship();
+	}
+
 	void Scene::OnPhysics2DStart() {
 		RE_PROFILE_FUNCTION();
 		
@@ -449,6 +454,10 @@ namespace RealEngine {
 
 		// Render
 		Renderer2D::EndScene();
+	}
+
+	template<>
+	void Scene::OnComponentAdded<Relationship>(Entity entity, Relationship& component) {
 	}
 
 	template<>

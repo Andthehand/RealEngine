@@ -40,7 +40,11 @@ namespace RealEngine {
 		if (m_Context) {
 			m_Context->m_Registry.each([&](auto entityID) {
 				Entity entity{ entityID , m_Context.get() };
-				DrawEntityNode(entity);
+
+				Relationship& relationship = entity.GetRelationship();
+				if (relationship.parent == 0) {
+					DrawEntityNode(entity, relationship);
+				}
 			});
 
 			if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
@@ -81,14 +85,18 @@ namespace RealEngine {
 		m_SelectionContext = entity;
 	}
 
-	void SceneHierarchyPanel::DrawEntityNode(Entity entity) {
+	void SceneHierarchyPanel::DrawEntityNode(Entity entity, Relationship& relationship) {
 		RE_PROFILE_FUNCTION();
 		
 		auto& tag = entity.GetComponent<TagComponent>().Tag;
 
-		ImGuiTreeNodeFlags flags = ((m_SelectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
+		bool hasChildren = !relationship.children.empty();
+
+		ImGuiTreeNodeFlags flags = m_SelectionContext == entity ? ImGuiTreeNodeFlags_Selected : 0 | ImGuiTreeNodeFlags_OpenOnArrow;
 		flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
+
 		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
+
 		if (ImGui::BeginDragDropSource()) {
 			//This is the payload
 			uint64_t id = entity.GetUUID();
@@ -98,6 +106,29 @@ namespace RealEngine {
 			ImGui::Text(entity.GetName().c_str());
 
 			ImGui::EndDragDropSource();
+		}
+
+		if (ImGui::BeginDragDropTarget()) {
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ENTITY")) {
+				UUID childID = UUID(*(uint64_t*)payload->Data);
+
+				Relationship& childRelationship = m_Context->GetRelationshipByUUID(childID);
+				UUID childsParent = childRelationship.parent;
+
+				//Clear parent's child list of the moved child if child has parent
+				if (childsParent != 0) {
+					Relationship& childParentRelationship = m_Context->GetRelationshipByUUID(childsParent);
+					childParentRelationship.children.erase(childID);
+				}
+
+				//Set the correct child and parent relationship
+				childRelationship.parent = entity.GetUUID();
+				relationship.children.insert(childID);
+
+				//Sets TreeNodeEx to open
+				ImGui::GetStateStorage()->SetInt(ImGui::GetItemID(), true);
+			}
+			ImGui::EndDragDropTarget();
 		}
 
 		if (ImGui::IsMouseReleased(0)) {
@@ -114,12 +145,15 @@ namespace RealEngine {
 		}
 
 		if (opened) {
-			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-			bool opened = ImGui::TreeNodeEx((void*)9817239, flags, tag.c_str());
-			if (opened)
-				ImGui::TreePop();
+			if (hasChildren) {
+				for (UUID childID : relationship.children) {
+					Entity childEntity = m_Context->GetEntityByUUID(childID);
+					DrawEntityNode(childEntity, childEntity.GetRelationship());
+				}
+			}
 			ImGui::TreePop();
 		}
+		
 
 		if (entityDeleted) {
 			m_Context->DestroyEntity(entity);

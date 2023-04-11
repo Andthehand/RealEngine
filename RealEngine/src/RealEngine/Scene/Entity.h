@@ -49,6 +49,7 @@ namespace RealEngine {
 
 		UUID GetUUID() { return GetComponent<IDComponent>().ID; }
 		const std::string& GetName() { return GetComponent<TagComponent>().Tag; }
+		Relationship& GetRelationship() { return GetComponent<Relationship>(); }
 	
 		bool operator==(const Entity& other) const {
 			return m_EntityHandle == other.m_EntityHandle && m_Scene == other.m_Scene;

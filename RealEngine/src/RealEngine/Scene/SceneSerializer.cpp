@@ -92,6 +92,32 @@ namespace YAML {
 			return true;
 		}
 	};
+
+	// std::unordered_set
+	template <typename T, typename A>
+	struct convert<std::unordered_set<T, A>> {
+		static Node encode(const std::unordered_set<T, A>& rhs) {
+			Node node(NodeType::Sequence);
+			for (const auto& element : rhs)
+				node.insert(element);
+			return node;
+		}
+
+		static bool decode(const Node& node, std::unordered_set<T, A>& rhs) {
+			if (!node.IsSequence())
+				return false;
+
+			rhs.clear();
+			for (const auto& element : node)
+#if defined(__GNUC__) && __GNUC__ < 4
+				// workaround for GCC 3:
+				rhs.insert(element.template as<T>());
+#else
+				rhs.insert(element.as<T>());
+#endif
+			return true;
+		}
+	};
 }
 
 namespace RealEngine {
@@ -101,11 +127,11 @@ namespace RealEngine {
 				out << scriptField.GetValue<Type>();  \
 				break
 
-#define READ_SCRIPT_FIELD(FieldType, Type)             \
-	case ScriptFieldType::FieldType: {                 \
-		Type data = scriptField["Data"].as<Type>();    \
-		fieldInstance.SetValue(data);                  \
-		break;                                         \
+#define READ_SCRIPT_FIELD(FieldType, Type)            \
+	case ScriptFieldType::FieldType: {                \
+		Type data = scriptField["Data"].as<Type>();   \
+		fieldInstance.SetValue(data);                 \
+		break;                                        \
 	}
 
 
@@ -126,6 +152,11 @@ namespace RealEngine {
 		out << YAML::Flow;
 		out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
 		return out;
+	}
+
+	template <typename T>
+	YAML::Emitter& operator<<(YAML::Emitter& emitter, const std::unordered_set<T>& v) {
+		return EmitSeq(emitter, v);
 	}
 
 	static std::string RigidBody2DBodyTypeToString(Rigidbody2DComponent::BodyType bodyType) {
@@ -157,7 +188,7 @@ namespace RealEngine {
 		RE_CORE_ASSERT(entity.HasComponent<IDComponent>());
 
 		out << YAML::BeginMap; // Entity
-		out << YAML::Key << "Entity" << YAML::Value << entity.GetUUID(); // TODO: Entity ID goes here
+		out << YAML::Key << "Entity" << YAML::Value << entity.GetUUID();
 
 		if (entity.HasComponent<TagComponent>()) {
 			out << YAML::Key << "TagComponent";
@@ -167,6 +198,21 @@ namespace RealEngine {
 			out << YAML::Key << "Tag" << YAML::Value << tag;
 
 			out << YAML::EndMap; // TagComponent
+		}
+
+		if (entity.HasComponent<Relationship>()) {
+			out << YAML::Key << "Relationship";
+			out << YAML::BeginMap; // Relationship
+
+			auto& relationship = entity.GetComponent<Relationship>();
+
+			if (relationship.parent != 0)
+				out << YAML::Key << "Parent" << YAML::Value << relationship.parent;
+
+			if (!relationship.children.empty())
+				out << YAML::Key << "Children" << YAML::Value << relationship.children;
+
+			out << YAML::EndMap; // Relationship
 		}
 
 		if (entity.HasComponent<TransformComponent>()) {
@@ -223,7 +269,7 @@ namespace RealEngine {
 					if (entityFields.find(name) == entityFields.end())
 						continue;
 
-					out << YAML::BeginMap; // ScriptField
+					out << YAML::BeginMap; // ScriptField	
 					out << YAML::Key << "Name" << YAML::Value << name;
 					out << YAML::Key << "Type" << YAML::Value << Utils::ScriptFieldTypeToString(field.Type);
 
@@ -373,7 +419,7 @@ namespace RealEngine {
 		auto entities = data["Entities"];
 		if (entities) {
 			for (auto entity : entities) {
-				uint64_t uuid = entity["Entity"].as<uint64_t>(); // TODO
+				uint64_t uuid = entity["Entity"].as<uint64_t>();
 
 				std::string name;
 				auto tagComponent = entity["TagComponent"];
@@ -383,6 +429,16 @@ namespace RealEngine {
 				//RE_CORE_TRACE("Deserialized entity with ID = {0}, name = {1}", uuid, name);
 
 				Entity deserializedEntity = m_Scene->CreateEntityWithUUID(uuid, name);
+
+				auto relationship = entity["Relationship"];
+				if (relationship) {
+					auto& relations = deserializedEntity.GetComponent<Relationship>();
+					if (relationship["Parent"])
+						relations.parent = relationship["Parent"].as<UUID>();
+					if (relationship["Children"]) {
+						relations.children = relationship["Children"].as<std::unordered_set<UUID>>();
+					}						
+				}
 
 				auto transformComponent = entity["TransformComponent"];
 				if (transformComponent) {

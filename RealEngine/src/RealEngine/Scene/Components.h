@@ -11,6 +11,11 @@
 #include <glm/gtx/quaternion.hpp>
 
 namespace RealEngine {
+	struct Relationship {
+		UUID parent = 0; // Entity ID of the parent entity
+		std::unordered_set<UUID> children; // Vector of child entities
+	};
+
 	struct IDComponent {
 		UUID ID;
 
