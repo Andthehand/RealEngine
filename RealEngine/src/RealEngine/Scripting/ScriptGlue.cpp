@@ -267,6 +267,10 @@ namespace RealEngine {
 	static bool Input_IsKeyDown(KeyCode keycode) {
 		return Input::IsKeyPressed(keycode);
 	}
+	
+	static bool Input_IsMouseButtonPressed(MouseCode mousecode) {
+		return Input::IsMouseButtonPressed(mousecode);
+	}
 
 	static void Input_GetMousePosition(glm::vec2* outPosition) {
 		*outPosition = Input::GetMousePosition();
@@ -342,6 +346,7 @@ namespace RealEngine {
 		RE_ADD_INTERNAL_CALL(Rigidbody2DComponent_SetType);
 
 		RE_ADD_INTERNAL_CALL(Input_IsKeyDown);
+		RE_ADD_INTERNAL_CALL(Input_IsMouseButtonPressed);
 		RE_ADD_INTERNAL_CALL(Input_GetMousePosition);
 	}
 }
