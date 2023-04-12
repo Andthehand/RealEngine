@@ -45,6 +45,7 @@ namespace RealEngine {
 		static Ref<Project> New();
 		static Ref<Project> Load(const std::filesystem::path& path);
 		static bool SaveActive();
+		static bool Save(const std::filesystem::path path);
 	private:
 		ProjectConfig m_Config;
 		std::filesystem::path m_ProjectDirectory;

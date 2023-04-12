@@ -27,10 +27,13 @@ namespace RealEngine {
 	}
 
 	bool Project::SaveActive() {
-		RE_PROFILE_FUNCTION();
-	
 		std::filesystem::path path = s_ActiveProject->m_ProjectDirectory / s_ActiveProject->GetConfig().Name += (".realproj");
+		return Save(path);
+	}
 
+	bool Project::Save(const std::filesystem::path path) {
+		RE_PROFILE_FUNCTION();
+		
 		ProjectSerializer serializer(s_ActiveProject);
 		if (serializer.Serialize(path)) {
 			s_ActiveProject->m_ProjectDirectory = path.parent_path();
