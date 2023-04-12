@@ -633,7 +633,7 @@ namespace RealEngine {
 	}
 
 	void EditorLayer::SaveProject() {
-		// Project::SaveActive();
+		Project::SaveActive();
 	}
 
 	void EditorLayer::NewScene() {
@@ -674,6 +674,12 @@ namespace RealEngine {
 
 			m_ActiveScene = m_EditorScene;
 			m_EditorScenePath = path;
+
+			std::string stringPath = path.string();
+			stringPath.replace(0, Project::GetAssetDirectory().string().length() + 1, "");
+
+			Project::SetProjectStartScene(stringPath);
+			SaveProject();
 		}
 		else {
 			RE_ASSERT(false, "Failed to Open Scene");
@@ -687,7 +693,7 @@ namespace RealEngine {
 			SerializeScene(m_ActiveScene, m_EditorScenePath);
 		else
 			SaveSceneAs();
-	}
+		}
 	
 	void EditorLayer::SaveSceneAs(){
 		RE_PROFILE_FUNCTION();
