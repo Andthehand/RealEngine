@@ -512,6 +512,7 @@ namespace RealEngine {
 		m_OnCreateMethod = scriptClass->GetMethod("OnCreate", 0);
 		m_OnUpdateMethod = scriptClass->GetMethod("OnUpdate", 1);
 
+		//Physics
 		m_OnBeginContact = scriptClass->GetMethod("OnBeginContact", 0);
 		m_OnEndContact = scriptClass->GetMethod("OnEndContact", 0);
 

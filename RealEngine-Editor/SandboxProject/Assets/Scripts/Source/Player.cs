@@ -17,8 +17,8 @@ namespace Sandbox {
 		public float Speed = 2.0f;
 		public float Time = 0.0f;
 
-		public Color ChangeEntityColor = new Color(1.0f);
-		public Color EntityColor = new Color(1.0f);
+		public Color ChangeEntityColor = new Color(255.0f);
+		public Color EntityColor = new Color(255.0f);
 
 		void OnCreate() {
 			m_Transform = GetComponent<TransformComponent>();

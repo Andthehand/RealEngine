@@ -487,11 +487,11 @@ namespace RealEngine {
 
 								ScriptFieldInstance& fieldInstance = entityFields[name];
 
-								// TODO(Yan): turn this assert into RealEngine log warning
-								RE_CORE_ASSERT(fields.find(name) != fields.end());
-
-								if (fields.find(name) == fields.end())
+								//This gets hit when you chane what variables are public inside of the script
+								if (fields.find(name) == fields.end()) {
+									RE_CORE_WARN("{0}: No longer exists inside the script attached to {1}", name, deserializedEntity.GetName());
 									continue;
+								}
 
 								fieldInstance.Field = fields.at(name);
 
