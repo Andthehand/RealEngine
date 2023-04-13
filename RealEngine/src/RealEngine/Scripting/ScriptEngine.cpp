@@ -323,6 +323,30 @@ namespace RealEngine {
 		}
 	}
 
+	void ScriptEngine::OnBeginContactEntity(UUID entityUUID) {
+		RE_PROFILE_FUNCTION();
+
+		if (s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end()) {
+			Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
+			instance->InvokeOnBeginContact();
+		}
+		else {
+			RE_CORE_ERROR("Could not find ScriptInstance for entity {}", entityUUID);
+		}
+	}
+
+	void ScriptEngine::OnEndContactEntity(UUID entityUUID) {
+		RE_PROFILE_FUNCTION();
+
+		if (s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end()) {
+			Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
+			instance->InvokeOnEndContact();
+		}
+		else {
+			RE_CORE_ERROR("Could not find ScriptInstance for entity {}", entityUUID);
+		}
+	}
+
 	Scene* ScriptEngine::GetSceneContext() {
 		return s_Data->SceneContext;
 	}
@@ -484,8 +508,12 @@ namespace RealEngine {
 		m_Instance = scriptClass->Instantiate();
 
 		m_Constructor = s_Data->EntityClass.GetMethod(".ctor", 1);
+
 		m_OnCreateMethod = scriptClass->GetMethod("OnCreate", 0);
 		m_OnUpdateMethod = scriptClass->GetMethod("OnUpdate", 1);
+
+		m_OnBeginContact = scriptClass->GetMethod("OnBeginContact", 0);
+		m_OnEndContact = scriptClass->GetMethod("OnEndContact", 0);
 
 		// Call Entity constructor
 		{
@@ -509,6 +537,20 @@ namespace RealEngine {
 			void* param = &ts;
 			m_ScriptClass->InvokeMethod(m_Instance, m_OnUpdateMethod, &param);
 		}
+	}
+
+	void ScriptInstance::InvokeOnBeginContact() {
+		RE_PROFILE_FUNCTION();
+
+		if (m_OnBeginContact) 
+			m_ScriptClass->InvokeMethod(m_Instance, m_OnBeginContact);
+	}
+
+	void ScriptInstance::InvokeOnEndContact() {
+		RE_PROFILE_FUNCTION();
+
+		if (m_OnEndContact)
+			m_ScriptClass->InvokeMethod(m_Instance, m_OnEndContact);
 	}
 
 	bool ScriptInstance::GetFieldValueInternal(const std::string& name, void* buffer) {

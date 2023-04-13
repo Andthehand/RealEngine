@@ -14,17 +14,11 @@ namespace Sandbox {
 		private Rigidbody2DComponent m_Rigidbody;
 		private SpriteRendererComponent m_RenderComponent;
 
-		public Entity testEntity;
 		public float Speed = 2.0f;
 		public float Time = 0.0f;
+
+		public Color ChangeEntityColor = new Color(1.0f);
 		public Color EntityColor = new Color(1.0f);
-		public Vector2 tempVec2 = new Vector2(1.0f);
-		public Vector3 tempVec3 = new Vector3(1.0f);
-		public Vector4 tempVec4 = new Vector4(0.0f);
-		public string tempString = "Hello World";
-		public double temp = 1.01231;
-		public uint tempU32 = 10;
-		public bool tempBool = true;
 
 		void OnCreate() {
 			m_Transform = GetComponent<TransformComponent>();
@@ -32,18 +26,11 @@ namespace Sandbox {
 			m_RenderComponent = GetComponent<SpriteRendererComponent>();
 
 			EntityColor = m_RenderComponent.Color;
-			Logging.Log(ref tempVec2);
-			Logging.Log(ref tempVec3);
-			Logging.Log(ref tempVec4);
-			Logging.Log(tempString);
 		}
 
 		void OnUpdate(float ts) {
 			// Console.WriteLine($"Player.OnUpdate: {ts}");
 			Time += ts;
-
-			Vector2 mousePos = Input.GetMousePosition();
-			Logging.Log(ref mousePos);
 
 			Vector3 velocity = Vector3.Zero;
 
@@ -71,10 +58,17 @@ namespace Sandbox {
 
 			m_Rigidbody.ApplyLinearImpulse(velocity.XY, true);
 
-			m_RenderComponent.Color = EntityColor;
 			//Vector3 translation = m_Transform.Translation;
 			//translation += velocity * ts;
 			//m_Transform.Translation = translation;
+		}
+
+		void OnBeginContact() {
+			m_RenderComponent.Color = ChangeEntityColor;
+		}
+
+		void OnEndContact() {
+			m_RenderComponent.Color = EntityColor;
 		}
 	}
 }

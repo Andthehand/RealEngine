@@ -6,6 +6,7 @@
 #include "RealEngine/Scripting/ScriptEngine.h"
 #include "RealEngine/Renderer/Renderer2D.h"
 #include "RealEngine/Physics/Physics2D.h"
+#include "RealEngine/Physics/SceneContactListener.h"	
 
 #include "Entity.h"
 
@@ -122,7 +123,7 @@ namespace RealEngine {
 	
 		m_IsRunning = true;
 
-		OnPhysics2DStart();
+		OnPhysics2DStart(false);
 
 		// Scripting
 		{
@@ -150,7 +151,7 @@ namespace RealEngine {
 	void Scene::OnSimulationStart() {
 		RE_PROFILE_FUNCTION();
 		
-		OnPhysics2DStart();
+		OnPhysics2DStart(true);
 	}
 
 	void Scene::OnSimulationStop() {
@@ -367,10 +368,14 @@ namespace RealEngine {
 		return GetEntityByUUID(uuid).GetRelationship();
 	}
 
-	void Scene::OnPhysics2DStart() {
+	void Scene::OnPhysics2DStart(bool isSimulated) {
 		RE_PROFILE_FUNCTION();
-		
+
 		m_PhysicsWorld = new b2World({ 0.0f, -9.8f });
+
+		static SceneContactListener m_ContactListener;
+		if(!isSimulated)
+			m_PhysicsWorld->SetContactListener(&m_ContactListener);
 
 		auto view = m_Registry.view<Rigidbody2DComponent>();
 		for (auto e : view) {
@@ -385,6 +390,10 @@ namespace RealEngine {
 
 			b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
 			body->SetFixedRotation(rb2d.FixedRotation);
+
+			if(entity.HasComponent<ScriptComponent>())
+				body->GetUserData().pointer = (uintptr_t)entity.GetUUID();
+			
 			rb2d.RuntimeBody = body;
 
 			if (entity.HasComponent<BoxCollider2DComponent>()) {

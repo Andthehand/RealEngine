@@ -57,7 +57,7 @@ namespace RealEngine {
 		template<typename T>
 		void OnComponentAdded(Entity entity, T& component);
 
-		void OnPhysics2DStart();
+		void OnPhysics2DStart(bool isSimulated);
 		void OnPhysics2DStop();
 
 		void RenderScene(EditorCamera& camera);

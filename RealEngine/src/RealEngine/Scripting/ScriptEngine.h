@@ -92,6 +92,9 @@ namespace RealEngine {
 		void InvokeOnCreate();
 		void InvokeOnUpdate(float ts);
 
+		void InvokeOnBeginContact();
+		void InvokeOnEndContact();
+
 		Ref<ScriptClass> GetScriptClass() { return m_ScriptClass; }
 
 		template<typename T>
@@ -121,8 +124,13 @@ namespace RealEngine {
 
 		MonoObject* m_Instance = nullptr;
 		MonoMethod* m_Constructor = nullptr;
+
 		MonoMethod* m_OnCreateMethod = nullptr;
 		MonoMethod* m_OnUpdateMethod = nullptr;
+
+		//Physics
+		MonoMethod* m_OnBeginContact = nullptr;
+		MonoMethod* m_OnEndContact = nullptr;
 
 		inline static char s_FieldValueBuffer[16];
 
@@ -144,8 +152,13 @@ namespace RealEngine {
 		static void OnRuntimeStop();
 
 		static bool EntityClassExists(const std::string& fullClassName);
+
 		static void OnCreateEntity(Entity entity);
 		static void OnUpdateEntity(Entity entity, Timestep ts);
+
+		//Physics
+		static void OnBeginContactEntity(UUID entityUUID);
+		static void OnEndContactEntity(UUID entityUUID);
 
 		static Scene* GetSceneContext();
 		static Ref<ScriptInstance> GetEntityScriptInstance(UUID entityID);
