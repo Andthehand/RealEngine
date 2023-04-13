@@ -292,6 +292,7 @@ namespace RealEngine {
 						WRITE_SCRIPT_FIELD(Vector2, glm::vec2);
 						WRITE_SCRIPT_FIELD(Vector3, glm::vec3);
 						WRITE_SCRIPT_FIELD(Vector4, glm::vec4);
+						WRITE_SCRIPT_FIELD(Color, glm::vec4);
 						WRITE_SCRIPT_FIELD(Entity, UUID);
 					}
 					out << YAML::EndMap; // ScriptFields
@@ -407,6 +408,7 @@ namespace RealEngine {
 			data = YAML::LoadFile(filepath.string());
 		}
 		catch (YAML::ParserException e) {
+			RE_CORE_CRITICAL("{0}: On line {1}", e.msg, e.mark.line);
 			return false;
 		}
 
@@ -511,6 +513,7 @@ namespace RealEngine {
 									READ_SCRIPT_FIELD(Vector2, glm::vec2);
 									READ_SCRIPT_FIELD(Vector3, glm::vec3);
 									READ_SCRIPT_FIELD(Vector4, glm::vec4);
+									READ_SCRIPT_FIELD(Color, glm::vec4);
 									READ_SCRIPT_FIELD(Entity, UUID);
 								}
 							}

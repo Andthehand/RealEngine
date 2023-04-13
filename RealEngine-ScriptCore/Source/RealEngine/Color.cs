@@ -11,35 +11,35 @@ namespace RealEngine {
 			R = scalar;
 			G = scalar;
 			B = scalar;
-			A = scalar;
+			A = 255.0f;
 		}
 
-		public Color(float x, float y, float z, float w) {
-			R = x;
-			G = y;
-			B = z;
-			A = w;
+		public Color(float r, float g, float b, float a) {
+			R = r;
+			G = g;
+			B = b;
+			A = a;
 		}
 
-		public Color(Vector2 xy, float z, float w) {
-			R = xy.X;
-			G = xy.Y;
-			B = z;
-			A = w;
+		public Color(Vector2 rg, float b, float a) {
+			R = rg.X;
+			G = rg.Y;
+			B = b;
+			A = a;
 		}
 
-		public Color(Vector3 xyz, float w) {
-			R = xyz.X;
-			G = xyz.Y;
-			B = xyz.Z;
-			A = w;
+		public Color(Vector3 rgb, float a) {
+			R = rgb.X;
+			G = rgb.Y;
+			B = rgb.Z;
+			A = a;
 		}
 
-		public Color(Vector4 xyzw) {
-			R = xyzw.X;
-			G = xyzw.Y;
-			B = xyzw.Z;
-			A = xyzw.W;
+		public Color(Vector4 rgba) {
+			R = rgba.X;
+			G = rgba.Y;
+			B = rgba.Z;
+			A = rgba.W;
 		}
 
 		public static Color operator +(Color a, Color b) {

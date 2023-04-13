@@ -56,7 +56,7 @@ namespace RealEngine {
 			ImGui::PushID(filenameString.c_str());
 			Ref<Texture2D> icon = directoryEntry.is_directory() ? m_DirectoryIcon : m_FileIcon;
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-			ImGui::ImageButton((ImTextureID)icon->GetRendererID(), { iconSize, iconSize }, { 0, 1 }, { 1, 0 });
+			ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetRendererID(), { iconSize, iconSize }, { 0, 1 }, { 1, 0 });
 
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 			if (ImGui::BeginDragDropSource()) {
@@ -67,7 +67,7 @@ namespace RealEngine {
 				ImGui::SetDragDropPayload(GetPayloadType(path.extension().string()), itemPath, (wcslen(itemPath) + 1) * sizeof(wchar_t));
 
 				//Thumbnail
-				ImGui::Image((ImTextureID)icon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+				ImGui::Image((ImTextureID)(uint64_t)icon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
 
 				ImGui::EndDragDropSource();
 			}

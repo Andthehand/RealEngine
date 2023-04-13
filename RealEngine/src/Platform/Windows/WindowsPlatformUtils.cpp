@@ -10,7 +10,7 @@
 
 namespace RealEngine {
 	float Time::GetTime() {
-		return glfwGetTime();
+		return (float)glfwGetTime();
 	}
 
 	std::string FileDialogs::OpenFile(const char* filter) {
