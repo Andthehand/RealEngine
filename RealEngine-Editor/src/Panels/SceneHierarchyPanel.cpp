@@ -686,7 +686,7 @@ namespace RealEngine {
 									break;
 								}
 								case ScriptFieldType::Color: {
-									glm::vec4 data = glm::vec4{ 0.0f };
+									glm::vec4 data = glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f };
 									if (ImGui::ColorEdit4(name.c_str(), glm::value_ptr(data))) {
 										ScriptFieldInstance& fieldInstance = entityFields[name];
 										fieldInstance.Field = field;
