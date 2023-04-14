@@ -379,7 +379,7 @@ namespace RealEngine {
 		
 		YAML::Emitter out;
 		out << YAML::BeginMap;
-		out << YAML::Key << "Scene" << YAML::Value << "Untitled";
+		out << YAML::Key << "Scene" << YAML::Value << filepath.stem().string();
 		out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
 		m_Scene->m_Registry.each([&](auto entityID) {
 			Entity entity = { entityID, m_Scene.get() };
