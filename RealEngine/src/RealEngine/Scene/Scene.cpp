@@ -404,6 +404,7 @@ namespace RealEngine {
 
 				b2FixtureDef fixtureDef;
 				fixtureDef.shape = &boxShape;
+				fixtureDef.isSensor = bc2d.IsSensor;
 				fixtureDef.density = bc2d.Density;
 				fixtureDef.friction = bc2d.Friction;
 				fixtureDef.restitution = bc2d.Restitution;
@@ -420,6 +421,7 @@ namespace RealEngine {
 
 				b2FixtureDef fixtureDef;
 				fixtureDef.shape = &circleShape;
+				fixtureDef.isSensor = cc2d.IsSensor;
 				fixtureDef.density = cc2d.Density;
 				fixtureDef.friction = cc2d.Friction;
 				fixtureDef.restitution = cc2d.Restitution;

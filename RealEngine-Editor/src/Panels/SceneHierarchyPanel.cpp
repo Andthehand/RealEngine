@@ -766,6 +766,7 @@ namespace RealEngine {
 		DrawComponent<BoxCollider2DComponent>("Box Collider 2D", entity, [](auto& component) {
 			ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset), 0.01f);
 			ImGui::DragFloat2("Size", glm::value_ptr(component.Size), 0.01f);
+			ImGui::Checkbox("Sensor", &component.IsSensor);
 			ImGui::DragFloat("Density", &component.Density, 0.01f, 0.0f, 1.0f);
 			ImGui::DragFloat("Friction", &component.Friction, 0.01f, 0.0f, 1.0f);
 			ImGui::DragFloat("Restitution", &component.Restitution, 0.01f, 0.0f, 1.0f);
@@ -775,6 +776,7 @@ namespace RealEngine {
 		DrawComponent<CircleCollider2DComponent>("Circle Collider 2D", entity, [](auto& component) {
 			ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset), 0.01f);
 			ImGui::DragFloat("Radius", &component.Radius, 0.01f);
+			ImGui::Checkbox("Sensor", &component.IsSensor);
 			ImGui::DragFloat("Density", &component.Density, 0.01f, 0.0f, 1.0f);
 			ImGui::DragFloat("Friction", &component.Friction, 0.01f, 0.0f, 1.0f);
 			ImGui::DragFloat("Restitution", &component.Restitution, 0.01f, 0.0f, 1.0f);
