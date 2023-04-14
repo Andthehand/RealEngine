@@ -4,6 +4,7 @@
 #include "Panels/ContentBrowserPanel.h"
 
 #include "RealEngine/Renderer/EditorCamera.h"
+#include "RealEngine/Core/CircularBuffer.h"
 
 namespace RealEngine {
 	class EditorLayer : public Layer {
@@ -67,8 +68,8 @@ namespace RealEngine {
 		SceneState m_SceneState = SceneState::Edit;
 
 		//FPS counter
-		float deltaTime = 0.0f;
-		float fps = 0.0f;
+		float m_DeltaTime = 0.0f;
+		CircularBuffer<float> m_FPS;
 
 		bool m_Wireframe = false;
 

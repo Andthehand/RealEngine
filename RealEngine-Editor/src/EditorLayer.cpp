@@ -14,7 +14,7 @@
 
 namespace RealEngine {
     EditorLayer::EditorLayer() 
-		: Layer("EditorLayer") { }
+		: Layer("EditorLayer"), m_FPS(30) { }
 
     void EditorLayer::OnAttach() {
         RE_PROFILE_FUNCTION();
@@ -72,9 +72,9 @@ namespace RealEngine {
             m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
         }
 
-        deltaTime += ts;
-        deltaTime /= 2.0f;
-        fps = 1.0f / deltaTime;
+        m_DeltaTime += ts;
+        m_DeltaTime /= 2.0f;
+        m_FPS.push_back(1.0f / m_DeltaTime);
 
 		m_EditorCamera.OnUpdate(ts);
 
@@ -224,7 +224,7 @@ namespace RealEngine {
 		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
 		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
 
-		ImGui::Text("FPS: %f", fps);
+		ImGui::Text("FPS: %f", m_FPS.Average());
 
 		if (ImGui::Button("Wireframe")) {
 			m_Wireframe = !m_Wireframe;

@@ -7,6 +7,8 @@
 
 #include "RealEngine/Core/TimeStep.h"
 
+#include "RealEngine/Core/CircularBuffer.h"
+
 #include "RealEngine/Core/Input.h"
 #include "RealEngine/Core/KeyCodes.h"
 #include "RealEngine/Core/MouseCodes.h"
