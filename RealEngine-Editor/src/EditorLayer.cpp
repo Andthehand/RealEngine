@@ -259,6 +259,9 @@ namespace RealEngine {
 
 		ImGui::Begin("Settings");
 		ImGui::Checkbox("Show physics colliders", &m_ShowPhysicsColliders);
+		static bool vsync = true;
+		if (ImGui::Checkbox("Vsync", &vsync))
+			Application::Get().GetWindow().SetVSync(vsync);
 		ImGui::End();
 
 		//ImGui Viewport Window/Panel
