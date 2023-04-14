@@ -24,5 +24,9 @@ namespace RealEngine {
 		static const std::unordered_set<std::string> REALENGINE_SCENE_EXTENTIONS {
 			".scene"
 		};
+
+		static const std::unordered_set<std::string> REALENGINE_PROJECT_EXTENTIONS{
+			".realProj"
+		};
 	}
 }

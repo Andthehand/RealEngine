@@ -20,6 +20,7 @@
 #include "RealEngine/UI/UI.h"
 
 #include "RealEngine/Utils/PlatformUtils.h"
+#include "RealEngine/Utils/FileFormats.h"
 
 
 namespace RealEngine {
@@ -719,9 +720,13 @@ namespace RealEngine {
 			ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
 
 			if (ImGui::Button("Texture", ImVec2(100.0f, 0.0f))) {
-				std::string texturePath = FileDialogs::OpenFile("Image Files");
-				if(!texturePath.empty())
-					component.Texture = Texture2D::Create(texturePath);
+				std::filesystem::path texturePath = FileDialogs::OpenFile("Image Files");
+				if (!texturePath.empty()) {
+					if (FileExtenstion::DoesExtensionExist(FileExtenstion::STBI_IMAGE_EXTENSTIONS, texturePath.extension().string()))
+						component.Texture = Texture2D::Create(texturePath);
+					else
+						RE_CORE_WARN("{0} is not a proper image extention", texturePath.extension().string());
+				}
 			}
 			
 			if (ImGui::BeginDragDropTarget()) {
