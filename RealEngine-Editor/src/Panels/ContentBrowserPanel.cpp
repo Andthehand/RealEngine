@@ -34,6 +34,7 @@ namespace RealEngine {
 		if (m_CurrentDirectory != m_BaseDirectory) {
 			if (ImGui::Button("<-")) {
 				m_CurrentDirectory = m_CurrentDirectory.parent_path();
+				m_ImageIcons.clear();
 			}
 		}
 
@@ -54,7 +55,27 @@ namespace RealEngine {
 			std::string filenameString = path.filename().string();
 
 			ImGui::PushID(filenameString.c_str());
-			Ref<Texture2D> icon = directoryEntry.is_directory() ? m_DirectoryIcon : m_FileIcon;
+
+			Ref<Texture2D> icon = nullptr;
+			if (directoryEntry.is_directory()) {
+				icon = m_DirectoryIcon;
+			}
+			else if (FileExtenstion::DoesExtensionExist(FileExtenstion::STBI_IMAGE_EXTENSTIONS, path.extension().string())) {
+				if (m_ImageIcons.find(path.filename().string()) != m_ImageIcons.end()) {
+					icon = m_ImageIcons.find(path.filename().string())->second;
+				}
+				else {
+					Ref<Texture2D> tempImageIcon = Texture2D::Create(path);
+					m_ImageIcons.emplace(path.filename().string(), tempImageIcon);
+				
+					icon = tempImageIcon;
+				}
+			}
+			else {
+				icon = m_FileIcon;
+			}
+			
+			
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 			ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetRendererID(), { iconSize, iconSize }, { 0, 1 }, { 1, 0 });
 
@@ -75,9 +96,11 @@ namespace RealEngine {
 
 			ImGui::PopStyleColor();
 			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-				if (directoryEntry.is_directory())
+				if (directoryEntry.is_directory()) {
 					m_CurrentDirectory /= path.filename();
-				//TODO: Implement more stuff to be used when double clicked liek a scene
+					m_ImageIcons.clear();
+				}
+				//TODO: Implement more stuff to be used when double clicked like a scene
 			}
 			ImGui::TextWrapped(filenameString.c_str());
 
