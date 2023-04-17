@@ -60,5 +60,13 @@
 		public static Vector4 operator /(Vector4 vector, float scalar) {
 			return new Vector4(vector.X / scalar, vector.Y / scalar, vector.Z / scalar, vector.W / scalar);
 		}
+
+		public static bool operator ==(Vector4 vec1, Vector4 vec2) {
+			return vec1.Equals(vec2);
+		}
+
+		public static bool operator !=(Vector4 vec1, Vector4 vec2) {
+			return !vec1.Equals(vec2);
+		}
 	}
 }

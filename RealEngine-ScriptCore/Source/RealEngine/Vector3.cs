@@ -38,5 +38,12 @@
 			return new Vector3(vector.X * scalar, vector.Y * scalar, vector.Z * scalar);
 		}
 
+		public static bool operator ==(Vector3 vec1, Vector3 vec2) {
+			return vec1.Equals(vec2);
+		}
+
+		public static bool operator !=(Vector3 vec1, Vector3 vec2) {
+			return !vec1.Equals(vec2);
+		}
 	}
 }
