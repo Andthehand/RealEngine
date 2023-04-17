@@ -8,8 +8,6 @@ using RealEngine;
 
 namespace Sandbox {
 	public class Camera : Entity {
-		public Entity OtherEntity;
-
 		public float DistanceFromPlayer = 5.0f;
 
 		private Entity m_Player;

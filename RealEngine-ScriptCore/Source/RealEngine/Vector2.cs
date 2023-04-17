@@ -31,5 +31,13 @@ namespace RealEngine {
 		public float Length() {
 			return (float)Math.Sqrt(LengthSquared());
 		}
+
+		public static bool operator ==(Vector2 obj1, Vector2 obj2) {
+			return obj1.Equals(obj2);
+		}
+
+		public static bool operator !=(Vector2 obj1, Vector2 obj2) {
+			return !obj1.Equals(obj2);
+		}
 	}
 }

@@ -1,0 +1,61 @@
+Scene: Snake
+Entities:
+  - Entity: 5904056319972861827
+    TagComponent:
+      Tag: Tile
+    Relationship:
+      {}
+    TransformComponent:
+      Translation: [246.899994, 400.200012, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      TilingFactor: 1
+  - Entity: 13188490402175490794
+    TagComponent:
+      Tag: Game
+    Relationship:
+      {}
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    ScriptComponent:
+      ClassName: Sandbox.Game
+      ScriptFields:
+        - Name: DefaultGridColor
+          Type: Color
+          Data: [255, 255, 255, 255]
+        - Name: FruitColor
+          Type: Color
+          Data: [66.9498215, 255, 0, 255]
+        - Name: ReferenceGrid
+          Type: Entity
+          Data: 5904056319972861827
+        - Name: SnakeBodyColor
+          Type: Color
+          Data: [255, 141.776062, 0, 255]
+        - Name: SnakeColor
+          Type: Color
+          Data: [255, 0, 0, 255]
+  - Entity: 5479895369298036961
+    TagComponent:
+      Tag: Camera
+    Relationship:
+      {}
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 1
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 15
+        OrthographicNear: -1
+        OrthographicFar: 1
+      Primary: true
+      FixedAspectRatio: false

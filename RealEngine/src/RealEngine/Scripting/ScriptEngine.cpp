@@ -291,6 +291,9 @@ namespace RealEngine {
 
 	void ScriptEngine::OnCreateEntity(Entity entity) {
 		RE_PROFILE_FUNCTION();
+
+		if (!entity.HasComponent<ScriptComponent>())
+			return;
 		
 		const auto& sc = entity.GetComponent<ScriptComponent>();
 		if (ScriptEngine::EntityClassExists(sc.ClassName)) {
@@ -414,7 +417,8 @@ namespace RealEngine {
 
 			MonoClass* monoClass = mono_class_from_name(s_Data->AppAssemblyImage, nameSpace, className);
 
-			if (monoClass == entityClass)
+			if (monoClass == entityClass
+				|| monoClass == nullptr)
 				continue;
 
 			bool isEntity = mono_class_is_subclass_of(monoClass, entityClass, false);
