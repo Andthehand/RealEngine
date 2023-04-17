@@ -1,0 +1,15 @@
+Scene: Test
+Entities:
+  - Entity: 3212020517080726116
+    TagComponent:
+      Tag: Test
+    Relationship:
+      {}
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    ScriptComponent:
+      ClassName: Sandbox.AttributeTest
+      ScriptFields:
+        []

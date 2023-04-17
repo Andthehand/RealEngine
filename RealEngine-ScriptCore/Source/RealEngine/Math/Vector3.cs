@@ -4,6 +4,12 @@
 
 		public static Vector3 Zero => new Vector3(0.0f);
 
+		public Vector3(Vector3Int vector3Int) {
+			X = (float)vector3Int.X;
+			Y = (float)vector3Int.Y;
+			Z = (float)vector3Int.Z;
+		}
+
 		public Vector3(float scalar) {
 			X = scalar;
 			Y = scalar;

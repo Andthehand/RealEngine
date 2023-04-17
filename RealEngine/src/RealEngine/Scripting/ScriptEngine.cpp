@@ -40,6 +40,9 @@ namespace RealEngine {
 		{ "RealEngine.Vector2", ScriptFieldType::Vector2 },
 		{ "RealEngine.Vector3", ScriptFieldType::Vector3 },
 		{ "RealEngine.Vector4", ScriptFieldType::Vector4 },
+		{ "RealEngine.Vector2Int", ScriptFieldType::Vector2Int },
+		{ "RealEngine.Vector3Int", ScriptFieldType::Vector3Int },
+		{ "RealEngine.Vector4Int", ScriptFieldType::Vector4Int },
 
 		{ "RealEngine.Entity", ScriptFieldType::Entity },
 	};
@@ -402,6 +405,7 @@ namespace RealEngine {
 		const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(s_Data->AppAssemblyImage, MONO_TABLE_TYPEDEF);
 		int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
 		MonoClass* entityClass = mono_class_from_name(s_Data->CoreAssemblyImage, "RealEngine", "Entity");
+		MonoClass* hideInInspectorClass = mono_class_from_name(s_Data->CoreAssemblyImage, "RealEngine", "HideInInspector");
 
 		for (int32_t i = 0; i < numTypes; i++) {
 			uint32_t cols[MONO_TYPEDEF_SIZE];
@@ -441,6 +445,14 @@ namespace RealEngine {
 				uint32_t flags = mono_field_get_flags(field);
 				if (flags & FIELD_ATTRIBUTE_PUBLIC) {
 					MonoType* type = mono_field_get_type(field);
+
+					// Check if the HideInInspector attribute is applied to the object's field
+					MonoCustomAttrInfo* attrInfo = mono_custom_attrs_from_field(monoClass, field);
+					if(attrInfo && mono_custom_attrs_has_attr(attrInfo, hideInInspectorClass)) {
+						continue;
+					}
+					mono_custom_attrs_free(attrInfo);
+
 					ScriptFieldType fieldType = Utils::MonoTypeToScriptFieldType(type);
 					RE_CORE_WARN("  {} ({})", fieldName, Utils::ScriptFieldTypeToString(fieldType));
 

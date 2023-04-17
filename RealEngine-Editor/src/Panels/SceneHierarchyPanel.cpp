@@ -472,6 +472,13 @@ namespace RealEngine {
 								}
 								break;
 							}
+							case ScriptFieldType::Vector2Int: {
+								glm::ivec2 data = scriptInstance->GetFieldValue<glm::ivec2>(name);
+								if (ImGui::DragInt2(name.c_str(), glm::value_ptr(data), 0.01f)) {
+									scriptInstance->SetFieldValue(name, data);
+								}
+								break;
+							}
 							case ScriptFieldType::Vector3: {
 								glm::vec3 data = scriptInstance->GetFieldValue<glm::vec3>(name);
 								if (ImGui::DragFloat3(name.c_str(), glm::value_ptr(data), 0.01f)) {
@@ -479,9 +486,23 @@ namespace RealEngine {
 								}
 								break;
 							}
+							case ScriptFieldType::Vector3Int: {
+								glm::ivec3 data = scriptInstance->GetFieldValue<glm::ivec3>(name);
+								if (ImGui::DragInt3(name.c_str(), glm::value_ptr(data), 0.01f)) {
+									scriptInstance->SetFieldValue(name, data);
+								}
+								break;
+							}
 							case ScriptFieldType::Vector4: {
 								glm::vec4 data = scriptInstance->GetFieldValue<glm::vec4>(name);
 								if (ImGui::DragFloat4(name.c_str(), glm::value_ptr(data), 0.01f)) {
+									scriptInstance->SetFieldValue(name, data);
+								}
+								break;
+							}
+							case ScriptFieldType::Vector4Int: {
+								glm::ivec4 data = scriptInstance->GetFieldValue<glm::ivec4>(name);
+								if (ImGui::DragInt4(name.c_str(), glm::value_ptr(data), 0.01f)) {
 									scriptInstance->SetFieldValue(name, data);
 								}
 								break;
@@ -567,15 +588,33 @@ namespace RealEngine {
 										scriptField.SetValue(data);
 									break;
 								}
+								case ScriptFieldType::Vector2Int: {
+									glm::ivec2 data = scriptField.GetValue<glm::ivec2>();
+									if (ImGui::DragInt2(name.c_str(), glm::value_ptr(data), 0.01f))
+										scriptField.SetValue(data);
+									break;
+								}
 								case ScriptFieldType::Vector3: {
 									glm::vec3 data = scriptField.GetValue<glm::vec3>();
 									if (ImGui::DragFloat3(name.c_str(), glm::value_ptr(data), 0.01f))
 										scriptField.SetValue(data);
 									break;
 								}
+								case ScriptFieldType::Vector3Int: {
+									glm::ivec3 data = scriptField.GetValue<glm::ivec3>();
+									if (ImGui::DragInt3(name.c_str(), glm::value_ptr(data), 0.01f))
+										scriptField.SetValue(data);
+									break;
+								}
 								case ScriptFieldType::Vector4: {
 									glm::vec4 data = scriptField.GetValue<glm::vec4>();
 									if (ImGui::DragFloat4(name.c_str(), glm::value_ptr(data), 0.01f))
+										scriptField.SetValue(data);
+									break;
+								}
+								case ScriptFieldType::Vector4Int: {
+									glm::ivec4 data = scriptField.GetValue<glm::ivec4>();
+									if (ImGui::DragInt4(name.c_str(), glm::value_ptr(data), 0.01f))
 										scriptField.SetValue(data);
 									break;
 								}
@@ -668,6 +707,15 @@ namespace RealEngine {
 									}
 									break;
 								}
+								case ScriptFieldType::Vector2Int: {
+									glm::ivec2 data = glm::ivec2{ 0 };
+									if (ImGui::DragInt2(name.c_str(), glm::value_ptr(data), 0.01f)) {
+										ScriptFieldInstance& fieldInstance = entityFields[name];
+										fieldInstance.Field = field;
+										fieldInstance.SetValue(data);
+									}
+									break;
+								}
 								case ScriptFieldType::Vector3: {
 									glm::vec3 data = glm::vec3{ 0.0f };
 									if (ImGui::DragFloat3(name.c_str(), glm::value_ptr(data), 0.01f)) {
@@ -677,9 +725,27 @@ namespace RealEngine {
 									}
 									break;
 								}
+								case ScriptFieldType::Vector3Int: {
+									glm::ivec3 data = glm::ivec3{ 0 };
+									if (ImGui::DragInt3(name.c_str(), glm::value_ptr(data), 0.01f)) {
+										ScriptFieldInstance& fieldInstance = entityFields[name];
+										fieldInstance.Field = field;
+										fieldInstance.SetValue(data);
+									}
+									break;
+								}
 								case ScriptFieldType::Vector4: {
 									glm::vec4 data = glm::vec4{ 0.0f };
 									if (ImGui::DragFloat4(name.c_str(), glm::value_ptr(data), 0.01f)) {
+										ScriptFieldInstance& fieldInstance = entityFields[name];
+										fieldInstance.Field = field;
+										fieldInstance.SetValue(data);
+									}
+									break;
+								}
+								case ScriptFieldType::Vector4Int: {
+									glm::ivec4 data = glm::ivec4{ 0 };
+									if (ImGui::DragInt4(name.c_str(), glm::value_ptr(data), 0.01f)) {
 										ScriptFieldInstance& fieldInstance = entityFields[name];
 										fieldInstance.Field = field;
 										fieldInstance.SetValue(data);

@@ -4,6 +4,13 @@
 
 		public static Vector4 Zero => new Vector4(0.0f);
 
+		public Vector4(Vector4Int vector4Int) {
+			X = (float)vector4Int.X;
+			Y = (float)vector4Int.Y;
+			Z = (float)vector4Int.Z;
+			W = (float)vector4Int.W;
+		}
+
 		public Vector4(float scalar) {
 			X = scalar;
 			Y = scalar;

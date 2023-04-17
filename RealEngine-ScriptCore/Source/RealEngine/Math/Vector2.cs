@@ -1,10 +1,16 @@
 ﻿using System;
+using System.Numerics;
 
 namespace RealEngine {
 	public struct Vector2 {
 		public float X, Y;
 
 		public static Vector2 Zero => new Vector2(0.0f);
+
+		public Vector2(Vector2Int vector2Int) {
+			X = (float)vector2Int.X;
+			Y = (float)vector2Int.Y;
+		}
 
 		public Vector2(float scalar) {
 			X = scalar;

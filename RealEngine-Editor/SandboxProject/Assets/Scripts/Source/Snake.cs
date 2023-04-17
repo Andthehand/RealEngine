@@ -11,12 +11,12 @@ namespace Sandbox {
 		West
 	}
 	struct BodyPos {
-		public BodyPos(Vector2 positon, Direction facing) {
+		public BodyPos(Vector2Int positon, Direction facing) {
 			Positon = positon;
 			Facing = facing;
 		}
 
-		public Vector2 Positon;
+		public Vector2Int Positon;
 		public Direction Facing;
 	}
 
@@ -24,7 +24,7 @@ namespace Sandbox {
 		private float MoveTimeInterval = 0.25f;
 		private float MoveDeltatime;
 
-		public Vector2 SnakePosition = new Vector2(0, 0);
+		public Vector2Int SnakePosition = Vector2Int.Zero;
 
 		public List<BodyPos> BodyPositions;
 
@@ -32,7 +32,7 @@ namespace Sandbox {
 
 		public void Reset() {
 			MoveTimeInterval = 0.25f;
-			SnakePosition = new Vector2(0, 0);
+			SnakePosition = Vector2Int.Zero;
 			m_SnakeFacing = Direction.South;
 			BodyPositions.Clear();
 		}
@@ -92,7 +92,7 @@ namespace Sandbox {
 			MoveTimeInterval -= .01f;
 
 			if (BodyPositions.Count == 0) {
-				Vector2 newBodyPos = SnakePosition;
+				Vector2Int newBodyPos = SnakePosition;
 				switch (m_SnakeFacing) {
 					case Direction.North:
 						newBodyPos.Y += 1;
@@ -111,7 +111,7 @@ namespace Sandbox {
 				BodyPositions.Add(new BodyPos(newBodyPos, m_SnakeFacing));
 			}
 			else {
-				Vector2 newBodyPos = BodyPositions[BodyPositions.Count - 1].Positon;
+				Vector2Int newBodyPos = BodyPositions[BodyPositions.Count - 1].Positon;
 				switch (BodyPositions[BodyPositions.Count - 1].Facing) {
 					case Direction.North:
 						newBodyPos.Y += 1;

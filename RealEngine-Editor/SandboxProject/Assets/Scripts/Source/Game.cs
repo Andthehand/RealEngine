@@ -8,7 +8,7 @@ using RealEngine;
 
 namespace Sandbox {
 	class Game : Entity {
-		public Vector2 GridSize = new Vector2(10, 10);
+		public Vector2Int GridSize = new Vector2Int(10, 10);
 		public float Padding = 0.05f;
 		public Entity ReferenceGrid;
 		public Color DefaultGridColor;
@@ -18,13 +18,13 @@ namespace Sandbox {
 		public Color FruitColor;
 
 		private Random m_Random = new Random();
-		private Vector2 m_FruitPos;
+		private Vector2Int m_FruitPos;
 
 		private Snake m_Snake;
 		private SpriteRendererComponent[,] m_Grid;
 
 		void ReGenerateFruitPos() {
-			m_FruitPos = new Vector2(m_Random.Next((int)GridSize.X), m_Random.Next((int)GridSize.Y));
+			m_FruitPos = new Vector2Int(m_Random.Next(GridSize.X), m_Random.Next(GridSize.Y));
 
 			if (m_Snake.SnakePosition == m_FruitPos)
 				ReGenerateFruitPos();
@@ -41,7 +41,7 @@ namespace Sandbox {
 			m_Snake.OnCreate();
 
 			//Init Grid Tiles
-			m_Grid = new SpriteRendererComponent[(int)GridSize.X, (int)GridSize.Y];
+			m_Grid = new SpriteRendererComponent[GridSize.X, GridSize.Y];
 
 			Vector3 pos = Vector3.Zero;
 			for (int x = 0; x < GridSize.X; x++) {
@@ -83,12 +83,12 @@ namespace Sandbox {
 					m_Snake.Reset();
 
 			//Draw Everything
-			m_Grid[(int)m_FruitPos.X, (int)m_FruitPos.Y].Color = FruitColor;
+			m_Grid[m_FruitPos.X, m_FruitPos.Y].Color = FruitColor;
 			
-			m_Grid[(int)m_Snake.SnakePosition.X, (int)m_Snake.SnakePosition.Y].Color = SnakeColor;
+			m_Grid[m_Snake.SnakePosition.X, m_Snake.SnakePosition.Y].Color = SnakeColor;
 			
 			foreach (BodyPos pos in m_Snake.BodyPositions)
-				m_Grid[(int)pos.Positon.X, (int)pos.Positon.Y].Color = SnakeBodyColor;
+				m_Grid[pos.Positon.X, pos.Positon.Y].Color = SnakeBodyColor;
 		}
 	}
 }
