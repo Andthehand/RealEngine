@@ -226,7 +226,7 @@ namespace RealEngine {
 
 	void ScriptEngine::ShutdownMono() {
 		RE_PROFILE_FUNCTION();
-	
+		
 		if (MonoDomain* domain = mono_get_root_domain()) {
 			mono_domain_set(domain, false);
 
