@@ -5,8 +5,8 @@
 
 class Sandbox : public RealEngine::Application {
 public:
-	Sandbox(RealEngine::ApplicationCommandLineArgs args)
-		: Application("NES Emulator") {
+	Sandbox(const RealEngine::ApplicationSpecification& specification)
+		: Application(specification) {
 		PushLayer(new MainLayer());
 	}
 
@@ -16,5 +16,9 @@ public:
 };
 
 RealEngine::Application* RealEngine::CreateApplication(RealEngine::ApplicationCommandLineArgs args) {
-	return new Sandbox(args);
+	ApplicationSpecification spec;
+	spec.Name = "NES Emulator";
+	spec.CommandLineArgs = args;
+
+	return new Sandbox(spec);
 }

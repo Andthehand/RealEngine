@@ -19,7 +19,7 @@ namespace RealEngine {
 	public:
 		KeyPressedEvent(const KeyCode keycode, const bool isRepeat) : KeyEvent(keycode), m_IsRepeat(isRepeat) {}
 
-		bool IsRepeatCount() const { return m_IsRepeat; }
+		bool IsRepeating() const { return m_IsRepeat; }
 
 		std::string ToString() const override {
 			std::stringstream ss;

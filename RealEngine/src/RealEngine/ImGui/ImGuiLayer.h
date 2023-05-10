@@ -8,8 +8,7 @@
 
 namespace RealEngine {
 
-	class ImGuiLayer : public Layer
-	{
+	class ImGuiLayer : public Layer {
 	public:
 		ImGuiLayer();
 		~ImGuiLayer() = default;

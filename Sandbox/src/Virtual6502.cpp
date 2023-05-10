@@ -58,7 +58,7 @@ std::map<uint16_t, std::string> Virtual6502::Disassemble(uint16_t nStart, uint16
 		std::string sInst = "$" + hex(addr, 4) + ": ";
 
 		// Read instruction, and get its readable name
-		uint8_t opcode = m_Bus->Read(addr, true); addr++;
+		uint8_t opcode = m_Bus->CPURead(addr, true); addr++;
 		sInst += m_Lookup[opcode].name + " ";
 
 		// Get oprands from desired locations, and form the
@@ -70,56 +70,56 @@ std::map<uint16_t, std::string> Virtual6502::Disassemble(uint16_t nStart, uint16
 			sInst += " {IMP}";
 		}
 		else if (m_Lookup[opcode].Addrmode == &Virtual6502::IMM) {
-			value = m_Bus->Read(addr, true); addr++;
+			value = m_Bus->CPURead(addr, true); addr++;
 			sInst += "#$" + hex(value, 2) + " {IMM}";
 		}
 		else if (m_Lookup[opcode].Addrmode == &Virtual6502::ZP0) {
-			lo = m_Bus->Read(addr, true); addr++;
+			lo = m_Bus->CPURead(addr, true); addr++;
 			hi = 0x00;
 			sInst += "$" + hex(lo, 2) + " {ZP0}";
 		}
 		else if (m_Lookup[opcode].Addrmode == &Virtual6502::ZPX) {
-			lo = m_Bus->Read(addr, true); addr++;
+			lo = m_Bus->CPURead(addr, true); addr++;
 			hi = 0x00;
 			sInst += "$" + hex(lo, 2) + ", X {ZPX}";
 		}
 		else if (m_Lookup[opcode].Addrmode == &Virtual6502::ZPY) {
-			lo = m_Bus->Read(addr, true); addr++;
+			lo = m_Bus->CPURead(addr, true); addr++;
 			hi = 0x00;
 			sInst += "$" + hex(lo, 2) + ", Y {ZPY}";
 		}
 		else if (m_Lookup[opcode].Addrmode == &Virtual6502::IZX) {
-			lo = m_Bus->Read(addr, true); addr++;
+			lo = m_Bus->CPURead(addr, true); addr++;
 			hi = 0x00;
 			sInst += "($" + hex(lo, 2) + ", X) {IZX}";
 		}
 		else if (m_Lookup[opcode].Addrmode == &Virtual6502::IZY) {
-			lo = m_Bus->Read(addr, true); addr++;
+			lo = m_Bus->CPURead(addr, true); addr++;
 			hi = 0x00;
 			sInst += "($" + hex(lo, 2) + "), Y {IZY}";
 		}
 		else if (m_Lookup[opcode].Addrmode == &Virtual6502::ABS) {
-			lo = m_Bus->Read(addr, true); addr++;
-			hi = m_Bus->Read(addr, true); addr++;
+			lo = m_Bus->CPURead(addr, true); addr++;
+			hi = m_Bus->CPURead(addr, true); addr++;
 			sInst += "$" + hex((uint16_t)(hi << 8) | lo, 4) + " {ABS}";
 		}
 		else if (m_Lookup[opcode].Addrmode == &Virtual6502::ABX) {
-			lo = m_Bus->Read(addr, true); addr++;
-			hi = m_Bus->Read(addr, true); addr++;
+			lo = m_Bus->CPURead(addr, true); addr++;
+			hi = m_Bus->CPURead(addr, true); addr++;
 			sInst += "$" + hex((uint16_t)(hi << 8) | lo, 4) + ", X {ABX}";
 		}
 		else if (m_Lookup[opcode].Addrmode == &Virtual6502::ABY) {
-			lo = m_Bus->Read(addr, true); addr++;
-			hi = m_Bus->Read(addr, true); addr++;
+			lo = m_Bus->CPURead(addr, true); addr++;
+			hi = m_Bus->CPURead(addr, true); addr++;
 			sInst += "$" + hex((uint16_t)(hi << 8) | lo, 4) + ", Y {ABY}";
 		}
 		else if (m_Lookup[opcode].Addrmode == &Virtual6502::IND) {
-			lo = m_Bus->Read(addr, true); addr++;
-			hi = m_Bus->Read(addr, true); addr++;
+			lo = m_Bus->CPURead(addr, true); addr++;
+			hi = m_Bus->CPURead(addr, true); addr++;
 			sInst += "($" + hex((uint16_t)(hi << 8) | lo, 4) + ") {IND}";
 		}
 		else if (m_Lookup[opcode].Addrmode == &Virtual6502::REL) {
-			value = m_Bus->Read(addr, true); addr++;
+			value = m_Bus->CPURead(addr, true); addr++;
 			sInst += "$" + hex(value, 2) + " [$" + hex(addr + ((uint16_t)value | 0xFF00), 4) + "] {REL}";
 		}
 
@@ -134,11 +134,11 @@ std::map<uint16_t, std::string> Virtual6502::Disassemble(uint16_t nStart, uint16
 }
 
 uint8_t Virtual6502::Read(uint16_t addr) {
-	return m_Bus->Read(addr);
+	return m_Bus->CPURead(addr, false);
 }
 
 void Virtual6502::Write(uint16_t addr, uint8_t data) {
-	m_Bus->Write(addr, data);
+	m_Bus->CPUWrite(addr, data);
 }
 
 void Virtual6502::Clock() {
