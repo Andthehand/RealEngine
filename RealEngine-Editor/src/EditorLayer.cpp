@@ -429,7 +429,7 @@ namespace RealEngine {
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e) {
 		RE_PROFILE_FUNCTION();
 		
-		if (e.IsRepeatCount())
+		if (e.IsRepeating())
 			return false;
 		bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
 		bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
