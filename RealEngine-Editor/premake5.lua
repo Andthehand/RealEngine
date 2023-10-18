@@ -21,6 +21,7 @@ project "RealEngine-Editor"
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.ImGuizmo}",
+		"%{IncludeDir.ImNode}",
 		"%{IncludeDir.optick}",
 		"%{IncludeDir.ImPlot}"
 	}

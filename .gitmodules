@@ -30,3 +30,6 @@
 [submodule "RealEngine/vendor/GLFW"]
 	path = RealEngine/vendor/GLFW
 	url = https://github.com/TheCherno/glfw.git
+[submodule "RealEngine/vendor/ImNode"]
+	path = RealEngine/vendor/ImNode
+	url = https://github.com/Andthehand/imgui-node-editor.git

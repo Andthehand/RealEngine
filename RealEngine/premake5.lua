@@ -19,8 +19,11 @@ project "RealEngine"
 		"vendor/glm/glm/**.inl",
 		"vendor/ImGuizmo/ImGuizmo.h",
 		"vendor/ImGuizmo/ImGuizmo.cpp",
+		"vendor/ImNode/*.h",
+		"vendor/ImNode/*.cpp",
+		"vendor/ImNode/*.inl",
 		"vendor/ImPlot/**.cpp",
-		"vendor/ImPlot/**.h"
+		"vendor/ImPlot/**.h",
 	}
 
 	defines {
@@ -42,6 +45,7 @@ project "RealEngine"
 		"%{IncludeDir.Box2D}",
 		"%{IncludeDir.filewatch}",
 		"%{IncludeDir.ImGuizmo}",
+		"%{IncludeDir.ImNode}",
 		"%{IncludeDir.ImPlot}",
 		"%{IncludeDir.optick}",
 		"%{IncludeDir.VulkanSDK}"
@@ -60,6 +64,9 @@ project "RealEngine"
 	}
 
 	filter "files:vendor/ImGuizmo/**.cpp"
+	flags { "NoPCH" }
+
+	filter "files:vendor/ImNode/*.cpp"
 	flags { "NoPCH" }
 
 	filter "files:vendor/ImPlot/**.cpp"
