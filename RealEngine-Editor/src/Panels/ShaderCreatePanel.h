@@ -1,8 +1,10 @@
 #pragma once
-#include <imgui_node_editor.h>
-
 #include <vector>
 #include <string>
+
+#include <imgui_node_editor.h>
+
+#include "RealEngine/Renderer/Texture.h"
 
 namespace ImNode = ax::NodeEditor;
 using PinKind = ax::NodeEditor::PinKind;
@@ -57,13 +59,18 @@ namespace RealEngine {
 	public:
 		ShaderCreatePanel();
 
+		void DrawPinIcon(const Pin& pin, bool connected, int alpha);
+
 		void OnImGuiRender();
 		void HandleInteraction();
 
 		Pin* FindPin(ImNode::PinId id);
+		bool IsPinLinked(ImNode::PinId id);
 
 		inline int GetNextId() { return m_UniqueId++; }
 	private:
+		Ref<Texture2D> m_HeaderBackground;
+
 		ImNode::EditorContext* m_Context = nullptr;
 
 		int m_UniqueId = 1;
