@@ -19,35 +19,49 @@ namespace RealEngine {
 
 		//Init Testing Nodes
 		m_Nodes.emplace_back(GetNextId(), "Node A");
-		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In");
-		m_Nodes.back().Outputs.emplace_back(GetNextId(), "Out ->");
+		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In", PinType::Float);
+		m_Nodes.back().Outputs.emplace_back(GetNextId(), "Out ->", PinType::Float);
 		m_Nodes.back().BuildNode();
 
 		m_Nodes.emplace_back(GetNextId(), "Node B");
-		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In1");
-		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In2");
-		m_Nodes.back().Outputs.emplace_back(GetNextId(), "Out ->");
+		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In1", PinType::String);
+		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In2", PinType::Float);
+		m_Nodes.back().Outputs.emplace_back(GetNextId(), "Out ->", PinType::Float);
+		m_Nodes.back().BuildNode();
+
+		m_Nodes.emplace_back(GetNextId(), "Node C");
+		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In1", PinType::Float);
+		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In2", PinType::Float);
+		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In3", PinType::Float);
+		m_Nodes.back().Outputs.emplace_back(GetNextId(), "Out ->", PinType::String);
 		m_Nodes.back().BuildNode();
 	}
 
+	ImColor ShaderCreatePanel::GetIconColor(PinType type) {
+		switch (type) {
+		default:
+			case PinType::Bool:     return ImColor(220, 48, 48);
+			case PinType::Int:      return ImColor(68, 201, 156);
+			case PinType::Float:    return ImColor(147, 226, 74);
+			case PinType::String:   return ImColor(124, 21, 153);
+		}
+	};
+
 	void ShaderCreatePanel::DrawPinIcon(const Pin& pin, bool connected, int alpha) {
 		//TODO: Implement!
-		IconType iconType = IconType::Circle;
-		ImColor color = ImColor(147, 226, 74);
-		/*ImColor  color = GetIconColor(pin.Type);
+		IconType iconType;
+		ImColor  color = GetIconColor(pin.Type);
 		color.Value.w = alpha / 255.0f;
 		switch (pin.Type) {
-			case PinType::Flow:     iconType = IconType::Flow;   break;
-			case PinType::Bool:     iconType = IconType::Circle; break;
+			case PinType::Bool:     iconType = IconType::Diamond; break;
 			case PinType::Int:      iconType = IconType::Circle; break;
 			case PinType::Float:    iconType = IconType::Circle; break;
-			case PinType::String:   iconType = IconType::Circle; break;
-			case PinType::Object:   iconType = IconType::Circle; break;
-			case PinType::Function: iconType = IconType::Circle; break;
-			case PinType::Delegate: iconType = IconType::Square; break;
+			case PinType::Vector2:  iconType = IconType::Circle; break;
+			case PinType::Vector3:  iconType = IconType::Circle; break;
+			case PinType::String:   iconType = IconType::RoundSquare; break;
 			default:
 				return;
-		}*/
+		}
 
 		//ax::Widgets::Icon(iconType, connected, color, ImColor(32, 32, 32, alpha));
 		ax::Widgets::Icon(iconType, connected, color, ImColor(32, 32, 32, alpha));
@@ -208,6 +222,16 @@ namespace RealEngine {
 					std::string kind = inputPin->Kind == PinKind::Input ? "Inputs" : "Outputs";
 
 					showLabel(("Can't Connect 2 " + kind + " Together").c_str(), ImColor(171, 44, 44, 180));
+					ImNode::RejectNewItem(ImColor(255, 0, 0), 2.0f);
+				}
+				else if (inputPin->Type != outputPin->Type) {
+					//Can't connect 2 pins of different types together
+					showLabel("Can't Connect Pins of Different Types", ImColor(171, 44, 44, 180));
+					ImNode::RejectNewItem(ImColor(255, 0, 0), 2.0f);
+				}
+				else if (IsPinLinked(inputPinId)) {
+					//Inputs can't have 2 connections
+					showLabel("Pin Already Connected", ImColor(171, 44, 44, 180));
 					ImNode::RejectNewItem(ImColor(255, 0, 0), 2.0f);
 				}
 				else {

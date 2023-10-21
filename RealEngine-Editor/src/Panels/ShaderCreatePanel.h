@@ -13,14 +13,23 @@ namespace RealEngine {
 	//Forward declaration
 	struct Node;
 
+	enum class PinType {
+		Bool,
+		Int,
+		Float,
+		Vector2,
+		Vector3,
+		String
+	};
+
 	struct Pin {
-		Pin(ImNode::PinId id, const char* name)
-			: ID(id), Name(name), Kind() {}
+		Pin(ImNode::PinId id, const char* name, PinType type)
+			: ID(id), Name(name), Type(type), Kind(PinKind::Input) {}
 
 		ImNode::PinId ID;
 		Node* Node;
-		//This is just a default value and will be set later in the script
-		PinKind Kind = PinKind::Input;
+		PinType Type;
+		PinKind Kind;
 
 		std::string Name;
 	};
@@ -59,6 +68,7 @@ namespace RealEngine {
 	public:
 		ShaderCreatePanel();
 
+		ImColor GetIconColor(PinType type);
 		void DrawPinIcon(const Pin& pin, bool connected, int alpha);
 
 		void OnImGuiRender();
