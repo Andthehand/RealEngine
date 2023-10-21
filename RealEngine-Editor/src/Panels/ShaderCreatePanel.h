@@ -5,14 +5,20 @@
 #include <string>
 
 namespace ImNode = ax::NodeEditor;
+using PinKind = ax::NodeEditor::PinKind;
+
 namespace RealEngine {
+	//Forward declaration
+	struct Node;
+
 	struct Pin {
 		Pin(ImNode::PinId id, const char* name)
 			: ID(id), Name(name), Kind() {}
 
 		ImNode::PinId ID;
+		Node* Node;
 		//This is just a default value and will be set later in the script
-		ImNode::PinKind Kind = ImNode::PinKind::Input;
+		PinKind Kind = PinKind::Input;
 
 		std::string Name;
 	};
@@ -23,12 +29,13 @@ namespace RealEngine {
 
 		void BuildNode() {
 			for (auto& input : Inputs) {
-				input.Kind = ImNode::PinKind::Input;
+				input.Kind = PinKind::Input;
+				input.Node = this;
 			}
 
-			for (auto& output : Outputs)
-			{
-				output.Kind = ImNode::PinKind::Output;
+			for (auto& output : Outputs) {
+				output.Kind = PinKind::Output;
+				output.Node = this;
 			}
 		}
 
@@ -40,10 +47,6 @@ namespace RealEngine {
 		std::vector<Pin> Outputs;
 	};
 
-	// Struct to hold basic information about connection between
-	// pins. Note that connection (aka. link) has its own ID.
-	// This is useful later with dealing with selections, deletion
-	// or other operations.
 	struct Link {
 		ImNode::LinkId Id;
 		ImNode::PinId  InputId;
