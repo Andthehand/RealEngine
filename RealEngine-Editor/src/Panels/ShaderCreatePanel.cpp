@@ -97,7 +97,7 @@ namespace RealEngine {
 				auto inputPin = FindPin(inputPinId);
 				auto outputPin = FindPin(outputPinId);
 					
-				if (inputPin->Kind == PinKind::Input) {
+				if (inputPin->Kind == PinKind::Output) {
 					std::swap(inputPin, outputPin);
 					std::swap(inputPinId, outputPinId);
 				}
@@ -107,16 +107,19 @@ namespace RealEngine {
 				}
 				else if (inputPin->Node == outputPin->Node) {
 					//Can't connect input and output from same node together
-					showLabel("Pin Cannot Connect to Same Node", ImColor(45, 32, 32, 180));
+					showLabel("Pin Cannot Connect to Same Node", ImColor(171, 44, 44, 180));
 					ImNode::RejectNewItem(ImColor(255, 0, 0), 2.0f);
 				}
 				else if (inputPin->Kind == outputPin->Kind) {
 					//Can't connect 2 inputs or 2 outputs together
+					std::string kind = inputPin->Kind == PinKind::Input ? "Inputs" : "Outputs";
+
+					showLabel(("Can't Connect 2 " + kind + " Together").c_str(), ImColor(171, 44, 44, 180));
 					ImNode::RejectNewItem(ImColor(255, 0, 0), 2.0f);
 				}
 				else {
 					//If hovering over valid pin
-					showLabel("Connect Pairs", ImColor(32, 90, 32, 180));
+					showLabel("Connect Pairs", ImColor(44, 171, 44, 180));
 
 					//If mouse released basically
 					if (ImNode::AcceptNewItem(ImColor(0, 255, 0), 2.0f)) {
@@ -146,9 +149,6 @@ namespace RealEngine {
 						}
 					}
 				}
-
-				// You may reject link deletion by calling:
-				// ImNode::RejectDeletedItem();
 			}
 		}
 		ImNode::EndDelete();
