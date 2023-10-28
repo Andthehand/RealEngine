@@ -42,12 +42,12 @@ namespace RealEngine {
 			: ID(id), Name(name) {}
 
 		void BuildNode() {
-			for (auto& input : Inputs) {
+			for (Pin& input : Inputs) {
 				input.Kind = PinKind::Input;
 				input.Node = this;
 			}
 
-			for (auto& output : Outputs) {
+			for (Pin& output : Outputs) {
 				output.Kind = PinKind::Output;
 				output.Node = this;
 			}
@@ -77,8 +77,14 @@ namespace RealEngine {
 		void OnImGuiRender();
 		void HandleInteraction();
 
+		void Compile();
+
 		Pin* FindPin(ImNode::PinId id);
+		Link* FindPinLink(ImNode::PinId id);
 		bool IsPinLinked(ImNode::PinId id);
+
+		//This has to be called ever time a node is added after first init because the node pointers inside of the pins will be corrupted
+		void BuildNodes();
 
 		inline int GetNextId() { return m_UniqueId++; }
 	private:
@@ -88,7 +94,10 @@ namespace RealEngine {
 
 		int m_UniqueId = 1;
 		std::vector<Node>   m_Nodes;
-		ImVector<Link>   m_Links;                // List of live links. It is dynamic unless you want to create read-only view over nodes.
-		int                  m_NextLinkId = 100;     // Counter to help generate link ids. In real application this will probably based on pointer to user data structure.
+		ImVector<Link>   m_Links;
+
+		ImVector<ImNode::PinId>   m_FlowStartIDs;
+		
+		int              m_NextLinkId = 100;     // Counter to help generate link ids. In real application this will probably based on pointer to user data structure.
 	};
 }

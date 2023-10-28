@@ -20,23 +20,25 @@ namespace RealEngine {
 		//Init Testing Nodes
 		m_Nodes.emplace_back(GetNextId(), "Node A");
 		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In", PinType::Float);
-		m_Nodes.back().Outputs.emplace_back(GetNextId(), "What does this do?", PinType::Flow);
+		m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Flow);
+		m_FlowStartIDs.push_back(m_Nodes.back().Outputs.back().ID);
 		m_Nodes.back().Outputs.emplace_back(GetNextId(), "Out ->", PinType::Float);
-		m_Nodes.back().BuildNode();
 
 		m_Nodes.emplace_back(GetNextId(), "Node B");
-		m_Nodes.back().Inputs.emplace_back(GetNextId(), "Oh cool", PinType::Flow);
+		m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
 		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In1", PinType::String);
 		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In2", PinType::Float);
+		m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Flow);
 		m_Nodes.back().Outputs.emplace_back(GetNextId(), "Out ->", PinType::Float);
-		m_Nodes.back().BuildNode();
 
 		m_Nodes.emplace_back(GetNextId(), "Node C");
+		m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
 		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In1", PinType::Float);
 		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In2", PinType::Float);
 		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In3", PinType::Float);
 		m_Nodes.back().Outputs.emplace_back(GetNextId(), "Out ->", PinType::String);
-		m_Nodes.back().BuildNode();
+
+		BuildNodes();
 	}
 
 	ImColor ShaderCreatePanel::GetIconColor(PinType type) {
@@ -76,6 +78,22 @@ namespace RealEngine {
 
 		ImNode::SetCurrentEditor(m_Context);
 		ImNode::Begin("My Editor");
+
+		//You have to suspend ImNode because https://github.com/thedmd/imgui-node-editor/issues/37#issuecomment-549122793
+		ImNode::Suspend();
+			if (ImNode::ShowBackgroundContextMenu()) {
+				ImGui::OpenPopup("Create New Node");
+			}
+
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
+			if (ImGui::BeginPopup("Create New Node")) {
+
+				if (ImGui::MenuItem("Compile")) Compile();
+				ImGui::EndPopup();
+			}
+			ImGui::PopStyleVar();
+		ImNode::Resume();
+
 		{
 			auto cursorTopLeft = ImGui::GetCursorScreenPos();
 
@@ -207,7 +225,8 @@ namespace RealEngine {
 
 				auto inputPin = FindPin(inputPinId);
 				auto outputPin = FindPin(outputPinId);
-					
+				
+				//Make sure the input and output are actually in the correct orientation
 				if (inputPin->Kind == PinKind::Output) {
 					std::swap(inputPin, outputPin);
 					std::swap(inputPinId, outputPinId);
@@ -238,16 +257,19 @@ namespace RealEngine {
 					showLabel("Pin Already Connected", ImColor(171, 44, 44, 180));
 					ImNode::RejectNewItem(ImColor(255, 0, 0), 2.0f);
 				}
+				else if (outputPin->Type == PinType::Flow && IsPinLinked(outputPinId)) {
+					//Inputs can't have 2 connections
+					showLabel("Can't branch functions ", ImColor(171, 44, 44, 180));
+					ImNode::RejectNewItem(ImColor(255, 0, 0), 2.0f);
+				}
 				else {
 					//If hovering over valid pin
 					showLabel("Connect Pairs", ImColor(44, 171, 44, 180));
 
 					//If mouse released basically
 					if (ImNode::AcceptNewItem(ImColor(0, 255, 0), 2.0f)) {
+						//Just add the link to the list
 						m_Links.push_back({ ImNode::LinkId(m_NextLinkId++), inputPinId, outputPinId });
-
-						// Draw new link.
-						ImNode::Link(m_Links.back().Id, m_Links.back().InputId, m_Links.back().OutputId);
 					}
 				}
 			}
@@ -261,18 +283,50 @@ namespace RealEngine {
 			ImNode::LinkId deletedLinkId;
 			while (ImNode::QueryDeletedLink(&deletedLinkId)) {
 				// If you agree that link can be deleted, accept deletion.
-				if (ImNode::AcceptDeletedItem()) {
-					// Then remove link from your data.
-					for (auto& link : m_Links) {
-						if (link.Id == deletedLinkId) {
-							m_Links.erase(&link);
-							break;
-						}
-					}
+				if (!ImNode::AcceptDeletedItem())
+					continue;
+
+				// Then remove link from your data.
+				for (Link& link : m_Links) {
+					if (link.Id != deletedLinkId)
+						continue;
+
+					m_Links.erase(&link);
 				}
 			}
 		}
 		ImNode::EndDelete();
+	}
+
+	void ShaderCreatePanel::Compile() {
+		//TODO: Turn this into a custom StringBuilder that has a vector of strings and then joins them all together at the end to keep re alocations low
+		//Use this as an example https://github.com/timothyqiu/godot/blob/master/core/string/string_builder.h
+		std::string shaderCode;
+
+		for (auto flowStartID : m_FlowStartIDs) {
+			//Gets the first pin in the flow and then finds the link that goes to the next pin
+			Pin* flowPin = FindPin(flowStartID);
+			Link* link = FindPinLink(flowStartID);
+
+			shaderCode +=  "Starts at " + flowPin->Node->Name + "()\n";
+
+			while (link != nullptr) {
+				//Finds the next pin in the flow
+				flowPin = FindPin(link->InputId);
+
+				shaderCode += "Goes to " + flowPin->Node->Name + "()\n";
+				
+				//TODO: Make this work for multiple Flows in the same node
+				//This finds the link to the next Node in the flow
+				link = nullptr;
+				for (auto& output : flowPin->Node->Outputs)
+					if (output.Type == PinType::Flow)
+						link = FindPinLink(output.ID);
+			}
+		}
+
+
+		RE_WARN("{0}", shaderCode);
 	}
 
 	Pin* ShaderCreatePanel::FindPin(ImNode::PinId id) {
@@ -286,6 +340,15 @@ namespace RealEngine {
 					return &pin;
 		}
 
+		RE_CRITICAL("Coundn't find Pin");
+		return nullptr;
+	}
+
+	Link* ShaderCreatePanel::FindPinLink(ImNode::PinId id) {
+		for (auto& link : m_Links)
+			if (link.InputId == id || link.OutputId == id)
+				return &link;
+
 		return nullptr;
 	}
 
@@ -295,5 +358,11 @@ namespace RealEngine {
 				return true;
 
 		return false;
+	}
+
+
+	void ShaderCreatePanel::BuildNodes() {
+		for (auto& node : m_Nodes)
+			node.BuildNode();
 	}
 }
