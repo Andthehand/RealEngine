@@ -20,10 +20,12 @@ namespace RealEngine {
 		//Init Testing Nodes
 		m_Nodes.emplace_back(GetNextId(), "Node A");
 		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In", PinType::Float);
+		m_Nodes.back().Outputs.emplace_back(GetNextId(), "What does this do?", PinType::Flow);
 		m_Nodes.back().Outputs.emplace_back(GetNextId(), "Out ->", PinType::Float);
 		m_Nodes.back().BuildNode();
 
 		m_Nodes.emplace_back(GetNextId(), "Node B");
+		m_Nodes.back().Inputs.emplace_back(GetNextId(), "Oh cool", PinType::Flow);
 		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In1", PinType::String);
 		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In2", PinType::Float);
 		m_Nodes.back().Outputs.emplace_back(GetNextId(), "Out ->", PinType::Float);
@@ -40,6 +42,7 @@ namespace RealEngine {
 	ImColor ShaderCreatePanel::GetIconColor(PinType type) {
 		switch (type) {
 		default:
+			case PinType::Flow:     return ImColor(255, 255, 255);
 			case PinType::Bool:     return ImColor(220, 48, 48);
 			case PinType::Int:      return ImColor(68, 201, 156);
 			case PinType::Float:    return ImColor(147, 226, 74);
@@ -53,6 +56,7 @@ namespace RealEngine {
 		ImColor  color = GetIconColor(pin.Type);
 		color.Value.w = alpha / 255.0f;
 		switch (pin.Type) {
+			case PinType::Flow:     iconType = IconType::Flow;   break;
 			case PinType::Bool:     iconType = IconType::Diamond; break;
 			case PinType::Int:      iconType = IconType::Circle; break;
 			case PinType::Float:    iconType = IconType::Circle; break;

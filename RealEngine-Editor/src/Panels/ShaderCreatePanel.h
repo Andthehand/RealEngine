@@ -19,7 +19,10 @@ namespace RealEngine {
 		Float,
 		Vector2,
 		Vector3,
-		String
+		String,
+
+		//This is to tell what function connects to what function
+		Flow
 	};
 
 	struct Pin {
