@@ -19,10 +19,7 @@ namespace RealEngine {
 		Float,
 		Vector2,
 		Vector3,
-		String,
-
-		//This is to tell what function connects to what function
-		Flow
+		String
 	};
 
 	struct Pin {
@@ -63,8 +60,8 @@ namespace RealEngine {
 
 	struct Link {
 		ImNode::LinkId Id;
-		ImNode::PinId  InputId;
-		ImNode::PinId  OutputId;
+		Pin*  InputPin;
+		Pin*  OutputPin;
 	};
 
 	class ShaderCreatePanel {
@@ -77,6 +74,7 @@ namespace RealEngine {
 		void OnImGuiRender();
 		void HandleInteraction();
 
+		void RecursiveSearch(const Node* currentNode, std::string& shaderCode);
 		void Compile();
 
 		Pin* FindPin(ImNode::PinId id);
@@ -96,8 +94,6 @@ namespace RealEngine {
 		std::vector<Node>   m_Nodes;
 		ImVector<Link>   m_Links;
 
-		ImVector<ImNode::PinId>   m_FlowStartIDs;
-		
 		int              m_NextLinkId = 100;     // Counter to help generate link ids. In real application this will probably based on pointer to user data structure.
 	};
 }

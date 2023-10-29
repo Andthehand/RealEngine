@@ -18,25 +18,15 @@ namespace RealEngine {
 		m_HeaderBackground = RealEngine::Texture2D::Create("Resources/Icons/ShaderCreate/BlueprintHeader.png");
 
 		//Init Testing Nodes
-		m_Nodes.emplace_back(GetNextId(), "Node A");
-		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In", PinType::Float);
-		m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Flow);
-		m_FlowStartIDs.push_back(m_Nodes.back().Outputs.back().ID);
-		m_Nodes.back().Outputs.emplace_back(GetNextId(), "Out ->", PinType::Float);
+		m_Nodes.emplace_back(GetNextId(), "Fragment Output");
+		m_Nodes.back().Inputs.emplace_back(GetNextId(), "Color", PinType::Float);
+		m_Nodes.back().Inputs.emplace_back(GetNextId(), "Normal", PinType::Float);
 
-		m_Nodes.emplace_back(GetNextId(), "Node B");
-		m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
-		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In1", PinType::String);
-		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In2", PinType::Float);
-		m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Flow);
-		m_Nodes.back().Outputs.emplace_back(GetNextId(), "Out ->", PinType::Float);
-
-		m_Nodes.emplace_back(GetNextId(), "Node C");
-		m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
-		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In1", PinType::Float);
-		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In2", PinType::Float);
-		m_Nodes.back().Inputs.emplace_back(GetNextId(), "-> In3", PinType::Float);
-		m_Nodes.back().Outputs.emplace_back(GetNextId(), "Out ->", PinType::String);
+		m_Nodes.emplace_back(GetNextId(), "Texture2D");
+		m_Nodes.back().Inputs.emplace_back(GetNextId(), "UV", PinType::Float);
+		m_Nodes.back().Inputs.emplace_back(GetNextId(), "LOD", PinType::Float);
+		m_Nodes.back().Inputs.emplace_back(GetNextId(), "Sampler2D", PinType::Float);
+		m_Nodes.back().Outputs.emplace_back(GetNextId(), "Color", PinType::Float);
 
 		BuildNodes();
 	}
@@ -44,7 +34,6 @@ namespace RealEngine {
 	ImColor ShaderCreatePanel::GetIconColor(PinType type) {
 		switch (type) {
 		default:
-			case PinType::Flow:     return ImColor(255, 255, 255);
 			case PinType::Bool:     return ImColor(220, 48, 48);
 			case PinType::Int:      return ImColor(68, 201, 156);
 			case PinType::Float:    return ImColor(147, 226, 74);
@@ -58,7 +47,6 @@ namespace RealEngine {
 		ImColor  color = GetIconColor(pin.Type);
 		color.Value.w = alpha / 255.0f;
 		switch (pin.Type) {
-			case PinType::Flow:     iconType = IconType::Flow;   break;
 			case PinType::Bool:     iconType = IconType::Diamond; break;
 			case PinType::Int:      iconType = IconType::Circle; break;
 			case PinType::Float:    iconType = IconType::Circle; break;
@@ -183,7 +171,7 @@ namespace RealEngine {
 
 		// Submit Links for drawing
 		for (auto& linkInfo : m_Links)
-			ImNode::Link(linkInfo.Id, linkInfo.InputId, linkInfo.OutputId);
+			ImNode::Link(linkInfo.Id, linkInfo.InputPin->ID, linkInfo.OutputPin->ID);
 
 		HandleInteraction();
 
@@ -257,11 +245,6 @@ namespace RealEngine {
 					showLabel("Pin Already Connected", ImColor(171, 44, 44, 180));
 					ImNode::RejectNewItem(ImColor(255, 0, 0), 2.0f);
 				}
-				else if (outputPin->Type == PinType::Flow && IsPinLinked(outputPinId)) {
-					//Inputs can't have 2 connections
-					showLabel("Can't branch functions ", ImColor(171, 44, 44, 180));
-					ImNode::RejectNewItem(ImColor(255, 0, 0), 2.0f);
-				}
 				else {
 					//If hovering over valid pin
 					showLabel("Connect Pairs", ImColor(44, 171, 44, 180));
@@ -269,7 +252,7 @@ namespace RealEngine {
 					//If mouse released basically
 					if (ImNode::AcceptNewItem(ImColor(0, 255, 0), 2.0f)) {
 						//Just add the link to the list
-						m_Links.push_back({ ImNode::LinkId(m_NextLinkId++), inputPinId, outputPinId });
+						m_Links.push_back({ ImNode::LinkId(m_NextLinkId++), inputPin, outputPin });
 					}
 				}
 			}
@@ -298,33 +281,28 @@ namespace RealEngine {
 		ImNode::EndDelete();
 	}
 
+	void ShaderCreatePanel::RecursiveSearch(const Node* currentNode, std::string &shaderCode) {
+		int numberOfInputs = currentNode->Inputs.size();
+
+		//Going down the chain of Nodes until it reaches the end
+		for (int i = 0; i < numberOfInputs; i++) {
+			const Link* link = FindPinLink(currentNode->Inputs[i].ID);
+
+			//If there actually is a link
+			if (link)
+				RecursiveSearch(link->OutputPin->Node, shaderCode);
+		}
+
+		//Add to the shader code
+	}
+
 	void ShaderCreatePanel::Compile() {
 		//TODO: Turn this into a custom StringBuilder that has a vector of strings and then joins them all together at the end to keep re alocations low
 		//Use this as an example https://github.com/timothyqiu/godot/blob/master/core/string/string_builder.h
 		std::string shaderCode;
 
-		for (auto flowStartID : m_FlowStartIDs) {
-			//Gets the first pin in the flow and then finds the link that goes to the next pin
-			Pin* flowPin = FindPin(flowStartID);
-			Link* link = FindPinLink(flowStartID);
-
-			shaderCode +=  "Starts at " + flowPin->Node->Name + "()\n";
-
-			while (link != nullptr) {
-				//Finds the next pin in the flow
-				flowPin = FindPin(link->InputId);
-
-				shaderCode += "Goes to " + flowPin->Node->Name + "()\n";
-				
-				//TODO: Make this work for multiple Flows in the same node
-				//This finds the link to the next Node in the flow
-				link = nullptr;
-				for (auto& output : flowPin->Node->Outputs)
-					if (output.Type == PinType::Flow)
-						link = FindPinLink(output.ID);
-			}
-		}
-
+		//m_Nodes[0] is always the output node
+		RecursiveSearch(&m_Nodes[0], shaderCode);
 
 		RE_WARN("{0}", shaderCode);
 	}
@@ -346,7 +324,7 @@ namespace RealEngine {
 
 	Link* ShaderCreatePanel::FindPinLink(ImNode::PinId id) {
 		for (auto& link : m_Links)
-			if (link.InputId == id || link.OutputId == id)
+			if (link.InputPin->ID == id || link.OutputPin->ID == id)
 				return &link;
 
 		return nullptr;
@@ -354,12 +332,11 @@ namespace RealEngine {
 
 	bool ShaderCreatePanel::IsPinLinked(ImNode::PinId id) {
 		for (auto& link : m_Links)
-			if (link.InputId == id || link.OutputId == id)
+			if (link.InputPin->ID == id || link.OutputPin->ID == id)
 				return true;
 
 		return false;
 	}
-
 
 	void ShaderCreatePanel::BuildNodes() {
 		for (auto& node : m_Nodes)
