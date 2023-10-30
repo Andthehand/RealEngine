@@ -7,13 +7,13 @@ namespace RealEngine {
 	public:
 		FragmentShaderOutputNode();
 
-		std::string GenerateCode(std::string* outputVars, std::string* inputVars) override;
+		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 	};
 
 	class ShaderTextureNode : public ShaderNode {
 	public:
 		ShaderTextureNode();
 
-		std::string GenerateCode(std::string* outputVars, std::string* inputVars) override;
+		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 	};
 }

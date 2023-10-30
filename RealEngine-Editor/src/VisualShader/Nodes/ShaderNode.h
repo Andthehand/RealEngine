@@ -45,13 +45,16 @@ namespace RealEngine {
 			}
 		}
 
-		virtual std::string GenerateCode(std::string* outputVars, std::string* inputVars) = 0;
+		virtual std::string GenerateCode(std::string* outputVars, std::string* inputVars) const = 0;
 
 		ImNode::NodeId ID;
 
 		std::string Name;
 
+		std::vector<Pin*> ConnectedInputs;
 		std::vector<Pin> Inputs;
+
+		std::vector<Pin*> ConnectedOutputs;
 		std::vector<Pin> Outputs;
 	};
 }

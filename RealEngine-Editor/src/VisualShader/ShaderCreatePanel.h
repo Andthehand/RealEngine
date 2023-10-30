@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <unordered_set>
 
 #include <imgui_node_editor.h>
 
@@ -24,7 +25,7 @@ namespace RealEngine {
 		void OnImGuiRender();
 		void HandleInteraction();
 
-		void RecursiveSearch(const ShaderNode* currentNode, std::string& shaderCode);
+		void RecursiveSearch(const ShaderNode* currentNode, std::string& shaderCode, std::unordered_set<uint64_t>* nodeTracking);
 		void Compile();
 
 		Pin* FindPin(ImNode::PinId id);

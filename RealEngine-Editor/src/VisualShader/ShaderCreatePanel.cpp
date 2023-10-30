@@ -74,19 +74,19 @@ namespace RealEngine {
 		ImNode::Resume();
 
 		{
-			auto cursorTopLeft = ImGui::GetCursorScreenPos();
+			ImVec2 cursorTopLeft = ImGui::GetCursorScreenPos();
 
 			ImNode::Utilities::BlueprintNodeBuilder builder((ImTextureID)(uint64_t)m_HeaderBackground->GetRendererID(),
 				m_HeaderBackground->GetWidth(), m_HeaderBackground->GetHeight());
 
-			for (auto& node : m_Nodes) {
+			for (Ref<ShaderNode> node : m_Nodes) {
 
 				//TODO: Implement
 				/*if (node.Type != NodeType::Blueprint && node.Type != NodeType::Simple)
 					continue;*/
 
-				//const auto isSimple = node.Type == NodeType::Simple;
-				const auto isSimple = false;
+				//const bool isSimple = node.Type == NodeType::Simple;
+				const bool isSimple = false;
 
 				builder.Begin(node->ID);
 				if (!isSimple) {
@@ -101,8 +101,8 @@ namespace RealEngine {
 					builder.EndHeader();
 				}
 
-				for (auto& input : node->Inputs) {
-					auto alpha = ImGui::GetStyle().Alpha;
+				for (Pin& input : node->Inputs) {
+					float alpha = ImGui::GetStyle().Alpha;
 					//TODO: Implement!
 					/*if (newLinkPin && !CanCreateLink(newLinkPin, &input) && &input != newLinkPin)
 						alpha = alpha * (48.0f / 255.0f);*/
@@ -120,8 +120,8 @@ namespace RealEngine {
 					builder.EndInput();
 				}
 
-				for (auto& output : node->Outputs) {
-					auto alpha = ImGui::GetStyle().Alpha;
+				for (Pin& output : node->Outputs) {
+					float alpha = ImGui::GetStyle().Alpha;
 					//TODO: Implement!
 					/*if (newLinkPin && !CanCreateLink(newLinkPin, &output) && &output != newLinkPin)
 						alpha = alpha * (48.0f / 255.0f);*/
@@ -161,7 +161,7 @@ namespace RealEngine {
 		}
 
 		// Submit Links for drawing
-		for (auto& linkInfo : m_Links)
+		for (Link& linkInfo : m_Links)
 			ImNode::Link(linkInfo.Id, linkInfo.InputPin->ID, linkInfo.OutputPin->ID);
 
 		HandleInteraction();
@@ -181,17 +181,17 @@ namespace RealEngine {
 			//TODO: Move to its own function?
 			auto showLabel = [](const char* label, ImColor color) {
 				ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetTextLineHeight());
-				auto size = ImGui::CalcTextSize(label);
+				ImVec2 size = ImGui::CalcTextSize(label);
 
-				auto padding = ImGui::GetStyle().FramePadding;
-				auto spacing = ImGui::GetStyle().ItemSpacing;
+				ImVec2 padding = ImGui::GetStyle().FramePadding;
+				ImVec2 spacing = ImGui::GetStyle().ItemSpacing;
 
 				ImGui::SetCursorPos(ImGui::GetCursorPos() + ImVec2(spacing.x, -spacing.y));
 
-				auto rectMin = ImGui::GetCursorScreenPos() - padding;
-				auto rectMax = ImGui::GetCursorScreenPos() + size + padding;
+				ImVec2 rectMin = ImGui::GetCursorScreenPos() - padding;
+				ImVec2 rectMax = ImGui::GetCursorScreenPos() + size + padding;
 
-				auto drawList = ImGui::GetWindowDrawList();
+				ImDrawList* drawList = ImGui::GetWindowDrawList();
 				drawList->AddRectFilled(rectMin, rectMax, color, size.y * 0.15f);
 				ImGui::TextUnformatted(label);
 			};
@@ -202,8 +202,8 @@ namespace RealEngine {
 				// Check that both IDs are valid
 				&& (inputPinId && outputPinId)) {
 
-				auto inputPin = FindPin(inputPinId);
-				auto outputPin = FindPin(outputPinId);
+				Pin* inputPin = FindPin(inputPinId);
+				Pin* outputPin = FindPin(outputPinId);
 				
 				//Make sure the input and output are actually in the correct orientation
 				if (inputPin->Kind == PinKind::Output) {
@@ -244,6 +244,9 @@ namespace RealEngine {
 					if (ImNode::AcceptNewItem(ImColor(0, 255, 0), 2.0f)) {
 						//Just add the link to the list
 						m_Links.push_back({ ImNode::LinkId(m_NextLinkId++), inputPin, outputPin });
+
+						inputPin->Node->ConnectedInputs.push_back(inputPin);
+						outputPin->Node->ConnectedOutputs.push_back(outputPin);
 					}
 				}
 			}
@@ -265,6 +268,14 @@ namespace RealEngine {
 					if (link.Id != deletedLinkId)
 						continue;
 
+					//This is so scuffed
+					//It is now less scuffed
+					std::vector<Pin*>& connectedInputsVector = link.InputPin->Node->ConnectedInputs;
+					std::vector<Pin*>& connectedOutputsVector = link.OutputPin->Node->ConnectedOutputs;
+
+					connectedInputsVector.erase(std::remove(connectedInputsVector.begin(), connectedInputsVector.end(), link.InputPin), connectedInputsVector.end());
+					connectedOutputsVector.erase(std::remove(connectedOutputsVector.begin(), connectedOutputsVector.end(), link.OutputPin), connectedOutputsVector.end());
+					
 					m_Links.erase(&link);
 				}
 			}
@@ -285,37 +296,54 @@ namespace RealEngine {
 		return nullptr;
 	}
 
-	void ShaderCreatePanel::RecursiveSearch(const ShaderNode* currentNode, std::string &shaderCode) {
-		int numberOfInputs = (int)currentNode->Inputs.size();
-
+	void ShaderCreatePanel::RecursiveSearch(const ShaderNode* currentNode, std::string &shaderCode, std::unordered_set<uint64_t>* nodeTracking) {
 		std::vector<const Link*> connectedLinks;
 
 		//Going down the chain of Nodes until it reaches the end
-		for (int i = 0; i < numberOfInputs; i++) {
-			const Link* link = FindPinLink(currentNode->Inputs[i].ID);
+		for (const Pin* inputPin: currentNode->ConnectedInputs) {
+			const Link* link = FindPinLink(inputPin->ID);
 
-			//If there actually is a link
-			if (link) {
+			//If there actually is a link then keep going
+			if (!link)
+				continue;
+
+			//Check to see if the node has already been visited
+			if(nodeTracking->find((uint64_t)link->OutputPin->Node->ID) == nodeTracking->end()) {
+				nodeTracking->insert((uint64_t)link->OutputPin->Node->ID);
+
 				connectedLinks.push_back(link);
-				RecursiveSearch(link->OutputPin->Node, shaderCode);
+				RecursiveSearch(link->OutputPin->Node, shaderCode, nodeTracking);
 			}
 		}
 
-		if (!connectedLinks.empty()) {
-			std::string nodeName = "\t// " + currentNode->Name + "\n";
+		std::vector<std::string> inputVars;
+		inputVars.resize(currentNode->Inputs.size());
+		std::string* inputs = inputVars.data();
 
-			shaderCode += nodeName;
-			shaderCode += "\t";
-			//shaderCode += PinTypeToString(link->OutputPin->Type);
-			//shaderCode += link->InputPin->Name + " = " + link->OutputPin->Name + ";\n";
+		std::vector<std::string> outputVars;
+		outputVars.resize(currentNode->Outputs.size());
+		std::string* outputs = outputVars.data();
+
+		for (const Pin* outputPin : currentNode->ConnectedOutputs) {
+			auto it = std::find(currentNode->ConnectedOutputs.begin(), currentNode->ConnectedOutputs.end(), outputPin);
+			int index = it - currentNode->ConnectedOutputs.begin();
+
+			outputs[index] = "out_";
+			outputs[index] += currentNode->Name;
+			outputs[index] += outputPin->Name;
+			outputs[index].erase(remove_if(outputs[index].begin(), outputs[index].end(), isspace), outputs[index].end());
 		}
 
 		//Add to the shader code
-		for (const Link* link : connectedLinks) {
-			shaderCode += "\t";
-			shaderCode += PinTypeToString(link->OutputPin->Type);
-			shaderCode += link->InputPin->Name + " = " + link->OutputPin->Name + ";\n";
+		for(int i = 0; i < connectedLinks.size(); i++) {
+
+			inputs[i] = "out_";
+			inputs[i] += currentNode->Name;
+			inputs[i] += connectedLinks[i]->InputPin->Name;
+			inputs[i].erase(remove_if(inputs[i].begin(), inputs[i].end(), isspace), inputs[i].end());
 		}
+
+		shaderCode += currentNode->GenerateCode(outputs, inputs);
 	}
 
 	void ShaderCreatePanel::Compile() {
@@ -324,7 +352,9 @@ namespace RealEngine {
 		std::string shaderCode = "\nvoid fragment() { \n";
 
 		//m_Nodes[0] is always the output node
-		RecursiveSearch(m_Nodes[0].get(), shaderCode);
+		std::unordered_set<uint64_t> nodeTracking;
+
+		RecursiveSearch(m_Nodes[0].get(), shaderCode, &nodeTracking);
 
 		shaderCode += "}";
 
@@ -332,12 +362,12 @@ namespace RealEngine {
 	}
 
 	Pin* ShaderCreatePanel::FindPin(ImNode::PinId id) {
-		for (auto& node : m_Nodes) {
-			for (auto& pin : node->Inputs)
+		for (Ref<ShaderNode>& node : m_Nodes) {
+			for (Pin& pin : node->Inputs)
 				if (pin.ID == id)
 					return &pin;
 
-			for (auto& pin : node->Outputs)
+			for (Pin& pin : node->Outputs)
 				if (pin.ID == id)
 					return &pin;
 		}
@@ -347,7 +377,7 @@ namespace RealEngine {
 	}
 
 	Link* ShaderCreatePanel::FindPinLink(ImNode::PinId id) {
-		for (auto& link : m_Links)
+		for (Link& link : m_Links)
 			if (link.InputPin->ID == id || link.OutputPin->ID == id)
 				return &link;
 
@@ -355,7 +385,7 @@ namespace RealEngine {
 	}
 
 	bool ShaderCreatePanel::IsPinLinked(ImNode::PinId id) {
-		for (auto& link : m_Links)
+		for (Link& link : m_Links)
 			if (link.InputPin->ID == id || link.OutputPin->ID == id)
 				return true;
 
@@ -363,7 +393,7 @@ namespace RealEngine {
 	}
 
 	void ShaderCreatePanel::BuildNodes() {
-		for (auto& node : m_Nodes)
+		for (Ref<ShaderNode> node : m_Nodes)
 			node->BuildNode();
 	}
 }

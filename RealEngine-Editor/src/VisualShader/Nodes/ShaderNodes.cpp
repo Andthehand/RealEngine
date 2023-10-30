@@ -8,8 +8,18 @@ namespace RealEngine {
 	}
 
 	//TODO: Implement this
-	std::string FragmentShaderOutputNode::GenerateCode(std::string* outputVars, std::string* inputVars) {
-		return std::string();
+	std::string FragmentShaderOutputNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
+		//Color
+		std::string color;
+		if (!inputVars[0].empty())
+			color = "\tFragColor = " + inputVars[0] + ";\n";
+
+		//Normal
+		std::string normal;
+		if (!inputVars[1].empty()) 
+			normal = "\tNormal = " + inputVars[1] + ";\n";
+
+		return color + normal;
 	}
 
 	ShaderTextureNode::ShaderTextureNode()
@@ -20,7 +30,7 @@ namespace RealEngine {
 		Outputs.emplace_back(GetNextId(), "Color", PinType::Float);
 	}
 
-	std::string ShaderTextureNode::GenerateCode(std::string* outputVars, std::string* inputVars) {
+	std::string ShaderTextureNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
 		//Sampler2D ID
 		std::string id;
 		if (inputVars[0].empty()) {
@@ -34,10 +44,10 @@ namespace RealEngine {
 		//UV
 		std::string uv;
 		if (inputVars[2].empty()) {
-			id = "UV";
+			uv = "UV";
 		}
 		else {
-			id = inputVars[1];
+			uv = inputVars[1];
 		}
 		
 		//LOD
