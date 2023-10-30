@@ -2,7 +2,7 @@
 #include "RealEngine.h"
 #include "Panels/SceneHierarchyPanel.h"
 #include "Panels/ContentBrowserPanel.h"
-#include "Panels/ShaderCreatePanel.h"
+#include "VisualShader/ShaderCreatePanel.h"
 
 #include "RealEngine/Renderer/EditorCamera.h"
 #include "RealEngine/Core/CircularBuffer.h"

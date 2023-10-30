@@ -4,10 +4,7 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui/imgui_internal.h>
 
-#include "../Utils/builders.h"
-#include "../Utils/widgets.h"
-
-using ax::Widgets::IconType;
+#include "Nodes/ShaderNodes.h"
 
 namespace RealEngine {
 	ShaderCreatePanel::ShaderCreatePanel() {
@@ -18,15 +15,9 @@ namespace RealEngine {
 		m_HeaderBackground = RealEngine::Texture2D::Create("Resources/Icons/ShaderCreate/BlueprintHeader.png");
 
 		//Init Testing Nodes
-		m_Nodes.emplace_back(GetNextId(), "Fragment Output");
-		m_Nodes.back().Inputs.emplace_back(GetNextId(), "Color", PinType::Float);
-		m_Nodes.back().Inputs.emplace_back(GetNextId(), "Normal", PinType::Float);
+		m_Nodes.emplace_back(CreateRef<FragmentShaderOutputNode>());
 
-		m_Nodes.emplace_back(GetNextId(), "Texture2D");
-		m_Nodes.back().Inputs.emplace_back(GetNextId(), "UV", PinType::Float);
-		m_Nodes.back().Inputs.emplace_back(GetNextId(), "LOD", PinType::Float);
-		m_Nodes.back().Inputs.emplace_back(GetNextId(), "Sampler2D", PinType::Float);
-		m_Nodes.back().Outputs.emplace_back(GetNextId(), "Color", PinType::Float);
+		m_Nodes.emplace_back(CreateRef<ShaderTextureNode>());
 
 		BuildNodes();
 	}
@@ -97,20 +88,20 @@ namespace RealEngine {
 				//const auto isSimple = node.Type == NodeType::Simple;
 				const auto isSimple = false;
 
-				builder.Begin(node.ID);
+				builder.Begin(node->ID);
 				if (!isSimple) {
 					//TODO: Implement
 					//builder.Header(node.Color);
 					builder.Header();
 					ImGui::Spring(0);
-					ImGui::TextUnformatted(node.Name.c_str());
+					ImGui::TextUnformatted(node->Name.c_str());
 					ImGui::Spring(1);
 					ImGui::Dummy(ImVec2(0, 28));
 					ImGui::Spring(0);
 					builder.EndHeader();
 				}
 
-				for (auto& input : node.Inputs) {
+				for (auto& input : node->Inputs) {
 					auto alpha = ImGui::GetStyle().Alpha;
 					//TODO: Implement!
 					/*if (newLinkPin && !CanCreateLink(newLinkPin, &input) && &input != newLinkPin)
@@ -129,7 +120,7 @@ namespace RealEngine {
 					builder.EndInput();
 				}
 
-				for (auto& output : node.Outputs) {
+				for (auto& output : node->Outputs) {
 					auto alpha = ImGui::GetStyle().Alpha;
 					//TODO: Implement!
 					/*if (newLinkPin && !CanCreateLink(newLinkPin, &output) && &output != newLinkPin)
@@ -281,44 +272,77 @@ namespace RealEngine {
 		ImNode::EndDelete();
 	}
 
-	void ShaderCreatePanel::RecursiveSearch(const Node* currentNode, std::string &shaderCode) {
-		int numberOfInputs = currentNode->Inputs.size();
+	static const char* PinTypeToString(PinType pinType) {
+		switch (pinType) {
+			case RealEngine::PinType::Bool:		return "bool ";
+			case RealEngine::PinType::Int:		return "int ";
+			case RealEngine::PinType::Float:	return "float ";
+			case RealEngine::PinType::Vector2:	return "vec2 ";
+			case RealEngine::PinType::Vector3:	return "vec3 ";
+			case RealEngine::PinType::String:	return "string ";
+		}
+		RE_CORE_ASSERT(false);
+		return nullptr;
+	}
+
+	void ShaderCreatePanel::RecursiveSearch(const ShaderNode* currentNode, std::string &shaderCode) {
+		int numberOfInputs = (int)currentNode->Inputs.size();
+
+		std::vector<const Link*> connectedLinks;
 
 		//Going down the chain of Nodes until it reaches the end
 		for (int i = 0; i < numberOfInputs; i++) {
 			const Link* link = FindPinLink(currentNode->Inputs[i].ID);
 
 			//If there actually is a link
-			if (link)
+			if (link) {
+				connectedLinks.push_back(link);
 				RecursiveSearch(link->OutputPin->Node, shaderCode);
+			}
+		}
+
+		if (!connectedLinks.empty()) {
+			std::string nodeName = "\t// " + currentNode->Name + "\n";
+
+			shaderCode += nodeName;
+			shaderCode += "\t";
+			//shaderCode += PinTypeToString(link->OutputPin->Type);
+			//shaderCode += link->InputPin->Name + " = " + link->OutputPin->Name + ";\n";
 		}
 
 		//Add to the shader code
+		for (const Link* link : connectedLinks) {
+			shaderCode += "\t";
+			shaderCode += PinTypeToString(link->OutputPin->Type);
+			shaderCode += link->InputPin->Name + " = " + link->OutputPin->Name + ";\n";
+		}
 	}
 
 	void ShaderCreatePanel::Compile() {
 		//TODO: Turn this into a custom StringBuilder that has a vector of strings and then joins them all together at the end to keep re alocations low
 		//Use this as an example https://github.com/timothyqiu/godot/blob/master/core/string/string_builder.h
-		std::string shaderCode;
+		std::string shaderCode = "\nvoid fragment() { \n";
 
 		//m_Nodes[0] is always the output node
-		RecursiveSearch(&m_Nodes[0], shaderCode);
+		RecursiveSearch(m_Nodes[0].get(), shaderCode);
 
-		RE_WARN("{0}", shaderCode);
+		shaderCode += "}";
+
+		RE_CORE_WARN("{0}", shaderCode);
 	}
 
 	Pin* ShaderCreatePanel::FindPin(ImNode::PinId id) {
 		for (auto& node : m_Nodes) {
-			for (auto& pin : node.Inputs)
+			for (auto& pin : node->Inputs)
 				if (pin.ID == id)
 					return &pin;
 
-			for (auto& pin : node.Outputs)
+			for (auto& pin : node->Outputs)
 				if (pin.ID == id)
 					return &pin;
 		}
 
-		RE_CRITICAL("Coundn't find Pin");
+		RE_CORE_CRITICAL("Coundn't find Pin");
 		return nullptr;
 	}
 
@@ -340,6 +364,6 @@ namespace RealEngine {
 
 	void ShaderCreatePanel::BuildNodes() {
 		for (auto& node : m_Nodes)
-			node.BuildNode();
+			node->BuildNode();
 	}
 }
