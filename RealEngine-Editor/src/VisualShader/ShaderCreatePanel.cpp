@@ -17,7 +17,7 @@ namespace RealEngine {
 		//Init Testing Nodes
 		m_Nodes.emplace_back(CreateRef<FragmentShaderOutputNode>());
 
-		m_Nodes.emplace_back(CreateRef<ShaderTextureNode>());
+		m_Nodes.emplace_back(CreateRef<ShaderConstantVec4Node>());
 
 		BuildNodes();
 	}
@@ -29,7 +29,7 @@ namespace RealEngine {
 		case PinType::Float:		return "float ";
 		case PinType::Vector2:		return "vec2 ";
 		case PinType::Vector3:		return "vec3 ";
-		case PinType::Vector4:		return "vec3 ";
+		case PinType::Vector4:		return "vec4 ";
 		case PinType::Sampler2D:	return "sampler2D ";
 		}
 		RE_CORE_ASSERT(false);
@@ -364,16 +364,28 @@ namespace RealEngine {
 	void ShaderCreatePanel::Compile() {
 		//TODO: Turn this into a custom StringBuilder that has a vector of strings and then joins them all together at the end to keep re alocations low
 		//Use this as an example https://github.com/timothyqiu/godot/blob/master/core/string/string_builder.h
-		std::string shaderCode = "\nvoid fragment() { \n";
+		std::string fragShaderCode;
+		fragShaderCode += "\n#version 450 core\n\n";
+		fragShaderCode += "layout(location = 0) out vec4 o_Color;\n\n";
+		fragShaderCode += "void main() { \n";
 
 		std::unordered_set<uint64_t> nodeTracking;
 
 		//m_Nodes[0] is always the output node
-		RecursiveSearch(m_Nodes[0].get(), shaderCode, &nodeTracking);
+		RecursiveSearch(m_Nodes[0].get(), fragShaderCode, &nodeTracking);
 
-		shaderCode += "}";
+		fragShaderCode += "}";
 
-		RE_CORE_WARN("{0}", shaderCode);
+		RE_CORE_WARN("{0}", fragShaderCode);
+
+		std::string vertShaderCode = "#version 450 core\n"
+			"layout (location = 0) in vec3 aPos;\n"
+			"void main()\n"
+			"{\n"
+			"   gl_Position = vec4(aPos, 1.0);\n"
+			"}\0";
+
+		m_PreviewShader = Shader::Create("Preview Shader", vertShaderCode, fragShaderCode);
 	}
 
 	Pin* ShaderCreatePanel::FindPin(ImNode::PinId id) {

@@ -12,12 +12,12 @@ namespace RealEngine {
 		//Color
 		std::string color;
 		if (!inputVars[0].empty())
-			color = "\tFragColor = " + inputVars[0] + ";\n";
+			color = "\to_Color = " + inputVars[0] + ";\n";
 
 		//Normal
 		std::string normal;
 		if (!inputVars[1].empty()) 
-			normal = "\tNormal = " + inputVars[1] + ";\n";
+			normal = "\to_Normal = " + inputVars[1] + ";\n";
 
 		return color + normal;
 	}
@@ -57,6 +57,15 @@ namespace RealEngine {
 		else {
 			return "\t" + outputVars[0] + " = texture(" + id + ", " + uv + ", " + inputVars[1] + ");\n";
 		}
+	}
+
+	ShaderConstantVec4Node::ShaderConstantVec4Node() 
+		: ShaderNode("Constanct Vector 4") {
+		Outputs.emplace_back(GetNextId(), "Vector4", PinType::Vector4);
+	}
+
+	std::string ShaderConstantVec4Node::GenerateCode(std::string* outputVars, std::string* inputVars) const {
+		return "\t" + outputVars[0] + " = vec4(255.0, 255.0, 255.0, 255.0);\n";
 	}
 }
 

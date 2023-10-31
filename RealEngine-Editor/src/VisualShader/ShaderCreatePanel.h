@@ -6,6 +6,7 @@
 #include <imgui_node_editor.h>
 
 #include "RealEngine/Renderer/Texture.h"
+#include "RealEngine/Renderer/Shader.h"
 #include "Nodes/ShaderNode.h"
 
 namespace RealEngine {
@@ -44,5 +45,8 @@ namespace RealEngine {
 		ImVector<Link>   m_Links;
 
 		int              m_NextLinkId = 100;     // Counter to help generate link ids. In real application this will probably based on pointer to user data structure.
+	
+		//Temp
+		Ref<Shader> m_PreviewShader;
 	};
 }
