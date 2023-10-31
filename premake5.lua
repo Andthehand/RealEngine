@@ -42,6 +42,7 @@ group ""
 
 group "Misc"
 	include "Sandbox"
+	include "6502CPU"
 	include "MachineLearningSandbox"
 	include "VoxelSandbox"
 group ""

@@ -17,7 +17,7 @@ public:
 
 RealEngine::Application* RealEngine::CreateApplication(RealEngine::ApplicationCommandLineArgs args) {
 	ApplicationSpecification spec;
-	spec.Name = "Sandbox";
+	spec.Name = "NES Emulator";
 	spec.CommandLineArgs = args;
 
 	return new Sandbox(spec);
