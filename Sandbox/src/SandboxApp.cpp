@@ -7,7 +7,7 @@ class Sandbox : public RealEngine::Application {
 public:
 	Sandbox(const RealEngine::ApplicationSpecification& specification)
 		: Application(specification) {
-		PushLayer(new MainLayer());
+		PushLayer(new RealEngine::MainLayer());
 	}
 
 	~Sandbox() {

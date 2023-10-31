@@ -1,10 +1,15 @@
 #pragma once
 #include <RealEngine.h>
 
-class MainLayer : public RealEngine::Layer {
-public:
-	MainLayer();
-	virtual void OnImGuiRender() override;
+#include "VisualShader/ShaderCreatePanel.h"
 
-private:
-};
+namespace RealEngine {
+	class MainLayer : public Layer {
+	public:
+		MainLayer();
+		virtual void OnImGuiRender() override;
+
+	private:
+		ShaderCreatePanel m_ShaderCreatePanel;
+	};
+}
