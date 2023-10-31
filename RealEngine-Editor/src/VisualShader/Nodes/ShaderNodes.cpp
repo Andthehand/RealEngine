@@ -3,8 +3,8 @@
 namespace RealEngine {
 	FragmentShaderOutputNode::FragmentShaderOutputNode()
 		: ShaderNode("Fragment Output") {
-		Inputs.emplace_back(GetNextId(), "Color", PinType::Float);
-		Inputs.emplace_back(GetNextId(), "Normal", PinType::Float);
+		Inputs.emplace_back(GetNextId(), "Color", PinType::Vector4);
+		Inputs.emplace_back(GetNextId(), "Normal", PinType::Vector3);
 	}
 
 	//TODO: Implement this
@@ -24,10 +24,10 @@ namespace RealEngine {
 
 	ShaderTextureNode::ShaderTextureNode()
 		: ShaderNode("Texture2D") {
-		Inputs.emplace_back(GetNextId(), "UV", PinType::Float);
+		Inputs.emplace_back(GetNextId(), "UV", PinType::Vector2);
 		Inputs.emplace_back(GetNextId(), "LOD", PinType::Float);
-		Inputs.emplace_back(GetNextId(), "Sampler2D", PinType::Float);
-		Outputs.emplace_back(GetNextId(), "Color", PinType::Float);
+		Inputs.emplace_back(GetNextId(), "Sampler2D", PinType::Sampler2D);
+		Outputs.emplace_back(GetNextId(), "Color", PinType::Vector4);
 	}
 
 	std::string ShaderTextureNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {

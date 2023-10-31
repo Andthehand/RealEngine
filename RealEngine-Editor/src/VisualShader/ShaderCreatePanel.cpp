@@ -22,14 +22,33 @@ namespace RealEngine {
 		BuildNodes();
 	}
 
+	static const char* PinTypeToString(PinType pinType) {
+		switch (pinType) {
+		case PinType::Bool:			return "bool ";
+		case PinType::Int:			return "int ";
+		case PinType::Float:		return "float ";
+		case PinType::Vector2:		return "vec2 ";
+		case PinType::Vector3:		return "vec3 ";
+		case PinType::Vector4:		return "vec3 ";
+		case PinType::Sampler2D:	return "sampler2D ";
+		}
+		RE_CORE_ASSERT(false);
+		return nullptr;
+	}
+
 	ImColor ShaderCreatePanel::GetIconColor(PinType type) {
 		switch (type) {
-		default:
-			case PinType::Bool:     return ImColor(220, 48, 48);
-			case PinType::Int:      return ImColor(68, 201, 156);
-			case PinType::Float:    return ImColor(147, 226, 74);
-			case PinType::String:   return ImColor(124, 21, 153);
+			case PinType::Bool:			return ImColor(220, 48, 48);
+			case PinType::Int:			return ImColor(68, 201, 156);
+			case PinType::Float:		return ImColor(97, 217, 245);
+			case PinType::Vector2:		return ImColor(189, 145, 242);
+			case PinType::Vector3:		return ImColor(214, 125, 237);
+			case PinType::Vector4:		return ImColor(255, 32, 242);
+			case PinType::Sampler2D:	return ImColor(255, 255, 0);
 		}
+
+		//RE_CORE_ASSERT(false);
+		return ImColor(255, 255, 255);
 	};
 
 	void ShaderCreatePanel::DrawPinIcon(const Pin& pin, bool connected, int alpha) {
@@ -38,13 +57,18 @@ namespace RealEngine {
 		ImColor  color = GetIconColor(pin.Type);
 		color.Value.w = alpha / 255.0f;
 		switch (pin.Type) {
-			case PinType::Bool:     iconType = IconType::Diamond; break;
-			case PinType::Int:      iconType = IconType::Circle; break;
-			case PinType::Float:    iconType = IconType::Circle; break;
-			case PinType::Vector2:  iconType = IconType::Circle; break;
-			case PinType::Vector3:  iconType = IconType::Circle; break;
-			case PinType::String:   iconType = IconType::RoundSquare; break;
+			case PinType::Bool:     
+				iconType = IconType::Diamond; break;
+			case PinType::Int:      
+			case PinType::Float:    
+			case PinType::Vector2:  
+			case PinType::Vector3:  
+			case PinType::Vector4:  
+				iconType = IconType::Circle; break;
+			case PinType::Sampler2D:
+				iconType = IconType::RoundSquare; break;
 			default:
+				RE_CORE_ASSERT(false);
 				return;
 		}
 
@@ -283,19 +307,6 @@ namespace RealEngine {
 		ImNode::EndDelete();
 	}
 
-	static const char* PinTypeToString(PinType pinType) {
-		switch (pinType) {
-			case RealEngine::PinType::Bool:		return "bool ";
-			case RealEngine::PinType::Int:		return "int ";
-			case RealEngine::PinType::Float:	return "float ";
-			case RealEngine::PinType::Vector2:	return "vec2 ";
-			case RealEngine::PinType::Vector3:	return "vec3 ";
-			case RealEngine::PinType::String:	return "string ";
-		}
-		RE_CORE_ASSERT(false);
-		return nullptr;
-	}
-
 	void ShaderCreatePanel::RecursiveSearch(const ShaderNode* currentNode, std::string &shaderCode, std::unordered_set<uint64_t>* nodeTracking) {
 		std::vector<const Link*> connectedLinks;
 
@@ -307,13 +318,13 @@ namespace RealEngine {
 			if (!link)
 				continue;
 
-			//Check to see if the node has already been visited
+			//If connected node hasn't been visited yet then visit it
 			if(nodeTracking->find((uint64_t)link->OutputPin->Node->ID) == nodeTracking->end()) {
 				nodeTracking->insert((uint64_t)link->OutputPin->Node->ID);
-
-				connectedLinks.push_back(link);
 				RecursiveSearch(link->OutputPin->Node, shaderCode, nodeTracking);
 			}
+
+			connectedLinks.push_back(link);
 		}
 
 		std::vector<std::string> inputVars;
@@ -326,20 +337,24 @@ namespace RealEngine {
 
 		for (const Pin* outputPin : currentNode->ConnectedOutputs) {
 			auto it = std::find(currentNode->ConnectedOutputs.begin(), currentNode->ConnectedOutputs.end(), outputPin);
-			int index = it - currentNode->ConnectedOutputs.begin();
+			int index = (int)(it - currentNode->ConnectedOutputs.begin());
 
-			outputs[index] = "out_";
-			outputs[index] += currentNode->Name;
-			outputs[index] += outputPin->Name;
-			outputs[index].erase(remove_if(outputs[index].begin(), outputs[index].end(), isspace), outputs[index].end());
+			std::string varName;
+			varName = "out_";
+			varName += currentNode->Name;
+			varName += "_";
+			varName += outputPin->Name;
+			varName.erase(remove_if(varName.begin(), varName.end(), isspace), varName.end());
+
+			outputs[index] = PinTypeToString(outputPin->Type) + varName;
 		}
 
 		//Add to the shader code
 		for(int i = 0; i < connectedLinks.size(); i++) {
-
 			inputs[i] = "out_";
-			inputs[i] += currentNode->Name;
-			inputs[i] += connectedLinks[i]->InputPin->Name;
+			inputs[i] += connectedLinks[i]->OutputPin->Node->Name;
+			inputs[i] += "_";
+			inputs[i] += connectedLinks[i]->OutputPin->Name;
 			inputs[i].erase(remove_if(inputs[i].begin(), inputs[i].end(), isspace), inputs[i].end());
 		}
 
@@ -351,9 +366,9 @@ namespace RealEngine {
 		//Use this as an example https://github.com/timothyqiu/godot/blob/master/core/string/string_builder.h
 		std::string shaderCode = "\nvoid fragment() { \n";
 
-		//m_Nodes[0] is always the output node
 		std::unordered_set<uint64_t> nodeTracking;
 
+		//m_Nodes[0] is always the output node
 		RecursiveSearch(m_Nodes[0].get(), shaderCode, &nodeTracking);
 
 		shaderCode += "}";

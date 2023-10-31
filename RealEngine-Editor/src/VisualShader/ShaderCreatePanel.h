@@ -11,8 +11,8 @@
 namespace RealEngine {
 	struct Link {
 		ImNode::LinkId Id;
-		Pin*  InputPin;
-		Pin*  OutputPin;
+		Pin* InputPin;
+		Pin* OutputPin;
 	};
 
 	class ShaderCreatePanel {

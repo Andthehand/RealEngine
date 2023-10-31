@@ -13,7 +13,10 @@ namespace RealEngine {
 		Float,
 		Vector2,
 		Vector3,
-		String
+		Vector4,
+
+		//GLSL Specific Types
+		Sampler2D,
 	};
 
 	struct Pin {
