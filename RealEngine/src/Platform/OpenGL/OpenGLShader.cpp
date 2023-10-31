@@ -154,7 +154,7 @@ namespace RealEngine {
 	}
 
 	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
-		: m_Name(name) {
+		: m_Name(name), m_FilePath(name) {
 		RE_PROFILE_FUNCTION();
 
 		std::unordered_map<GLenum, std::string> sources;
@@ -255,7 +255,7 @@ namespace RealEngine {
 				in.read((char*)data.data(), size);
 			}
 			else {
-				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), m_FilePath.string().c_str(), options);
+				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), m_Name.c_str(), options);
 				if (module.GetCompilationStatus() != shaderc_compilation_status_success) {
 					RE_CORE_ERROR(module.GetErrorMessage());
 					RE_CORE_ASSERT(false);

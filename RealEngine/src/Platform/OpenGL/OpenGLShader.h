@@ -26,6 +26,7 @@ namespace RealEngine {
 	private:
 		uint32_t m_RendererID;
 		std::filesystem::path m_FilePath;
+		//TODO: Remove this and get the name from the filepath
 		std::string m_Name;
 
 		//Don't recompile is used for making sure both Vulkan and Opengl bianaries are recompiled
