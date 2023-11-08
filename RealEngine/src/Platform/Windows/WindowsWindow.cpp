@@ -11,6 +11,9 @@
 
 #include "Platform/OpenGL/OpenGLContext.h"
 
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
+
 namespace RealEngine {
 
 	static uint8_t s_GLFWWindowCount = 0;
@@ -195,6 +198,10 @@ namespace RealEngine {
 	
 	bool WindowsWindow::IsVSync() const {
 		return m_Data.VSync;
+	}
+
+	bool WindowsWindow::SetParent(const void* parentHandle) {
+		return ::SetParent(glfwGetWin32Window(m_Window), (HWND)parentHandle);
 	}
 	
 	void WindowsWindow::SetCursorEnabled(bool enabled) {

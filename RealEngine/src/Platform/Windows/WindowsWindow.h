@@ -22,6 +22,8 @@ namespace RealEngine {
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;
 			
+		bool SetParent(const void* parentHandle) override;
+		
 		void SetTitle(const std::string& title) override;
 
 		void SetCursorEnabled(bool enabled) override;

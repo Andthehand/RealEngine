@@ -35,6 +35,8 @@ namespace RealEngine {
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;
 
+		virtual bool SetParent(const void* parentHandle) = 0;
+
 		virtual void SetTitle(const std::string& title) = 0;
 
 		virtual void SetCursorEnabled(bool enabled) = 0;
