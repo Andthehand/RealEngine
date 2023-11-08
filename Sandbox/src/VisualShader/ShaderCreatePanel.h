@@ -36,6 +36,8 @@ namespace RealEngine {
 		//This has to be called every time a node is added after first init because the node pointers inside of the pins will be corrupted
 		void BuildNodes();
 
+		//Temp
+		Ref<Shader> m_PreviewShader;
 	private:
 		Ref<Texture2D> m_HeaderBackground;
 
@@ -44,9 +46,6 @@ namespace RealEngine {
 		std::vector<Ref<ShaderNode>> m_Nodes;
 		ImVector<Link>   m_Links;
 
-		int              m_NextLinkId = 100;     // Counter to help generate link ids. In real application this will probably based on pointer to user data structure.
-	
-		//Temp
-		Ref<Shader> m_PreviewShader;
+		int m_NextLinkId = 100;     // Counter to help generate link ids. In real application this will probably based on pointer to user data structure.
 	};
 }

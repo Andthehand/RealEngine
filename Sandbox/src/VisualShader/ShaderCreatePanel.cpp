@@ -20,6 +20,8 @@ namespace RealEngine {
 		m_Nodes.emplace_back(CreateRef<ShaderConstantVec4Node>());
 
 		BuildNodes();
+
+		Compile();
 	}
 
 	static const char* PinTypeToString(PinType pinType) {
@@ -80,21 +82,23 @@ namespace RealEngine {
 		static bool p_open = true;
 		ImGui::Begin("Shader Creation Editor", &p_open, ImGuiWindowFlags_MenuBar);
 
-		if (ImGui::BeginMenuBar()) {
-			if (ImGui::BeginMenu("Options")) {
-				if (ImGui::MenuItem("Compile")) 
-					Compile();
-				ImGui::EndMenu();
+		//Mostly differnt gui option menus
+		{
+			if (ImGui::BeginMenuBar()) {
+				if (ImGui::BeginMenu("Options")) {
+					if (ImGui::MenuItem("Compile"))
+						Compile();
+					ImGui::EndMenu();
+				}
+
+				ImGui::EndMenuBar();
 			}
 
-			ImGui::EndMenuBar();
-		}
+			ImNode::SetCurrentEditor(m_Context);
+			ImNode::Begin("My Editor");
 
-		ImNode::SetCurrentEditor(m_Context);
-		ImNode::Begin("My Editor");
-		
-		//You have to suspend ImNode because https://github.com/thedmd/imgui-node-editor/issues/37#issuecomment-549122793
-		ImNode::Suspend();
+			//You have to suspend ImNode because https://github.com/thedmd/imgui-node-editor/issues/37#issuecomment-549122793
+			ImNode::Suspend();
 			if (ImNode::ShowBackgroundContextMenu()) {
 				ImGui::OpenPopup("Create New Node");
 			}
@@ -106,8 +110,10 @@ namespace RealEngine {
 				ImGui::EndPopup();
 			}
 			ImGui::PopStyleVar();
-		ImNode::Resume();
+			ImNode::Resume();
+		}
 
+		//Rendering of Nodes and lines
 		{
 			ImVec2 cursorTopLeft = ImGui::GetCursorScreenPos();
 

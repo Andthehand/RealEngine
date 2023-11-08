@@ -5,6 +5,38 @@
 namespace RealEngine {
 	MainLayer::MainLayer() : RealEngine::Layer("MainLayer") { }
 
+	void MainLayer::OnAttach() {
+		FramebufferSpecification fbSpec;
+		fbSpec.Attachments = { FramebufferTextureFormat::RGBA8 };
+		fbSpec.Width = 1280;
+		fbSpec.Height = 720;
+		m_Framebuffer = Framebuffer::Create(fbSpec);
+
+		float vertices[] = {
+			//Positions
+			 0.5f,  0.5f, 0.0f,
+			 0.5f, -0.5f, 0.0f,
+			-0.5f, -0.5f, 0.0f,
+			-0.5f,  0.5f, 0.0f
+		}; 
+		unsigned int indices[] = {
+			0, 1, 3, // first triangle
+			1, 2, 3  // second triangle
+		};
+
+		Ref<VertexBuffer> vertexBuffer = VertexBuffer::Create(vertices, sizeof(vertices) * 12);
+
+		vertexBuffer->SetLayout({
+			{ ShaderDataType::Float3, "a_Position" }
+		});
+
+		Ref<IndexBuffer> indexBuffer = IndexBuffer::Create(indices, 6);
+
+		m_VertexArray = VertexArray::Create();
+		m_VertexArray->AddVertexBuffer(vertexBuffer);
+		m_VertexArray->SetIndexBuffer(indexBuffer);
+	}
+
 	void MainLayer::OnImGuiRender() {
 		static bool p_open = true;
 		static bool opt_padding = false;
@@ -51,7 +83,24 @@ namespace RealEngine {
 
 		ImGui::End();
 
+		ImGui::Begin("Viewport");
+
+		ImVec2 viewpoerPanelSize = ImGui::GetContentRegionAvail();
+		uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
+		ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ viewpoerPanelSize.x, viewpoerPanelSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+		
+		ImGui::End();
+
 		m_ShaderCreatePanel.OnImGuiRender();
 	}
 
+	void MainLayer::OnUpdate(Timestep ts) {
+		m_Framebuffer->Bind();
+		RenderCommand::Clear();
+
+		m_ShaderCreatePanel.m_PreviewShader->Bind();
+		RenderCommand::DrawIndexed(m_VertexArray, 6);
+
+		m_Framebuffer->UnBind();
+	}
 }
