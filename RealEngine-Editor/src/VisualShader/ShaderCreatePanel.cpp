@@ -307,7 +307,7 @@ namespace RealEngine {
 		ImNode::EndDelete();
 	}
 
-	void ShaderCreatePanel::RecursiveSearch(const ShaderNode* currentNode, std::string &shaderCode, std::unordered_set<uint64_t>* nodeTracking) {
+	void ShaderCreatePanel::RecursiveSearch(const ShaderNode* currentNode, StringBuilder& shaderCode, StringBuilder& globalCode, std::unordered_set<uint64_t>* nodeTracking) {
 		std::vector<const Link*> connectedLinks;
 
 		//Going down the chain of Nodes until it reaches the end
@@ -321,7 +321,7 @@ namespace RealEngine {
 			//If connected node hasn't been visited yet then visit it
 			if(nodeTracking->find((uint64_t)link->OutputPin->Node->ID) == nodeTracking->end()) {
 				nodeTracking->insert((uint64_t)link->OutputPin->Node->ID);
-				RecursiveSearch(link->OutputPin->Node, shaderCode, nodeTracking);
+				RecursiveSearch(link->OutputPin->Node, shaderCode, globalCode, nodeTracking);
 			}
 
 			connectedLinks.push_back(link);
@@ -362,9 +362,8 @@ namespace RealEngine {
 	}
 
 	void ShaderCreatePanel::Compile() {
-		//TODO: Turn this into a custom StringBuilder that has a vector of strings and then joins them all together at the end to keep re alocations low
-		//Use this as an example https://github.com/timothyqiu/godot/blob/master/core/string/string_builder.h
-		std::string fragShaderCode;
+		StringBuilder fragShaderCode;
+		StringBuilder fragGlobalCode;
 		fragShaderCode += "\n#version 450 core\n\n";
 		fragShaderCode += "layout(location = 0) out vec4 o_Color;\n\n";
 		fragShaderCode += "void main() { \n";
@@ -372,13 +371,15 @@ namespace RealEngine {
 		std::unordered_set<uint64_t> nodeTracking;
 
 		//m_Nodes[0] is always the output node
-		RecursiveSearch(m_Nodes[0].get(), fragShaderCode, &nodeTracking);
+		RecursiveSearch(m_Nodes[0].get(), fragShaderCode, fragGlobalCode, &nodeTracking);
 
 		fragShaderCode += "}";
 
 		RE_CORE_WARN("{0}", fragShaderCode);
 
-		std::string vertShaderCode = "#version 450 core\n"
+		StringBuilder vertShaderCode;
+		vertShaderCode += 
+			"#version 450 core\n"
 			"layout (location = 0) in vec3 aPos;\n"
 			"void main()\n"
 			"{\n"

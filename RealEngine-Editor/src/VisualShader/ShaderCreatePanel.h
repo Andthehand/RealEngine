@@ -7,6 +7,9 @@
 
 #include "RealEngine/Renderer/Texture.h"
 #include "RealEngine/Renderer/Shader.h"
+
+#include "RealEngine/Utils/StringBuilder.h"
+
 #include "Nodes/ShaderNode.h"
 
 namespace RealEngine {
@@ -26,7 +29,7 @@ namespace RealEngine {
 		void OnImGuiRender();
 		void HandleInteraction();
 
-		void RecursiveSearch(const ShaderNode* currentNode, std::string& shaderCode, std::unordered_set<uint64_t>* nodeTracking);
+		void RecursiveSearch(const ShaderNode* currentNode, StringBuilder& shaderCode, StringBuilder& globalCode, std::unordered_set<uint64_t>* nodeTracking);
 		void Compile();
 
 		Pin* FindPin(ImNode::PinId id);
