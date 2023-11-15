@@ -21,7 +21,7 @@ namespace RealEngine {
 
 		BuildNodes();
 
-		Compile();
+		m_QueuedCompile = true;
 	}
 
 	static const char* PinTypeToString(PinType pinType) {
@@ -87,7 +87,7 @@ namespace RealEngine {
 			if (ImGui::BeginMenuBar()) {
 				if (ImGui::BeginMenu("Options")) {
 					if (ImGui::MenuItem("Compile"))
-						Compile();
+						m_QueuedCompile = true;
 					ImGui::EndMenu();
 				}
 
@@ -106,7 +106,7 @@ namespace RealEngine {
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
 			if (ImGui::BeginPopup("Create New Node")) {
 
-				if (ImGui::MenuItem("Compile")) Compile();
+				if (ImGui::MenuItem("Compile")) m_QueuedCompile = true;
 				ImGui::EndPopup();
 			}
 			ImGui::PopStyleVar();
@@ -304,6 +304,14 @@ namespace RealEngine {
 			}
 		}
 		ImNode::EndDelete();
+	}
+
+	void ShaderCreatePanel::OnUpdate() {
+		if (m_QueuedCompile) {
+			Compile();
+			m_QueuedCompile = false;
+		}
+	
 	}
 
 	void ShaderCreatePanel::RecursiveSearch(const ShaderNode* currentNode, std::string &shaderCode, std::unordered_set<uint64_t>* nodeTracking) {

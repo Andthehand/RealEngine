@@ -95,6 +95,8 @@ namespace RealEngine {
 	}
 
 	void MainLayer::OnUpdate(Timestep ts) {
+		m_ShaderCreatePanel.OnUpdate();
+
 		m_Framebuffer->Bind();
 		RenderCommand::Clear();
 

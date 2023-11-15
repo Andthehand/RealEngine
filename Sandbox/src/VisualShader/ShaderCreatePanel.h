@@ -26,6 +26,8 @@ namespace RealEngine {
 		void OnImGuiRender();
 		void HandleInteraction();
 
+		void OnUpdate();
+
 		void RecursiveSearch(const ShaderNode* currentNode, std::string& shaderCode, std::unordered_set<uint64_t>* nodeTracking);
 		void Compile();
 
@@ -37,6 +39,7 @@ namespace RealEngine {
 		void BuildNodes();
 
 		//Temp
+		bool m_QueuedCompile = false;
 		Ref<Shader> m_PreviewShader;
 	private:
 		Ref<Texture2D> m_HeaderBackground;
