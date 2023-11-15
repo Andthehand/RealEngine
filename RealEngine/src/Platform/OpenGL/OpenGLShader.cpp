@@ -137,9 +137,15 @@ namespace RealEngine {
 		: m_FilePath(filepath) {
 		RE_PROFILE_FUNCTION();
 
+		m_Name = filepath.stem().string();
 		Utils::CreateCacheDirectoryIfNeeded();
 
 		std::string source = ReadFile(filepath);
+		if (source.empty()) {
+			RE_CORE_WARN("Failed to create shader: {0}", m_Name);
+			return;
+		}
+
 		auto shaderSources = PreProcess(source);
 
 		{
@@ -150,7 +156,6 @@ namespace RealEngine {
 			RE_CORE_WARN("Shader {0} took {1} ms to create", filepath.stem().string(), timer.ElapsedMillis());
 		}
 
-		m_Name = filepath.stem().string();
 	}
 
 	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
