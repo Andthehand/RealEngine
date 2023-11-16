@@ -314,7 +314,7 @@ namespace RealEngine {
 	
 	}
 
-	void ShaderCreatePanel::RecursiveSearch(const ShaderNode* currentNode, std::string &shaderCode, std::unordered_set<uint64_t>* nodeTracking) {
+	void ShaderCreatePanel::RecursiveSearch(const ShaderNode* currentNode, StringBuilder &shaderCode, std::unordered_set<uint64_t>* nodeTracking) {
 		std::vector<const Link*> connectedLinks;
 
 		//Going down the chain of Nodes until it reaches the end
@@ -371,7 +371,8 @@ namespace RealEngine {
 	void ShaderCreatePanel::Compile() {
 		//TODO: Turn this into a custom StringBuilder that has a vector of strings and then joins them all together at the end to keep re alocations low
 		//Use this as an example https://github.com/timothyqiu/godot/blob/master/core/string/string_builder.h
-		std::string fragShaderCode;
+		StringBuilder fragShaderCode;
+		StringBuilder fragGlobalCode;
 		fragShaderCode += "\n#version 450 core\n\n";
 		fragShaderCode += "layout(location = 0) out vec4 o_Color;\n\n";
 		fragShaderCode += "void main() { \n";
@@ -385,7 +386,8 @@ namespace RealEngine {
 
 		RE_CORE_WARN("{0}", fragShaderCode);
 
-		std::string vertShaderCode = "#version 450 core\n"
+		StringBuilder vertShaderCode;
+		vertShaderCode += "#version 450 core\n"
 			"layout (location = 0) in vec3 aPos;\n"
 			"void main()\n"
 			"{\n"
