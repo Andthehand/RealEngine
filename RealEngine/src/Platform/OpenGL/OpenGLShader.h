@@ -16,6 +16,7 @@ namespace RealEngine {
 		virtual const std::string& GetName() const override { return m_Name; }
 	private:
 		std::string ReadFile(const std::filesystem::path& filepath);
+		void ReFormat(std::string& source);
 		std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);
 
 		void CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources);

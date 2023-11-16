@@ -146,6 +146,7 @@ namespace RealEngine {
 			return;
 		}
 
+		ReFormat(source);
 		auto shaderSources = PreProcess(source);
 
 		{
@@ -165,6 +166,9 @@ namespace RealEngine {
 		std::unordered_map<GLenum, std::string> sources;
 		sources[GL_VERTEX_SHADER] = vertexSrc;
 		sources[GL_FRAGMENT_SHADER] = fragmentSrc;
+		
+		ReFormat(sources[GL_VERTEX_SHADER]);
+		ReFormat(sources[GL_FRAGMENT_SHADER]);
 
 		CompileOrGetVulkanBinaries(sources);
 		CompileOrGetOpenGLBinaries();
@@ -199,6 +203,34 @@ namespace RealEngine {
 		}
 
 		return result;
+	}
+
+	void OpenGLShader::ReFormat(std::string& source) {
+		RE_PROFILE_FUNCTION();
+
+		//If there is a layout in the shader don't reformate
+		if(source.find("layout", 0) != std::string::npos)
+			return;
+
+		uint32_t location = 0;
+		size_t stringPos = 0;
+		stringPos = source.find("out ", 0);
+		while (stringPos != std::string::npos) {
+			std::string locationInset = "layout(location = " + std::to_string(location) + ") ";
+			source.insert(stringPos, locationInset);
+			location++;
+			stringPos = source.find("out ", stringPos + 3 + locationInset.size());
+		}
+
+		location = 0;
+		stringPos = 0;
+		stringPos = source.find("in ", 0);
+		while (stringPos != std::string::npos) {
+			std::string locationInset = "layout(location = " + std::to_string(location) + ") ";
+			source.insert(stringPos, locationInset);
+			location++;
+			stringPos = source.find("in ", stringPos + 2 + locationInset.size());
+		}
 	}
 
 	std::unordered_map<GLenum, std::string> OpenGLShader::PreProcess(const std::string& source) {
