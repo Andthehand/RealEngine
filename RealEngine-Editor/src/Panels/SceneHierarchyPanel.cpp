@@ -52,7 +52,7 @@ namespace RealEngine {
 				m_SelectionContext = {};
 
 			// Right-click on blank space
-			if (ImGui::BeginPopupContextWindow(0, 1, false)) {
+			if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems)) {
 				if (ImGui::MenuItem("Create Empty Entity"))
 					m_SelectionContext = m_Context->CreateEntity("Empty Entity");
 				if (ImGui::MenuItem("Create Sprite")) {

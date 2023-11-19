@@ -21,9 +21,6 @@
 [submodule "RealEngine/vendor/Box2D"]
 	path = RealEngine/vendor/Box2D
 	url = https://github.com/Andthehand/box2d.git
-[submodule "RealEngine/vendor/imgui"]
-	path = RealEngine/vendor/imgui
-	url = https://github.com/TheCherno/imgui.git
 [submodule "RealEngine/vendor/optick"]
 	path = RealEngine/vendor/optick
 	url = https://github.com/Andthehand/optick.git
@@ -33,3 +30,6 @@
 [submodule "RealEngine/vendor/ImNode"]
 	path = RealEngine/vendor/ImNode
 	url = https://github.com/Andthehand/imgui-node-editor.git
+[submodule "RealEngine/vendor/imgui"]
+	path = RealEngine/vendor/imgui
+	url = https://github.com/Andthehand/imgui.git

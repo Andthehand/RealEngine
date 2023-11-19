@@ -25,6 +25,10 @@ project "Sandbox"
 		"%{IncludeDir.optick}"
 	}
 
+	defines {
+		"IMGUI_DEFINE_MATH_OPERATORS"
+	}
+
 	links {
 		"RealEngine"
 	}

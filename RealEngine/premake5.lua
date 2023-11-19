@@ -28,7 +28,8 @@ project "RealEngine"
 
 	defines {
 		"_CRT_SECURE_NO_WARNINGS",
-		"GLFW_INCLUDE_NONE"
+		"GLFW_INCLUDE_NONE",
+		"IMGUI_DEFINE_MATH_OPERATORS"
 	}
 
 	includedirs {
@@ -74,9 +75,6 @@ project "RealEngine"
 
 	filter "system:windows"
 		systemversion "latest"
-
-		defines {
-		}
 
 		links {
 			"%{Library.WinSock}",

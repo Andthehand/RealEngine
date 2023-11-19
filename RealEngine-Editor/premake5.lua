@@ -26,6 +26,10 @@ project "RealEngine-Editor"
 		"%{IncludeDir.ImPlot}"
 	}
 
+	defines {
+		"IMGUI_DEFINE_MATH_OPERATORS"
+	}
+
 	links {
 		"RealEngine"
 	}
