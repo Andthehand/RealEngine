@@ -3,6 +3,7 @@
 //TODO: This might be really bad
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui/imgui_internal.h>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "Nodes/ShaderNodes.h"
 
@@ -154,6 +155,9 @@ namespace RealEngine {
 					DrawPinIcon(input, IsPinLinked(input.ID), (int)(alpha * 255));
 					ImGui::Spring(0);
 					if (!input.Name.empty()) {
+						static glm::vec4 test = glm::vec4(1.0f);
+						ImNode::DrawNodeVec4Control(input.Name, test);
+						ImGui::Spring(0);
 						ImGui::TextUnformatted(input.Name.c_str());
 						ImGui::Spring(0);
 					}
@@ -314,7 +318,7 @@ namespace RealEngine {
 	
 	}
 
-	void ShaderCreatePanel::RecursiveSearch(const ShaderNode* currentNode, StringBuilder &shaderCode, std::unordered_set<uint64_t>* nodeTracking) {
+	void ShaderCreatePanel::RecursiveSearch(const ShaderNode* currentNode, StringBuilder& shaderCode, StringBuilder& globalCode, std::unordered_set<uint64_t>* nodeTracking) {
 		std::vector<const Link*> connectedLinks;
 
 		//Going down the chain of Nodes until it reaches the end
@@ -328,12 +332,13 @@ namespace RealEngine {
 			//If connected node hasn't been visited yet then visit it
 			if(nodeTracking->find((uint64_t)link->OutputPin->Node->ID) == nodeTracking->end()) {
 				nodeTracking->insert((uint64_t)link->OutputPin->Node->ID);
-				RecursiveSearch(link->OutputPin->Node, shaderCode, nodeTracking);
+				RecursiveSearch(link->OutputPin->Node, shaderCode, globalCode, nodeTracking);
 			}
 
 			connectedLinks.push_back(link);
 		}
 
+		//Reserve space for the input and output variables
 		std::vector<std::string> inputVars;
 		inputVars.resize(currentNode->Inputs.size());
 		std::string* inputs = inputVars.data();
@@ -366,27 +371,27 @@ namespace RealEngine {
 		}
 
 		shaderCode += currentNode->GenerateCode(outputs, inputs);
+		globalCode += currentNode->GenerateGlobalCode(inputs);
 	}
 
 	void ShaderCreatePanel::Compile() {
-		//TODO: Turn this into a custom StringBuilder that has a vector of strings and then joins them all together at the end to keep re alocations low
-		//Use this as an example https://github.com/timothyqiu/godot/blob/master/core/string/string_builder.h
 		StringBuilder fragShaderCode;
 		StringBuilder fragGlobalCode;
-		fragShaderCode += "\n#version 450 core\n\n";
-		fragShaderCode += "out vec4 o_Color;\n\n";
+		fragGlobalCode += "\n#version 450 core\n\n";
 		fragShaderCode += "void main() { \n";
 
 		std::unordered_set<uint64_t> nodeTracking;
 
 		//m_Nodes[0] is always the output node
-		RecursiveSearch(m_Nodes[0].get(), fragShaderCode, &nodeTracking);
+		RecursiveSearch(m_Nodes[0].get(), fragShaderCode, fragGlobalCode, &nodeTracking);
 
 		fragShaderCode += "}";
+		fragGlobalCode += "\n";
 
-		RE_CORE_WARN("{0}", fragShaderCode);
+		RE_CORE_WARN("{0}", fragGlobalCode.as_string() + fragShaderCode.as_string());
 
 		StringBuilder vertShaderCode;
+		StringBuilder vertGlobalCode;
 		vertShaderCode += "#version 450 core\n"
 			"in vec3 aPos;\n"
 			"void main()\n"
@@ -394,7 +399,7 @@ namespace RealEngine {
 			"   gl_Position = vec4(aPos, 1.0);\n"
 			"}";
 
-		m_PreviewShader = Shader::Create("Preview Shader", vertShaderCode, fragShaderCode);
+		m_PreviewShader = Shader::Create("Preview Shader", vertGlobalCode.as_string() + vertShaderCode.as_string(), fragGlobalCode.as_string() + fragShaderCode.as_string());
 	}
 
 	Pin* ShaderCreatePanel::FindPin(ImNode::PinId id) {

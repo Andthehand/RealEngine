@@ -22,6 +22,18 @@ namespace RealEngine {
 		return color + normal;
 	}
 
+	std::string FragmentShaderOutputNode::GenerateGlobalCode(std::string* inputVars) const {
+		std::string code;
+		
+		if (!inputVars[0].empty())
+			code += "out vec4 o_Color;\n";
+
+		if (!inputVars[1].empty())
+			code += "out vec3 o_Normal;\n";
+
+		return code;
+	}
+
 	ShaderTextureNode::ShaderTextureNode()
 		: ShaderNode("Texture2D") {
 		Inputs.emplace_back(GetNextId(), "UV", PinType::Vector2);

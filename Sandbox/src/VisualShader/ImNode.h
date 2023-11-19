@@ -19,8 +19,9 @@ namespace RealEngine {
 
 namespace ax::NodeEditor {
 	static bool DrawNodeControlN(const std::string& label, void* p_data, int components, float v_speed = 1.0f, const void* p_min = NULL, const void* p_max = NULL, const char* format = NULL) {
-		if (components > 4) {
-			RE_ASSERT(true, "Cant't create a node greater than a vec4");
+		RE_ASSERT(components <= 4, "Cant't create a node greater than a vec4");
+		RE_ASSERT(components > 0, "Cant't create a node no components?");
+		if (components > 4 || components < 0) {
 			return false;
 		}
 

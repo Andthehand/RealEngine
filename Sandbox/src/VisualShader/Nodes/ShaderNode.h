@@ -49,6 +49,7 @@ namespace RealEngine {
 		}
 
 		virtual std::string GenerateCode(std::string* outputVars, std::string* inputVars) const = 0;
+		virtual std::string GenerateGlobalCode(std::string* inputVars) const { return ""; }
 
 		ImNode::NodeId ID;
 

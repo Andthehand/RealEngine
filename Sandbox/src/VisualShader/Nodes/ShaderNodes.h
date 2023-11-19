@@ -8,6 +8,8 @@ namespace RealEngine {
 		FragmentShaderOutputNode();
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
+		std::string GenerateGlobalCode(std::string* inputVars) const override;
+
 	};
 
 	class ShaderTextureNode : public ShaderNode {

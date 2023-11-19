@@ -30,7 +30,7 @@ namespace RealEngine {
 
 		void OnUpdate();
 
-		void RecursiveSearch(const ShaderNode* currentNode, StringBuilder& shaderCode, std::unordered_set<uint64_t>* nodeTracking);
+		void RecursiveSearch(const ShaderNode* currentNode, StringBuilder& shaderCode, StringBuilder& globalCode, std::unordered_set<uint64_t>* nodeTracking);
 		void Compile();
 
 		Pin* FindPin(ImNode::PinId id);
