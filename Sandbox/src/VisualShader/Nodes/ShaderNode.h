@@ -28,6 +28,10 @@ namespace RealEngine {
 		PinType Type;
 		PinKind Kind;
 
+		//This isn't a vector because outputs only need to know if they are connected
+		//and not with who they are connected with
+		Pin* ConnectedPin = nullptr;
+
 		std::string Name;
 	};
 
@@ -55,10 +59,7 @@ namespace RealEngine {
 
 		std::string Name;
 
-		std::vector<Pin*> ConnectedInputs;
 		std::vector<Pin> Inputs;
-
-		std::vector<Pin*> ConnectedOutputs;
 		std::vector<Pin> Outputs;
 	};
 }

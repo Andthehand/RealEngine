@@ -272,8 +272,8 @@ namespace RealEngine {
 						//Just add the link to the list
 						m_Links.push_back({ ImNode::LinkId(m_NextLinkId++), inputPin, outputPin });
 
-						inputPin->Node->ConnectedInputs.push_back(inputPin);
-						outputPin->Node->ConnectedOutputs.push_back(outputPin);
+						inputPin->ConnectedPin = outputPin;
+						outputPin->ConnectedPin = inputPin;
 					}
 				}
 			}
@@ -297,12 +297,10 @@ namespace RealEngine {
 
 					//This is so scuffed
 					//It is now less scuffed
-					std::vector<Pin*>& connectedInputsVector = link.InputPin->Node->ConnectedInputs;
-					std::vector<Pin*>& connectedOutputsVector = link.OutputPin->Node->ConnectedOutputs;
+					//and finally now it's way less scuffed
+					link.InputPin->ConnectedPin = nullptr;
+					link.OutputPin->ConnectedPin = nullptr;
 
-					connectedInputsVector.erase(std::remove(connectedInputsVector.begin(), connectedInputsVector.end(), link.InputPin), connectedInputsVector.end());
-					connectedOutputsVector.erase(std::remove(connectedOutputsVector.begin(), connectedOutputsVector.end(), link.OutputPin), connectedOutputsVector.end());
-					
 					m_Links.erase(&link);
 				}
 			}
@@ -319,23 +317,20 @@ namespace RealEngine {
 	}
 
 	void ShaderCreatePanel::RecursiveSearch(const ShaderNode* currentNode, StringBuilder& shaderCode, StringBuilder& globalCode, std::unordered_set<uint64_t>* nodeTracking) {
-		std::vector<const Link*> connectedLinks;
 
 		//Going down the chain of Nodes until it reaches the end
-		for (const Pin* inputPin: currentNode->ConnectedInputs) {
-			const Link* link = FindPinLink(inputPin->ID);
-
-			//If there actually is a link then keep going
-			if (!link)
+		for (const Pin& inputPin: currentNode->Inputs) {
+			//If the Node isn't connected continue
+			if (inputPin.ConnectedPin == nullptr)
 				continue;
 
 			//If connected node hasn't been visited yet then visit it
-			if(nodeTracking->find((uint64_t)link->OutputPin->Node->ID) == nodeTracking->end()) {
-				nodeTracking->insert((uint64_t)link->OutputPin->Node->ID);
-				RecursiveSearch(link->OutputPin->Node, shaderCode, globalCode, nodeTracking);
+			const uint64_t nextNodeID = (uint64_t)inputPin.ConnectedPin->Node->ID;
+			if(nodeTracking->find(nextNodeID) == nodeTracking->end()) {
+				nodeTracking->insert(nextNodeID);
+				RecursiveSearch(inputPin.ConnectedPin->Node, shaderCode, globalCode, nodeTracking);
 			}
 
-			connectedLinks.push_back(link);
 		}
 
 		//Reserve space for the input and output variables
@@ -347,26 +342,31 @@ namespace RealEngine {
 		outputVars.resize(currentNode->Outputs.size());
 		std::string* outputs = outputVars.data();
 
-		for (const Pin* outputPin : currentNode->ConnectedOutputs) {
-			auto it = std::find(currentNode->ConnectedOutputs.begin(), currentNode->ConnectedOutputs.end(), outputPin);
-			int index = (int)(it - currentNode->ConnectedOutputs.begin());
+		for (int i = 0; i < currentNode->Outputs.size(); i++) {
+			if(currentNode->Outputs[i].ConnectedPin == nullptr)
+				continue;
 
 			std::string varName;
 			varName = "out_";
 			varName += currentNode->Name;
 			varName += "_";
-			varName += outputPin->Name;
+			varName += currentNode->Outputs[i].Name;
 			varName.erase(remove_if(varName.begin(), varName.end(), isspace), varName.end());
 
-			outputs[index] = PinTypeToString(outputPin->Type) + varName;
+			outputs[i] = PinTypeToString(currentNode->Outputs[i].Type) + varName;
 		}
 
 		//Add to the shader code
-		for(int i = 0; i < connectedLinks.size(); i++) {
+		for(int i = 0; i < currentNode->Inputs.size(); i++) {
+			const Pin* connectedPin = currentNode->Inputs[i].ConnectedPin;
+
+			if(connectedPin == nullptr)
+				continue;
+
 			inputs[i] = "out_";
-			inputs[i] += connectedLinks[i]->OutputPin->Node->Name;
+			inputs[i] += connectedPin->Node->Name;
 			inputs[i] += "_";
-			inputs[i] += connectedLinks[i]->OutputPin->Name;
+			inputs[i] += connectedPin->Name;
 			inputs[i].erase(remove_if(inputs[i].begin(), inputs[i].end(), isspace), inputs[i].end());
 		}
 
