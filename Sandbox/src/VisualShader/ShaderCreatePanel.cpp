@@ -155,11 +155,12 @@ namespace RealEngine {
 					DrawPinIcon(input, IsPinLinked(input.ID), (int)(alpha * 255));
 					ImGui::Spring(0);
 					if (!input.Name.empty()) {
-						static glm::vec4 test = glm::vec4(1.0f);
-						ImNode::DrawNodeVec4Control(input.Name, test);
-						ImGui::Spring(0);
 						ImGui::TextUnformatted(input.Name.c_str());
 						ImGui::Spring(0);
+						static glm::vec4 test = glm::vec4(1.0f);
+						ImNode::DrawNodeVec4Control(&test);
+						ImGui::Spring(0);
+
 					}
 					ImGui::PopStyleVar();
 					builder.EndInput();
@@ -173,6 +174,13 @@ namespace RealEngine {
 
 					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 					builder.Output(output.ID);
+					static glm::vec4 test = glm::vec4(1.0f);
+					if (output.Type == PinType::Vector4) {
+						ShaderNodeConstant* constantNode = dynamic_cast<ShaderNodeConstant*>(output.Node);
+						if(constantNode != nullptr)
+							ImNode::DrawNodeVec4Control((glm::vec4*)constantNode->GetConstant());
+					}
+
 					if (!output.Name.empty()) {
 						ImGui::Spring(0);
 						ImGui::TextUnformatted(output.Name.c_str());
@@ -370,6 +378,7 @@ namespace RealEngine {
 			inputs[i].erase(remove_if(inputs[i].begin(), inputs[i].end(), isspace), inputs[i].end());
 		}
 
+		//Variable names are always out_NodeName_PinName
 		shaderCode += currentNode->GenerateCode(outputs, inputs);
 		globalCode += currentNode->GenerateGlobalCode(inputs);
 	}

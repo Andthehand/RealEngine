@@ -72,12 +72,12 @@ namespace RealEngine {
 	}
 
 	ShaderConstantVec4Node::ShaderConstantVec4Node() 
-		: ShaderNode("Constanct Vector 4") {
+		: ShaderNodeConstant("Constanct Vector 4") {
 		Outputs.emplace_back(GetNextId(), "Vector4", PinType::Vector4);
 	}
 
 	std::string ShaderConstantVec4Node::GenerateCode(std::string* outputVars, std::string* inputVars) const {
-		return "\t" + outputVars[0] + " = vec4(255.0, 255.0, 255.0, 255.0);\n";
+		return "\t" + outputVars[0] + " = " + glm::to_string(m_Constant) + "; \n";
 	}
 }
 

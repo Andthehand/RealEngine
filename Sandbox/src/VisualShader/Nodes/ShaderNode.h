@@ -62,4 +62,13 @@ namespace RealEngine {
 		std::vector<Pin> Inputs;
 		std::vector<Pin> Outputs;
 	};
+
+	class ShaderNodeConstant : public ShaderNode {
+	public:
+		ShaderNodeConstant(const char* name)
+			: ShaderNode(name) {}
+
+		virtual void* GetConstant() const = 0;
+		virtual void SetConstant(void* constant) = 0;
+	};
 }

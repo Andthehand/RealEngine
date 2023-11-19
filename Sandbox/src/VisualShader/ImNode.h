@@ -18,7 +18,7 @@ namespace RealEngine {
 }
 
 namespace ax::NodeEditor {
-	static bool DrawNodeControlN(const std::string& label, void* p_data, int components, float v_speed = 1.0f, const void* p_min = NULL, const void* p_max = NULL, const char* format = NULL) {
+	static bool DrawNodeControlN(void* p_data, int components, float v_speed = 1.0f, const void* p_min = NULL, const void* p_max = NULL, const char* format = NULL) {
 		RE_ASSERT(components <= 4, "Cant't create a node greater than a vec4");
 		RE_ASSERT(components > 0, "Cant't create a node no components?");
 		if (components > 4 || components < 0) {
@@ -27,10 +27,7 @@ namespace ax::NodeEditor {
 
 		bool value_changed = false;
 		ImGui::BeginGroup();
-		ImGui::PushID(label.c_str());
-
-		ImGui::Text(label.c_str());
-		ImGui::Spring(0);
+		ImGui::PushID("");
 
 		//For some reason the compiler doesn't like this
 		//ImGui::PushMultiItemsWidths(4, 64 * components);
@@ -68,15 +65,15 @@ namespace ax::NodeEditor {
 		return value_changed;
 	}
 
-	static bool DrawNodeVec4Control(const std::string& label, glm::vec4& v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f") {
-		return DrawNodeControlN(label, &v, 4, v_speed, &v_min, &v_max, format);
+	static bool DrawNodeVec4Control(glm::vec4* v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f") {
+		return DrawNodeControlN(v, 4, v_speed, &v_min, &v_max, format);
 	}
 
-	static bool DrawNodeVec3Control(const std::string& label, glm::vec3& v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f") {
-		return DrawNodeControlN(label, &v, 3, v_speed, &v_min, &v_max, format);
+	static bool DrawNodeVec3Control(glm::vec3* v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f") {
+		return DrawNodeControlN(v, 3, v_speed, &v_min, &v_max, format);
 	}
 
-	static bool DrawNodeVec2Control(const std::string& label, glm::vec2& v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f") {
-		return DrawNodeControlN(label, &v, 2, v_speed, &v_min, &v_max, format);
+	static bool DrawNodeVec2Control(glm::vec2* v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f") {
+		return DrawNodeControlN(v, 2, v_speed, &v_min, &v_max, format);
 	}
 }
