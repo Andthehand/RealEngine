@@ -3,6 +3,9 @@
 #include <string>
 #include <unordered_set>
 
+//For some reason I have to include this or else there will be a linking error
+#include <spdlog/fmt/fmt.h>
+
 #include <imgui_node_editor.h>
 
 #include "RealEngine/Utils/StringBuilder.h"
@@ -37,7 +40,7 @@ namespace RealEngine {
 		Link* FindPinLink(ImNode::PinId id);
 		bool IsPinLinked(ImNode::PinId id);
 
-		//This has to be called every time a node is added after first init because the node pointers inside of the pins will be corrupted
+		//This has to be called every time a node is added because the node pointers inside of the pins will be corrupted
 		void BuildNodes();
 
 		//Temp
@@ -51,6 +54,6 @@ namespace RealEngine {
 		std::vector<Ref<ShaderNode>> m_Nodes;
 		ImVector<Link>   m_Links;
 
-		int m_NextLinkId = 100;     // Counter to help generate link ids. In real application this will probably based on pointer to user data structure.
+		int m_NextLinkId = 100;
 	};
 }

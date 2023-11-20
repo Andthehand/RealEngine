@@ -1,7 +1,6 @@
 #include "ShaderCreatePanel.h"
 
 //TODO: This might be really bad
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui/imgui_internal.h>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -119,8 +118,6 @@ namespace RealEngine {
 
 		//Rendering of Nodes and lines
 		{
-			ImVec2 cursorTopLeft = ImGui::GetCursorScreenPos();
-
 			ImNode::Utilities::BlueprintNodeBuilder builder((ImTextureID)(uint64_t)m_HeaderBackground->GetRendererID(),
 				m_HeaderBackground->GetWidth(), m_HeaderBackground->GetHeight());
 
