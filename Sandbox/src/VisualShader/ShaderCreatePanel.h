@@ -47,6 +47,12 @@ namespace RealEngine {
 		bool m_QueuedCompile = false;
 		Ref<Shader> m_PreviewShader;
 	private:
+		template<class CustomNode>
+		void RegisterNodeType() {
+			m_NodeTypes.emplace_back(CustomNode::s_Name, []() { return CreateRef<CustomNode>(); });
+		}
+
+	private:
 		Ref<Texture2D> m_HeaderBackground;
 
 		ImNode::EditorContext* m_Context = nullptr;
@@ -55,6 +61,8 @@ namespace RealEngine {
 		ImVector<Link> m_Links;
 
 		std::string m_Tooltip;
+
+		std::vector<std::pair<std::string, std::function<Ref<ShaderNode>()>>> m_NodeTypes;
 
 		int m_NextLinkId = 100;
 	};

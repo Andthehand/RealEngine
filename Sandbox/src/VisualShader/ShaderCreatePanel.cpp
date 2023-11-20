@@ -14,6 +14,14 @@ namespace RealEngine {
 
 		m_HeaderBackground = RealEngine::Texture2D::Create("Resources/Icons/ShaderCreate/BlueprintHeader.png");
 
+		RegisterNodeType<ShaderTextureNode>();
+
+		RegisterNodeType<ShaderConstantVec4Node>();
+		RegisterNodeType<ShaderConstantVec3Node>();
+		RegisterNodeType<ShaderConstantVec2Node>();
+
+		RegisterNodeType<ShaderConstantFloatNode>();
+
 		//Init Testing Nodes
 		m_Nodes.emplace_back(CreateRef<FragmentShaderOutputNode>());
 
@@ -130,7 +138,7 @@ namespace RealEngine {
 		//Mostly differnt gui option menus
 		{
 			if (ImGui::BeginMenuBar()) {
-				if (ImGui::BeginMenu("Options")) {
+				if (ImGui::BeginMenu("Options")) {					
 					if (ImGui::MenuItem("Compile"))
 						m_QueuedCompile = true;
 					ImGui::EndMenu();
@@ -150,6 +158,14 @@ namespace RealEngine {
 
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
 			if (ImGui::BeginPopup("Create New Node")) {
+				for (const auto& nodeType : m_NodeTypes) {
+					if (ImGui::MenuItem(nodeType.first.c_str())) {
+						m_Nodes.emplace_back(nodeType.second());
+						BuildNodes();
+					}
+				}
+
+				ImGui::Separator();
 
 				if (ImGui::MenuItem("Compile")) m_QueuedCompile = true;
 				ImGui::EndPopup();
@@ -178,7 +194,7 @@ namespace RealEngine {
 					//builder.Header(node.Color);
 					builder.Header();
 					ImGui::Spring(0);
-					ImGui::TextUnformatted(node->Name.c_str());
+					ImGui::TextUnformatted(node->GetName());
 					ImGui::Spring(1);
 					ImGui::Dummy(ImVec2(0, 28));
 					ImGui::Spring(0);
@@ -405,7 +421,7 @@ namespace RealEngine {
 
 			std::string varName;
 			varName = "out_";
-			varName += currentNode->Name;
+			varName += currentNode->GetName();
 			varName += "_";
 			varName += currentNode->Outputs[i].Name;
 			varName.erase(remove_if(varName.begin(), varName.end(), isspace), varName.end());
@@ -421,7 +437,7 @@ namespace RealEngine {
 				continue;
 
 			inputs[i] = "out_";
-			inputs[i] += connectedPin->Node->Name;
+			inputs[i] += connectedPin->Node->GetName();
 			inputs[i] += "_";
 			inputs[i] += connectedPin->Name;
 			inputs[i].erase(remove_if(inputs[i].begin(), inputs[i].end(), isspace), inputs[i].end());

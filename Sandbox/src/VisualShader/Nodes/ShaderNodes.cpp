@@ -2,7 +2,7 @@
 
 namespace RealEngine {
 	FragmentShaderOutputNode::FragmentShaderOutputNode()
-		: ShaderNode("Fragment Output") {
+		: ShaderNode() {
 		Inputs.emplace_back(GetNextId(), "Color", PinType::Vector4);
 		Inputs.emplace_back(GetNextId(), "Normal", PinType::Vector3);
 	}
@@ -35,7 +35,7 @@ namespace RealEngine {
 	}
 
 	ShaderTextureNode::ShaderTextureNode()
-		: ShaderNode("Texture2D") {
+		: ShaderNode() {
 		Inputs.emplace_back(GetNextId(), "UV", PinType::Vector2);
 		Inputs.emplace_back(GetNextId(), "LOD", PinType::Float);
 		Inputs.emplace_back(GetNextId(), "Sampler2D", PinType::Sampler2D);
@@ -72,7 +72,7 @@ namespace RealEngine {
 	}
 
 	ShaderConstantVec4Node::ShaderConstantVec4Node() 
-		: ShaderNodeConstant("Constanct Vector 4") {
+		: ShaderNodeConstant() {
 		Outputs.emplace_back(GetNextId(), "Vector4", PinType::Vector4);
 	}
 
@@ -81,7 +81,7 @@ namespace RealEngine {
 	}
 
 	ShaderConstantVec3Node::ShaderConstantVec3Node()
-		: ShaderNodeConstant("Constanct Vector 3") {
+		: ShaderNodeConstant() {
 		Outputs.emplace_back(GetNextId(), "Vector3", PinType::Vector3);
 	}
 
@@ -90,7 +90,7 @@ namespace RealEngine {
 	}
 
 	ShaderConstantVec2Node::ShaderConstantVec2Node()
-		: ShaderNodeConstant("Constanct Vector 2") {
+		: ShaderNodeConstant() {
 		Outputs.emplace_back(GetNextId(), "Vector2", PinType::Vector2);
 	}
 
@@ -99,7 +99,7 @@ namespace RealEngine {
 	}
 
 	ShaderConstantFloatNode::ShaderConstantFloatNode()
-		: ShaderNodeConstant("Constanct Float") {
+		: ShaderNodeConstant() {
 		Outputs.emplace_back(GetNextId(), "Float", PinType::Float);
 	}
 

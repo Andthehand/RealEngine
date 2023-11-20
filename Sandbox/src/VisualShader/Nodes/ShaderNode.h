@@ -37,8 +37,8 @@ namespace RealEngine {
 
 	class ShaderNode {
 	public:
-		ShaderNode(const char* name)
-			: ID(GetNextId()), Name(name) {}
+		ShaderNode()
+			: ID(GetNextId()) {}
 
 		void BuildNode() {
 			for (Pin& input : Inputs) {
@@ -52,12 +52,12 @@ namespace RealEngine {
 			}
 		}
 
+		virtual const char* GetName() const = 0;
+
 		virtual std::string GenerateCode(std::string* outputVars, std::string* inputVars) const = 0;
 		virtual std::string GenerateGlobalCode(std::string* inputVars) const { return ""; }
 
 		ImNode::NodeId ID;
-
-		std::string Name;
 
 		std::vector<Pin> Inputs;
 		std::vector<Pin> Outputs;
@@ -65,8 +65,8 @@ namespace RealEngine {
 
 	class ShaderNodeConstant : public ShaderNode {
 	public:
-		ShaderNodeConstant(const char* name)
-			: ShaderNode(name) {}
+		ShaderNodeConstant()
+			: ShaderNode() {}
 
 		virtual void* GetConstant() const = 0;
 		virtual void SetConstant(void* constant) = 0;
