@@ -27,6 +27,34 @@ namespace RealEngine {
 		m_QueuedCompile = true;
 	}
 
+	static const bool IsPinTypeConvertableTo(PinType pinType1, PinType pinType2) {
+		switch (pinType1) {
+			case PinType::Bool:			
+			case PinType::Int:			
+			case PinType::Float:		
+			case PinType::Vector2:		
+			case PinType::Vector3:		
+			case PinType::Vector4:		
+				//This is disgusting
+				switch (pinType2) {
+					case PinType::Bool:
+					case PinType::Int:
+					case PinType::Float:
+					case PinType::Vector2:
+					case PinType::Vector3:
+					case PinType::Vector4:
+						return true;
+					case PinType::Sampler2D:
+						return false;
+				}
+				break;
+			case PinType::Sampler2D:	
+				return false;
+		}
+		RE_CORE_ASSERT(false);
+		return nullptr;
+	}
+
 	static const char* PinTypeToString(PinType pinType) {
 		switch (pinType) {
 			case PinType::Bool:			return "Boolean";
@@ -284,9 +312,9 @@ namespace RealEngine {
 					ImNode::NodeLabel(("Can't Connect 2 " + kind + " Together").c_str(), ImColor(171, 44, 44, 180));
 					ImNode::RejectNewItem(ImColor(255, 0, 0), 2.0f);
 				}
-				else if (inputPin->Type != outputPin->Type) {
+				else if (!IsPinTypeConvertableTo(inputPin->Type, outputPin->Type)) {
 					//Can't connect 2 pins of different types together
-					ImNode::NodeLabel("Can't Connect Pins of Different Types", ImColor(171, 44, 44, 180));
+					ImNode::NodeLabel("Pin Types are Not Compatible", ImColor(171, 44, 44, 180));
 					ImNode::RejectNewItem(ImColor(255, 0, 0), 2.0f);
 				}
 				else if (IsPinLinked(inputPinId)) {
@@ -345,11 +373,9 @@ namespace RealEngine {
 			Compile();
 			m_QueuedCompile = false;
 		}
-	
 	}
 
 	void ShaderCreatePanel::RecursiveSearch(const ShaderNode* currentNode, StringBuilder& shaderCode, StringBuilder& globalCode, std::unordered_set<uint64_t>* nodeTracking) {
-
 		//Going down the chain of Nodes until it reaches the end
 		for (const Pin& inputPin: currentNode->Inputs) {
 			//If the Node isn't connected continue
@@ -362,7 +388,6 @@ namespace RealEngine {
 				nodeTracking->insert(nextNodeID);
 				RecursiveSearch(inputPin.ConnectedPin->Node, shaderCode, globalCode, nodeTracking);
 			}
-
 		}
 
 		//Reserve space for the input and output variables
@@ -386,7 +411,7 @@ namespace RealEngine {
 			varName.erase(remove_if(varName.begin(), varName.end(), isspace), varName.end());
 
 			outputs[i] = PinTypeToCodeType(currentNode->Outputs[i].Type) + varName;
-		}
+		}	
 
 		//Add to the shader code
 		for(int i = 0; i < currentNode->Inputs.size(); i++) {
@@ -400,6 +425,70 @@ namespace RealEngine {
 			inputs[i] += "_";
 			inputs[i] += connectedPin->Name;
 			inputs[i].erase(remove_if(inputs[i].begin(), inputs[i].end(), isspace), inputs[i].end());
+
+			switch (currentNode->Inputs[i].Type) {
+				case PinType::Float: {
+					switch (currentNode->Inputs[i].ConnectedPin->Type) {
+						case PinType::Vector2: {
+							inputs[i] = inputs[i] + ".x";
+						} break;
+						case PinType::Vector3: {
+							inputs[i] = inputs[i] + ".x";
+						} break;
+						case PinType::Vector4: {
+							inputs[i] = inputs[i] + ".x";
+						} break;
+						default:
+							break;
+					}
+				} break;
+				case PinType::Vector2: {
+					switch (currentNode->Inputs[i].ConnectedPin->Type) {
+						case PinType::Float: {
+							inputs[i] = "vec2(" + inputs[i] + ")";
+						} break;
+						case PinType::Vector3:
+						case PinType::Vector4: {
+							inputs[i] = "vec2(" + inputs[i] + ".xy)";
+						} break;
+						default:
+							break;
+					}
+				} break;
+
+				case PinType::Vector3: {
+					switch (currentNode->Inputs[i].ConnectedPin->Type) {
+						case PinType::Float: {
+							inputs[i] = "vec3(" + inputs[i] + ")";
+						} break;
+						case PinType::Vector2: {
+							inputs[i] = "vec3(" + inputs[i] + ", 0.0)";
+						} break;
+						case PinType::Vector4: {
+							inputs[i] = "vec3(" + inputs[i] + ".xyz)";
+						} break;
+						default:
+							break;
+					}
+				} break;
+				case PinType::Vector4: {
+					switch (currentNode->Inputs[i].ConnectedPin->Type) {
+						case PinType::Float: {
+							inputs[i] = "vec4(" + inputs[i] + ")";
+						} break;
+						case PinType::Vector2: {
+							inputs[i] = "vec4(" + inputs[i] + ", 0.0, 0.0)";
+						} break;
+						case PinType::Vector3: {
+							inputs[i] = "vec4(" + inputs[i] + ", 0.0)";
+						} break;
+						default:
+							break;
+						}
+				} break;
+			default:
+				break;
+			}
 		}
 
 		//Variable names are always out_NodeName_PinName
@@ -427,8 +516,7 @@ namespace RealEngine {
 		StringBuilder vertGlobalCode;
 		vertShaderCode += "#version 450 core\n"
 			"in vec3 aPos;\n"
-			"void main()\n"
-			"{\n"
+			"void main() {\n"
 			"   gl_Position = vec4(aPos, 1.0);\n"
 			"}";
 
