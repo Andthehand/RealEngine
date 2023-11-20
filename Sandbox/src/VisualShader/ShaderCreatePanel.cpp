@@ -19,6 +19,9 @@ namespace RealEngine {
 		m_Nodes.emplace_back(CreateRef<FragmentShaderOutputNode>());
 
 		m_Nodes.emplace_back(CreateRef<ShaderConstantVec4Node>());
+		m_Nodes.emplace_back(CreateRef<ShaderConstantVec3Node>());
+		m_Nodes.emplace_back(CreateRef<ShaderConstantVec2Node>());
+		m_Nodes.emplace_back(CreateRef<ShaderConstantFloatNode>());
 
 		BuildNodes();
 
@@ -157,9 +160,6 @@ namespace RealEngine {
 					if (!input.Name.empty()) {
 						ImGui::TextUnformatted(input.Name.c_str());
 						ImGui::Spring(0);
-						static glm::vec4 test = glm::vec4(1.0f);
-						ImNode::DrawNodeVec4Control(&test);
-						ImGui::Spring(0);
 
 					}
 					ImGui::PopStyleVar();
@@ -175,10 +175,26 @@ namespace RealEngine {
 					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 					builder.Output(output.ID);
 					static glm::vec4 test = glm::vec4(1.0f);
-					if (output.Type == PinType::Vector4) {
-						ShaderNodeConstant* constantNode = dynamic_cast<ShaderNodeConstant*>(output.Node);
-						if(constantNode != nullptr)
-							ImNode::DrawNodeVec4Control((glm::vec4*)constantNode->GetConstant());
+
+					ShaderNodeConstant* constantNode = dynamic_cast<ShaderNodeConstant*>(output.Node);
+					if (constantNode != nullptr) {
+						switch (output.Type) {
+							case PinType::Vector4:
+								ImNode::DrawNodeVec4Control((glm::vec4*)constantNode->GetConstant());
+								break;
+							case PinType::Vector3:
+								ImNode::DrawNodeVec3Control((glm::vec3*)constantNode->GetConstant());
+								break;
+							case PinType::Vector2:
+								ImNode::DrawNodeVec2Control((glm::vec2*)constantNode->GetConstant());
+								break;
+							case PinType::Float:
+								ImNode::DrawNodeControlN((float*)constantNode->GetConstant(), 1);
+								break;
+							default:
+								RE_ASSERT(false, "Constant pin type not implemented");
+								break;
+						}
 					}
 
 					if (!output.Name.empty()) {

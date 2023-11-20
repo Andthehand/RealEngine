@@ -27,12 +27,11 @@ namespace ax::NodeEditor {
 
 		bool value_changed = false;
 		ImGui::BeginGroup();
-		ImGui::PushID("");
 
 		//For some reason the compiler doesn't like this
 		//ImGui::PushMultiItemsWidths(4, 64 * components);
 
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < components; i++) {
 			static const ImU32 colors[] = {
 				0xBB0000FF, // red
 				0xBB00FF00, // green
@@ -57,8 +56,6 @@ namespace ax::NodeEditor {
 			ImGui::PopID();
 			//ImGui::PopItemWidth();
 		}
-
-		ImGui::PopID();
 
 		ImGui::EndGroup();
 

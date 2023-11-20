@@ -79,5 +79,32 @@ namespace RealEngine {
 	std::string ShaderConstantVec4Node::GenerateCode(std::string* outputVars, std::string* inputVars) const {
 		return "\t" + outputVars[0] + " = " + glm::to_string(m_Constant) + "; \n";
 	}
+
+	ShaderConstantVec3Node::ShaderConstantVec3Node()
+		: ShaderNodeConstant("Constanct Vector 3") {
+		Outputs.emplace_back(GetNextId(), "Vector3", PinType::Vector3);
+	}
+
+	std::string ShaderConstantVec3Node::GenerateCode(std::string* outputVars, std::string* inputVars) const {
+		return "\t" + outputVars[0] + " = " + glm::to_string(m_Constant) + "; \n";
+	}
+
+	ShaderConstantVec2Node::ShaderConstantVec2Node()
+		: ShaderNodeConstant("Constanct Vector 2") {
+		Outputs.emplace_back(GetNextId(), "Vector2", PinType::Vector2);
+	}
+
+	std::string ShaderConstantVec2Node::GenerateCode(std::string* outputVars, std::string* inputVars) const {
+		return "\t" + outputVars[0] + " = " + glm::to_string(m_Constant) + "; \n";
+	}
+
+	ShaderConstantFloatNode::ShaderConstantFloatNode()
+		: ShaderNodeConstant("Constanct Float") {
+		Outputs.emplace_back(GetNextId(), "Float", PinType::Float);
+	}
+
+	std::string ShaderConstantFloatNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
+		return "\t" + outputVars[0] + " = " + std::to_string(m_Constant) + "; \n";
+	}
 }
 

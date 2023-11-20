@@ -39,6 +39,7 @@ namespace RealEngine {
 
 	void MainLayer::OnImGuiRender() {
 		static bool p_open = true;
+		ImGui::ShowStackToolWindow(&p_open);
 		static bool opt_padding = false;
 		static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
 
