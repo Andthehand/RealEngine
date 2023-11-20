@@ -52,7 +52,9 @@ namespace RealEngine {
 		ImNode::EditorContext* m_Context = nullptr;
 
 		std::vector<Ref<ShaderNode>> m_Nodes;
-		ImVector<Link>   m_Links;
+		ImVector<Link> m_Links;
+
+		std::string m_Tooltip;
 
 		int m_NextLinkId = 100;
 	};

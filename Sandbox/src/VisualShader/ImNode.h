@@ -18,6 +18,23 @@ namespace RealEngine {
 }
 
 namespace ax::NodeEditor {
+	static void NodeLabel(const char* label, ImColor color) {
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetTextLineHeight());
+		ImVec2 size = ImGui::CalcTextSize(label);
+
+		ImVec2 padding = ImGui::GetStyle().FramePadding;
+		ImVec2 spacing = ImGui::GetStyle().ItemSpacing;
+
+		ImGui::SetCursorPos(ImGui::GetCursorPos() + ImVec2(spacing.x, -spacing.y));
+
+		ImVec2 rectMin = ImGui::GetCursorScreenPos() - padding;
+		ImVec2 rectMax = ImGui::GetCursorScreenPos() + size + padding;
+
+		ImDrawList* drawList = ImGui::GetWindowDrawList();
+		drawList->AddRectFilled(rectMin, rectMax, color, size.y * 0.15f);
+		ImGui::TextUnformatted(label);
+	};
+
 	static bool DrawNodeControlN(void* p_data, int components, float v_speed = 1.0f, const void* p_min = NULL, const void* p_max = NULL, const char* format = NULL) {
 		RE_ASSERT(components <= 4, "Cant't create a node greater than a vec4");
 		RE_ASSERT(components > 0, "Cant't create a node no components?");

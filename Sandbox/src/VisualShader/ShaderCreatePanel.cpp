@@ -29,13 +29,27 @@ namespace RealEngine {
 
 	static const char* PinTypeToString(PinType pinType) {
 		switch (pinType) {
-		case PinType::Bool:			return "bool ";
-		case PinType::Int:			return "int ";
-		case PinType::Float:		return "float ";
-		case PinType::Vector2:		return "vec2 ";
-		case PinType::Vector3:		return "vec3 ";
-		case PinType::Vector4:		return "vec4 ";
-		case PinType::Sampler2D:	return "sampler2D ";
+			case PinType::Bool:			return "Boolean";
+			case PinType::Int:			return "Integer";
+			case PinType::Float:		return "Float";
+			case PinType::Vector2:		return "Vector 2";
+			case PinType::Vector3:		return "Vector 3";
+			case PinType::Vector4:		return "Vector 4";
+			case PinType::Sampler2D:	return "Sampler 2D";
+		}
+		RE_CORE_ASSERT(false);
+		return nullptr;
+	}
+
+	static const char* PinTypeToCodeType(PinType pinType) {
+		switch (pinType) {
+			case PinType::Bool:			return "bool ";
+			case PinType::Int:			return "int ";
+			case PinType::Float:		return "float ";
+			case PinType::Vector2:		return "vec2 ";
+			case PinType::Vector3:		return "vec3 ";
+			case PinType::Vector4:		return "vec4 ";
+			case PinType::Sampler2D:	return "sampler2D ";
 		}
 		RE_CORE_ASSERT(false);
 		return nullptr;
@@ -153,11 +167,14 @@ namespace RealEngine {
 					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 					//TODO: Implement!
 					DrawPinIcon(input, IsPinLinked(input.ID), (int)(alpha * 255));
+
+					if (ImGui::IsItemHovered())
+						m_Tooltip = PinTypeToString(input.Type);
+
 					ImGui::Spring(0);
 					if (!input.Name.empty()) {
-						ImGui::TextUnformatted(input.Name.c_str());
+						ImGui::TextUnformatted(input.Name.c_str());						
 						ImGui::Spring(0);
-
 					}
 					ImGui::PopStyleVar();
 					builder.EndInput();
@@ -200,6 +217,9 @@ namespace RealEngine {
 					}
 					ImGui::Spring(0);
 					DrawPinIcon(output, IsPinLinked(output.ID), (int)(alpha * 255));
+					if (ImGui::IsItemHovered())
+						m_Tooltip = PinTypeToString(output.Type);
+
 					ImGui::PopStyleVar();
 					builder.EndOutput();
 				}
@@ -219,32 +239,22 @@ namespace RealEngine {
 
 		ImNode::SetCurrentEditor(nullptr);
 
+		//Has to be outside of the ImNode::Begin() and ImNode::End()
+		if (!m_Tooltip.empty()) {
+			static ImFont* boldFont = ImGui::GetIO().Fonts->Fonts[0];
+			ImGui::PushFont(boldFont);
+			ImGui::SetTooltip(m_Tooltip.c_str());
+			ImGui::PopFont();
+			
+			m_Tooltip.clear();
+		}
+
 		ImGui::End();
 	}
 	
 	void ShaderCreatePanel::HandleInteraction() {
 		// Handle creation action, returns true if editor want to create new object (node or link)
 		if (ImNode::BeginCreate()) {
-			//Helper Lambda
-			//TODO: Move to its own function?
-			auto showLabel = [](const char* label, ImColor color) {
-				ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetTextLineHeight());
-				ImVec2 size = ImGui::CalcTextSize(label);
-
-				ImVec2 padding = ImGui::GetStyle().FramePadding;
-				ImVec2 spacing = ImGui::GetStyle().ItemSpacing;
-
-				ImGui::SetCursorPos(ImGui::GetCursorPos() + ImVec2(spacing.x, -spacing.y));
-
-				ImVec2 rectMin = ImGui::GetCursorScreenPos() - padding;
-				ImVec2 rectMax = ImGui::GetCursorScreenPos() + size + padding;
-
-				ImDrawList* drawList = ImGui::GetWindowDrawList();
-				drawList->AddRectFilled(rectMin, rectMax, color, size.y * 0.15f);
-				ImGui::TextUnformatted(label);
-			};
-
-
 			ImNode::PinId inputPinId, outputPinId;
 			if (ImNode::QueryNewLink(&inputPinId, &outputPinId) 
 				// Check that both IDs are valid
@@ -264,29 +274,29 @@ namespace RealEngine {
 				}
 				else if (inputPin->Node == outputPin->Node) {
 					//Can't connect input and output from same node together
-					showLabel("Pin Cannot Connect to Same Node", ImColor(171, 44, 44, 180));
+					ImNode::NodeLabel("Pin Cannot Connect to Same Node", ImColor(171, 44, 44, 180));
 					ImNode::RejectNewItem(ImColor(255, 0, 0), 2.0f);
 				}
 				else if (inputPin->Kind == outputPin->Kind) {
 					//Can't connect 2 inputs or 2 outputs together
 					std::string kind = inputPin->Kind == PinKind::Input ? "Inputs" : "Outputs";
 
-					showLabel(("Can't Connect 2 " + kind + " Together").c_str(), ImColor(171, 44, 44, 180));
+					ImNode::NodeLabel(("Can't Connect 2 " + kind + " Together").c_str(), ImColor(171, 44, 44, 180));
 					ImNode::RejectNewItem(ImColor(255, 0, 0), 2.0f);
 				}
 				else if (inputPin->Type != outputPin->Type) {
 					//Can't connect 2 pins of different types together
-					showLabel("Can't Connect Pins of Different Types", ImColor(171, 44, 44, 180));
+					ImNode::NodeLabel("Can't Connect Pins of Different Types", ImColor(171, 44, 44, 180));
 					ImNode::RejectNewItem(ImColor(255, 0, 0), 2.0f);
 				}
 				else if (IsPinLinked(inputPinId)) {
 					//Inputs can't have 2 connections
-					showLabel("Pin Already Connected", ImColor(171, 44, 44, 180));
+					ImNode::NodeLabel("Pin Already Connected", ImColor(171, 44, 44, 180));
 					ImNode::RejectNewItem(ImColor(255, 0, 0), 2.0f);
 				}
 				else {
 					//If hovering over valid pin
-					showLabel("Connect Pairs", ImColor(44, 171, 44, 180));
+					ImNode::NodeLabel("Connect Pairs", ImColor(44, 171, 44, 180));
 
 					//If mouse released basically
 					if (ImNode::AcceptNewItem(ImColor(0, 255, 0), 2.0f)) {
@@ -299,6 +309,7 @@ namespace RealEngine {
 				}
 			}
 		}
+
 		ImNode::EndCreate(); // Wraps up object creation action handling.
 
 
@@ -374,7 +385,7 @@ namespace RealEngine {
 			varName += currentNode->Outputs[i].Name;
 			varName.erase(remove_if(varName.begin(), varName.end(), isspace), varName.end());
 
-			outputs[i] = PinTypeToString(currentNode->Outputs[i].Type) + varName;
+			outputs[i] = PinTypeToCodeType(currentNode->Outputs[i].Type) + varName;
 		}
 
 		//Add to the shader code
