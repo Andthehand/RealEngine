@@ -7,20 +7,21 @@
 #include "Nodes/ShaderNodes.h"
 
 namespace RealEngine {
-	ShaderCreatePanel::ShaderCreatePanel() {
+	ShaderCreatePanel::ShaderCreatePanel() 
+		: m_CreateOptions(CreateOptions("Root")) {
 		ImNode::Config config;
 		config.SettingsFile = "Simple.json";
 		m_Context = ImNode::CreateEditor(&config);
 
 		m_HeaderBackground = RealEngine::Texture2D::Create("Resources/Icons/ShaderCreate/BlueprintHeader.png");
 
-		RegisterNodeType<ShaderTextureNode>();
-
-		RegisterNodeType<ShaderConstantVec4Node>();
-		RegisterNodeType<ShaderConstantVec3Node>();
-		RegisterNodeType<ShaderConstantVec2Node>();
-
-		RegisterNodeType<ShaderConstantFloatNode>();
+		RegisterNodeType<ShaderTextureNode>("Textures");
+		
+		RegisterNodeType<ShaderConstantVec4Node>("Vectors/Constants");
+		RegisterNodeType<ShaderConstantVec3Node>("Vectors/Constants");
+		RegisterNodeType<ShaderConstantVec2Node>("Vectors/Constants");
+		
+		RegisterNodeType<ShaderConstantFloatNode>("Scalar/Constants");
 
 		//Init Testing Nodes
 		m_Nodes.emplace_back(CreateRef<FragmentShaderOutputNode>());
@@ -131,6 +132,24 @@ namespace RealEngine {
 		ax::Widgets::Icon(iconType, connected, color, ImColor(32, 32, 32, alpha));
 	};
 
+	void ShaderCreatePanel::RecursiveOptionsMenu(const std::vector<Node<CreateOptions>*>& children) {
+		for (const Node<CreateOptions>* child : children) {
+			CreateOptions options = child->GetData();
+			if (options.CreateFunction != nullptr) {
+				if (ImGui::MenuItem(options.Name.c_str())) {
+					m_Nodes.emplace_back(options.CreateFunction());
+					BuildNodes();
+				}
+			}
+			else {
+				if (ImGui::TreeNode(options.Name.c_str())) {
+					RecursiveOptionsMenu(child->GetChildren());
+					ImGui::TreePop();
+				}
+			}
+		}
+	}
+
 	void ShaderCreatePanel::OnImGuiRender() {
 		static bool p_open = true;
 		ImGui::Begin("Shader Creation Editor", &p_open, ImGuiWindowFlags_MenuBar);
@@ -158,16 +177,11 @@ namespace RealEngine {
 
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
 			if (ImGui::BeginPopup("Create New Node")) {
-				for (const auto& nodeType : m_NodeTypes) {
-					if (ImGui::MenuItem(nodeType.first.c_str())) {
-						m_Nodes.emplace_back(nodeType.second());
-						BuildNodes();
-					}
-				}
-
-				ImGui::Separator();
-
 				if (ImGui::MenuItem("Compile")) m_QueuedCompile = true;
+				
+				ImGui::Separator();
+				
+				RecursiveOptionsMenu(m_CreateOptions.GetRoot()->GetChildren());
 				ImGui::EndPopup();
 			}
 			ImGui::PopStyleVar();

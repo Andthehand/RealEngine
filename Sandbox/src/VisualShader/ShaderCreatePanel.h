@@ -9,16 +9,27 @@
 #include <imgui_node_editor.h>
 
 #include "RealEngine/Utils/StringBuilder.h"
-
 #include "RealEngine/Renderer/Texture.h"
 #include "RealEngine/Renderer/Shader.h"
+
 #include "Nodes/ShaderNode.h"
+#include "../Utils/NaryTree.h"
 
 namespace RealEngine {
 	struct Link {
 		ImNode::LinkId Id;
 		Pin* InputPin;
 		Pin* OutputPin;
+	};
+
+	struct CreateOptions {
+		CreateOptions(std::string name, std::function<Ref<ShaderNode>()> createFunction = nullptr) 
+			: Name(name), CreateFunction(createFunction) {}
+
+		//The Name also is the category if CreateFunction is empty
+		std::string Name;
+
+		std::function<Ref<ShaderNode>()> CreateFunction;
 	};
 
 	class ShaderCreatePanel {
@@ -28,6 +39,8 @@ namespace RealEngine {
 		ImColor GetIconColor(PinType type);
 		void DrawPinIcon(const Pin& pin, bool connected, int alpha);
 
+		void RecursiveOptionsMenu(const std::vector<Node<CreateOptions>*>& children);
+			
 		void OnImGuiRender();
 		void HandleInteraction();
 
@@ -48,8 +61,23 @@ namespace RealEngine {
 		Ref<Shader> m_PreviewShader;
 	private:
 		template<class CustomNode>
-		void RegisterNodeType() {
-			m_NodeTypes.emplace_back(CustomNode::s_Name, []() { return CreateRef<CustomNode>(); });
+		void RegisterNodeType(std::string category) {
+			size_t pos = category.find("/");
+			Node<CreateOptions>* currentNode = m_CreateOptions.GetRoot();
+
+			while(pos != std::string::npos) {
+				std::string subCategory = category.substr(0, pos);
+				category = category.substr(pos + 1);
+
+				//Create subcategory if it doesn't exist
+				currentNode = currentNode->AddChild({ subCategory });
+				pos = category.find("/");
+			}
+
+			if (!category.empty())
+				currentNode = currentNode->AddChild({ category });
+
+			m_CreateOptions.AddChild(currentNode, { CustomNode::s_Name, []() { return CreateRef<CustomNode>(); } });
 		}
 
 	private:
@@ -62,7 +90,7 @@ namespace RealEngine {
 
 		std::string m_Tooltip;
 
-		std::vector<std::pair<std::string, std::function<Ref<ShaderNode>()>>> m_NodeTypes;
+		NaryTree<CreateOptions> m_CreateOptions;
 
 		int m_NextLinkId = 100;
 	};
