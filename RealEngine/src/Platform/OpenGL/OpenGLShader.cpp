@@ -146,7 +146,6 @@ namespace RealEngine {
 			return;
 		}
 
-		ReFormat(source);
 		auto shaderSources = PreProcess(source);
 
 		{
@@ -167,12 +166,14 @@ namespace RealEngine {
 		sources[GL_VERTEX_SHADER] = vertexSrc;
 		sources[GL_FRAGMENT_SHADER] = fragmentSrc;
 		
-		ReFormat(sources[GL_VERTEX_SHADER]);
-		ReFormat(sources[GL_FRAGMENT_SHADER]);
 
-		CompileOrGetVulkanBinaries(sources);
-		CompileOrGetOpenGLBinaries();
-		CreateProgram();
+		{
+			Timer timer;
+			CompileOrGetVulkanBinaries(sources);
+			CompileOrGetOpenGLBinaries();
+			CreateProgram();
+			RE_CORE_WARN("Shader {0} took {1} ms to create", name, timer.ElapsedMillis());
+		}
 	}
 
 	OpenGLShader::~OpenGLShader() {
@@ -203,34 +204,6 @@ namespace RealEngine {
 		}
 
 		return result;
-	}
-
-	void OpenGLShader::ReFormat(std::string& source) {
-		RE_PROFILE_FUNCTION();
-
-		//If there is a layout in the shader don't reformate
-		if(source.find("layout", 0) != std::string::npos)
-			return;
-
-		uint32_t location = 0;
-		size_t stringPos = 0;
-		stringPos = source.find("out ", 0);
-		while (stringPos != std::string::npos) {
-			std::string locationInset = "layout(location = " + std::to_string(location) + ") ";
-			source.insert(stringPos, locationInset);
-			location++;
-			stringPos = source.find("out ", stringPos + 3 + locationInset.size());
-		}
-
-		location = 0;
-		stringPos = 0;
-		stringPos = source.find("in ", 0);
-		while (stringPos != std::string::npos) {
-			std::string locationInset = "layout(location = " + std::to_string(location) + ") ";
-			source.insert(stringPos, locationInset);
-			location++;
-			stringPos = source.find("in ", stringPos + 2 + locationInset.size());
-		}
 	}
 
 	std::unordered_map<GLenum, std::string> OpenGLShader::PreProcess(const std::string& source) {
@@ -269,6 +242,9 @@ namespace RealEngine {
 		const bool optimize = true;
 		if (optimize)
 			options.SetOptimizationLevel(shaderc_optimization_level_performance);
+
+		options.SetAutoMapLocations(true);
+		options.SetAutoBindUniforms(true);
 
 		std::filesystem::path cacheDirectory = Utils::GetCacheDirectory();
 
@@ -322,7 +298,7 @@ namespace RealEngine {
 		shaderc::Compiler compiler;
 		shaderc::CompileOptions options;
 		options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
-		const bool optimize = false;
+		const bool optimize = true;
 		if (optimize)
 			options.SetOptimizationLevel(shaderc_optimization_level_performance);
 
