@@ -13,12 +13,13 @@ namespace RealEngine {
 		m_Framebuffer = Framebuffer::Create(fbSpec);
 
 		float vertices[] = {
-			//Positions
-			 0.5f,  0.5f, 0.0f,
-			 0.5f, -0.5f, 0.0f,
-			-0.5f, -0.5f, 0.0f,
-			-0.5f,  0.5f, 0.0f
+			//Positions			//UVs
+			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
 		}; 
+
 		unsigned int indices[] = {
 			0, 1, 3, // first triangle
 			1, 2, 3  // second triangle
@@ -27,7 +28,8 @@ namespace RealEngine {
 		Ref<VertexBuffer> vertexBuffer = VertexBuffer::Create(vertices, sizeof(vertices) * 12);
 
 		vertexBuffer->SetLayout({
-			{ ShaderDataType::Float3, "a_Position" }
+			{ ShaderDataType::Float3, "a_Position" },
+			{ ShaderDataType::Float2, "a_UV" }
 		});
 
 		Ref<IndexBuffer> indexBuffer = IndexBuffer::Create(indices, 6);
@@ -35,6 +37,9 @@ namespace RealEngine {
 		m_VertexArray = VertexArray::Create();
 		m_VertexArray->AddVertexBuffer(vertexBuffer);
 		m_VertexArray->SetIndexBuffer(indexBuffer);
+
+		m_Texture = Texture2D::Create("assets/textures/Checkerboard.png");
+		m_Texture->Bind();
 	}
 
 	void MainLayer::OnImGuiRender() {
@@ -102,6 +107,7 @@ namespace RealEngine {
 		RenderCommand::Clear();
 
 		m_ShaderCreatePanel.m_PreviewShader->Bind();
+
 		RenderCommand::DrawIndexed(m_VertexArray, 6);
 
 		m_Framebuffer->UnBind();

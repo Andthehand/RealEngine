@@ -18,5 +18,7 @@ namespace RealEngine {
 		Ref<Framebuffer> m_Framebuffer;
 
 		Ref<VertexArray> m_VertexArray;
+
+		Ref<Texture2D> m_Texture;
 	};
 }

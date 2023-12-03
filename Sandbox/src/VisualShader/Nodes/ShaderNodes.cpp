@@ -36,9 +36,9 @@ namespace RealEngine {
 
 	ShaderTextureNode::ShaderTextureNode()
 		: ShaderNode() {
+		Inputs.emplace_back(GetNextId(), "Sampler2D", PinType::Sampler2D);
 		Inputs.emplace_back(GetNextId(), "UV", PinType::Vector2);
 		Inputs.emplace_back(GetNextId(), "LOD", PinType::Float);
-		Inputs.emplace_back(GetNextId(), "Sampler2D", PinType::Sampler2D);
 		Outputs.emplace_back(GetNextId(), "Color", PinType::Vector4);
 	}
 
@@ -47,7 +47,7 @@ namespace RealEngine {
 		std::string id;
 		if (inputVars[0].empty()) {
 			//Change this to generate its own sampler2D id
-			id = "0";
+			id = GetUniformName(&Inputs[0]);
 		}
 		else {
 			id = inputVars[0];
@@ -55,20 +55,34 @@ namespace RealEngine {
 
 		//UV
 		std::string uv;
-		if (inputVars[2].empty()) {
-			uv = "UV";
+		if (inputVars[1].empty()) {
+			uv = "v_UV";
 		}
 		else {
 			uv = inputVars[1];
 		}
 		
 		//LOD
-		if (inputVars[1].empty()) {
+		if (inputVars[2].empty()) {
 			return "\t" + outputVars[0] + " = texture(" + id + ", " + uv + ");\n";
 		}
 		else {
 			return "\t" + outputVars[0] + " = texture(" + id + ", " + uv + ", " + inputVars[1] + ");\n";
 		}
+	}
+
+	std::string ShaderTextureNode::GenerateGlobalCode(std::string* inputVars) const {
+		std::string code;
+
+		if (inputVars[0].empty()) {
+			code += "uniform sampler2D " + GetUniformName(&Inputs[0]) + ";\n";
+		}
+
+		if (inputVars[1].empty()) {
+			code += "in vec2 v_UV;\n";
+		}
+		
+		return code;
 	}
 
 	ShaderConstantVec4Node::ShaderConstantVec4Node() 

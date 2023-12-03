@@ -25,7 +25,7 @@ namespace RealEngine {
 		const char* GetName() const override { return s_Name; }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
-
+		std::string GenerateGlobalCode(std::string* inputVars) const override;
 	public:
 		inline static const char* s_Name = "Texture2D";
 	};

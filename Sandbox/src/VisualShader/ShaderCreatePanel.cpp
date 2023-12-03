@@ -545,9 +545,12 @@ namespace RealEngine {
 		StringBuilder vertShaderCode;
 		StringBuilder vertGlobalCode;
 		vertShaderCode += "#version 450 core\n"
-			"in vec3 aPos;\n"
+			"in vec3 a_Position;\n"
+			"in vec2 a_UV;\n"
+			"out vec2 v_UV;\n"
 			"void main() {\n"
-			"   gl_Position = vec4(aPos, 1.0);\n"
+			"   v_UV = a_UV;\n"
+			"   gl_Position = vec4(a_Position, 1.0);\n"
 			"}";
 
 		m_PreviewShader = Shader::Create("Preview Shader", vertGlobalCode.as_string() + vertShaderCode.as_string(), fragGlobalCode.as_string() + fragShaderCode.as_string());
