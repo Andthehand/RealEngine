@@ -18,6 +18,10 @@ namespace RealEngine {
 		inline static const char* s_Name = "Fragment Output";
 	};
 
+	////////////////////////////////
+	///////////Textures/////////////
+	////////////////////////////////
+
 	class ShaderTextureNode : public ShaderNode {
 	public:
 		ShaderTextureNode();

@@ -58,7 +58,7 @@ namespace RealEngine {
 		virtual std::string GenerateGlobalCode(std::string* inputVars) const { return ""; }
 
 		std::string GetUniformName(const Pin* pin) const {
-			return "u_" + std::string(GetName()) + "_" + pin->Name;
+			return "u_" + std::to_string(ID.Get()) + "_" + std::string(GetName()) + "_" + pin->Name;
 		}
 	public:
 		ImNode::NodeId ID;

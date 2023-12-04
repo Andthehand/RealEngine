@@ -435,6 +435,8 @@ namespace RealEngine {
 
 			std::string varName;
 			varName = "out_";
+			varName += std::to_string(currentNode->ID.Get());
+			varName += "_";
 			varName += currentNode->GetName();
 			varName += "_";
 			varName += currentNode->Outputs[i].Name;
@@ -451,6 +453,8 @@ namespace RealEngine {
 				continue;
 
 			inputs[i] = "out_";
+			inputs[i] += std::to_string(connectedPin->Node->ID.Get());
+			inputs[i] += "_";
 			inputs[i] += connectedPin->Node->GetName();
 			inputs[i] += "_";
 			inputs[i] += connectedPin->Name;
