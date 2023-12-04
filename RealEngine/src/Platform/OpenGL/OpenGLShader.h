@@ -7,7 +7,7 @@ namespace RealEngine {
 	class OpenGLShader : public Shader {
 	public:
 		OpenGLShader(const std::filesystem::path& filepath);
-		OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
+		OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, ShaderReflect* reflect);
 		virtual ~OpenGLShader();
 
 		virtual void Bind() const override;
@@ -27,10 +27,11 @@ namespace RealEngine {
 		std::string ReadFile(const std::filesystem::path& filepath);
 		std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);
 
-		void CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources);
-		void CompileOrGetOpenGLBinaries();
+		void CompileOrGetOpenGLBinaries(const std::unordered_map<GLenum, std::string>& shaderSources);
 		void CreateProgram();
-		void Reflect(GLenum stage, const std::vector<uint32_t>& shaderData);
+
+		void GenerateReflectData(ShaderReflect* reflect);
+		void DebugReflect(GLenum stage, const std::vector<uint32_t>& shaderData);
 
 	private:
 		uint32_t m_RendererID;
@@ -40,9 +41,6 @@ namespace RealEngine {
 
 		//Don't recompile is used for making sure both Vulkan and Opengl bianaries are recompiled
 		std::unordered_map<GLenum, bool> m_DontRecompile;
-		std::unordered_map<GLenum, std::vector<uint32_t>> m_VulkanSPIRV;
 		std::unordered_map<GLenum, std::vector<uint32_t>> m_OpenGLSPIRV;
-
-		std::unordered_map<GLenum, std::string> m_OpenGLSourceCode;
 	};
 }

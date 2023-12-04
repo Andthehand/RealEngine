@@ -557,7 +557,9 @@ namespace RealEngine {
 			"   gl_Position = vec4(a_Position, 1.0);\n"
 			"}";
 
-		m_PreviewShader = Shader::Create("Preview Shader", vertGlobalCode.as_string() + vertShaderCode.as_string(), fragGlobalCode.as_string() + fragShaderCode.as_string());
+		m_PreviewShader = Shader::Create("Preview Shader", vertGlobalCode.as_string() + vertShaderCode.as_string(), 
+															fragGlobalCode.as_string() + fragShaderCode.as_string(),
+															&m_PreviewShaderReflect);
 	}
 
 	Pin* ShaderCreatePanel::FindPin(ImNode::PinId id) {

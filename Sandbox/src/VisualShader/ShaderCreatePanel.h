@@ -59,6 +59,7 @@ namespace RealEngine {
 		//Temp
 		bool m_QueuedCompile = false;
 		Ref<Shader> m_PreviewShader;
+		ShaderReflect m_PreviewShaderReflect;
 	private:
 		template<class CustomNode>
 		void RegisterNodeType(std::string category) {

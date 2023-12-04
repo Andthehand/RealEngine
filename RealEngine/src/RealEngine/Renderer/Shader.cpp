@@ -15,10 +15,10 @@ namespace RealEngine {
 		return nullptr;
 	}
 
-	Ref<Shader> Shader::Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc) {
+	Ref<Shader> Shader::Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, ShaderReflect* reflect) {
 		switch (Renderer::GetAPI()) {
 			case RendererAPI::API::None:    RE_CORE_ASSERT(false, "RenderAPI::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:  return std::make_shared<OpenGLShader>(name, vertexSrc, fragmentSrc);
+			case RendererAPI::API::OpenGL:  return std::make_shared<OpenGLShader>(name, vertexSrc, fragmentSrc, reflect);
 		}
 
 		RE_CORE_ASSERT(false, "Unkown RendererAPI!");

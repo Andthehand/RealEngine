@@ -4,6 +4,24 @@
 #include <glm/glm.hpp>
 
 namespace RealEngine {
+	struct ReflectType {
+		std::string Name;
+
+		uint32_t Binding;
+	};
+
+	struct ShaderReflect {
+		std::vector<ReflectType> PushConstants;
+		std::vector<ReflectType> VertexInputs;
+		std::vector<ReflectType> Sampler2D;
+
+		void clear() {
+			PushConstants.clear();
+			VertexInputs.clear();
+			Sampler2D.clear();
+		}
+	};
+
 	class Shader {
 	public:
 		virtual ~Shader() = default;
@@ -23,7 +41,7 @@ namespace RealEngine {
 		virtual const std::string& GetName() const = 0;
 	
 		static Ref<Shader> Create(const std::string& filepath);
-		static Ref<Shader> Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
+		static Ref<Shader> Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, ShaderReflect* reflect = nullptr);
 	};
 
 	class ShaderLibrary {
