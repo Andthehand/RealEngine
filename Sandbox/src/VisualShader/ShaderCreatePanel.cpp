@@ -154,20 +154,6 @@ namespace RealEngine {
 		static bool p_open = true;
 		ImGui::Begin("Shader Creation Editor", &p_open, ImGuiWindowFlags_MenuBar);
 
-		//Overlays
-		{
-			ImGui::SetCursorPosX(ImGui::GetStyle().WindowPadding.x + ImGui::GetCursorPosX());
-			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
-
-			ImGui::Button("Test Button");
-
-			ImGui::PopStyleVar();
-
-			//Reset Cursor Position for overlay
-			ImGui::SetCursorPosY(ImGui::GetStyle().WindowPadding.y);
-			ImGui::SetCursorPosX(ImGui::GetStyle().WindowPadding.x);
-		}
-
 		//Mostly differnt gui option menus
 		{
 			if (ImGui::BeginMenuBar()) {
@@ -185,6 +171,7 @@ namespace RealEngine {
 
 			//You have to suspend ImNode because https://github.com/thedmd/imgui-node-editor/issues/37#issuecomment-549122793
 			ImNode::Suspend();
+
 			if (ImNode::ShowBackgroundContextMenu()) {
 				ImGui::OpenPopup("Create New Node");
 			}
@@ -308,6 +295,23 @@ namespace RealEngine {
 		ImNode::End();
 
 		ImNode::SetCurrentEditor(nullptr);
+
+		//Overlays
+		{
+			ImGui::SetCursorPosX(16);
+			ImGui::SetCursorPosY(92);
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
+
+			ImGui::PushClipRect(ImVec2(4.0f, 110.0f), ImVec2(2556.0f, 1527.0f), true);
+			ImGui::Button("Test Button");
+			ImGui::PopClipRect();
+
+			ImGui::PopStyleVar();
+
+			//Reset Cursor Position for overlay
+			ImGui::SetCursorPosY(ImGui::GetStyle().WindowPadding.y);
+			ImGui::SetCursorPosX(ImGui::GetStyle().WindowPadding.x);
+		}
 
 		//Has to be outside of the ImNode::Begin() and ImNode::End()
 		if (!m_Tooltip.empty()) {
