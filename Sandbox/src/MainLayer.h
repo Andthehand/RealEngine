@@ -1,7 +1,7 @@
 #pragma once
 #include <RealEngine.h>
 
-#include "VisualShader/ShaderCreatePanel.h"
+#include "VisualShader/ShaderPanelManager.h"
 
 namespace RealEngine {
 	class MainLayer : public Layer {
@@ -13,7 +13,7 @@ namespace RealEngine {
 
 		virtual void OnUpdate(Timestep ts) override;
 	private:
-		ShaderCreatePanel m_ShaderCreatePanel;
+		ShaderPanelManager m_ShaderPanelManager;
 
 		Ref<Framebuffer> m_Framebuffer;
 

@@ -97,16 +97,16 @@ namespace RealEngine {
 		
 		ImGui::End();
 
-		m_ShaderCreatePanel.OnImGuiRender();
+		m_ShaderPanelManager.OnImGuiRender();
 	}
 
 	void MainLayer::OnUpdate(Timestep ts) {
-		m_ShaderCreatePanel.OnUpdate();
+		m_ShaderPanelManager.OnUpdate();
 
 		m_Framebuffer->Bind();
 		RenderCommand::Clear();
 
-		m_ShaderCreatePanel.m_PreviewShader->Bind();
+		m_ShaderPanelManager.GetShader()->Bind();
 
 		RenderCommand::DrawIndexed(m_VertexArray, 6);
 

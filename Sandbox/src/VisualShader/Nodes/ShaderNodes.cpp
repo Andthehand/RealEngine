@@ -1,13 +1,26 @@
 #include "ShaderNodes.h"
 
 namespace RealEngine {
+	VertexShaderOutputNode::VertexShaderOutputNode() {
+		Inputs.emplace_back(GetNextId(), "Vertex", PinType::Vector3);
+	}
+
+	//TODO: Implement this
+	std::string VertexShaderOutputNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
+		return "";
+	}
+
+	//TODO: Implement this
+	std::string VertexShaderOutputNode::GenerateGlobalCode(std::string* inputVars) const {
+		return "";
+	}
+
 	FragmentShaderOutputNode::FragmentShaderOutputNode()
 		: ShaderNode() {
 		Inputs.emplace_back(GetNextId(), "Color", PinType::Vector4);
 		Inputs.emplace_back(GetNextId(), "Normal", PinType::Vector3);
 	}
 
-	//TODO: Implement this
 	std::string FragmentShaderOutputNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
 		//Color
 		std::string color;

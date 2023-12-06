@@ -10,7 +10,6 @@
 
 #include "RealEngine/Utils/StringBuilder.h"
 #include "RealEngine/Renderer/Texture.h"
-#include "RealEngine/Renderer/Shader.h"
 
 #include "Nodes/ShaderNode.h"
 #include "../Utils/NaryTree.h"
@@ -32,22 +31,23 @@ namespace RealEngine {
 		std::function<Ref<ShaderNode>()> CreateFunction;
 	};
 
-	class ShaderCreatePanel {
+	class ShaderPanel {
 	public:
-		ShaderCreatePanel();
+		ShaderPanel(const char* type);
 
+		void SetHeaderBackground(const Ref<Texture2D>& texture) { m_HeaderBackground = texture; }
+
+		void OnImGuiRender();
+		std::string Compile();
+
+	private:
 		ImColor GetIconColor(PinType type);
 		void DrawPinIcon(const Pin& pin, bool connected, int alpha);
 
-		void RecursiveOptionsMenu(const std::vector<Node<CreateOptions>*>& children);
-			
-		void OnImGuiRender();
 		void HandleInteraction();
 
-		void OnUpdate();
-
+		void RecursiveOptionsMenu(const std::vector<Node<CreateOptions>*>& children);
 		void RecursiveSearch(const ShaderNode* currentNode, StringBuilder& shaderCode, StringBuilder& globalCode, std::unordered_set<uint64_t>* nodeTracking);
-		void Compile();
 
 		Pin* FindPin(ImNode::PinId id);
 		Link* FindPinLink(ImNode::PinId id);
@@ -56,11 +56,6 @@ namespace RealEngine {
 		//This has to be called every time a node is added because the node pointers inside of the pins will be corrupted
 		void BuildNodes();
 
-		//Temp
-		bool m_QueuedCompile = false;
-		Ref<Shader> m_PreviewShader;
-		ShaderReflect m_PreviewShaderReflect;
-	private:
 		template<class CustomNode>
 		void RegisterNodeType(std::string category) {
 			size_t pos = category.find("/");
@@ -82,6 +77,7 @@ namespace RealEngine {
 		}
 
 	private:
+		//Added in the constructor
 		Ref<Texture2D> m_HeaderBackground;
 
 		ImNode::EditorContext* m_Context = nullptr;

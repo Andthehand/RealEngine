@@ -1,4 +1,4 @@
-#include "ShaderCreatePanel.h"
+#include "ShaderPanel.h"
 
 //TODO: This might be really bad
 #include <imgui/imgui_internal.h>
@@ -7,13 +7,11 @@
 #include "Nodes/ShaderNodes.h"
 
 namespace RealEngine {
-	ShaderCreatePanel::ShaderCreatePanel() 
+	ShaderPanel::ShaderPanel(const char* type)
 		: m_CreateOptions(CreateOptions("Root")) {
 		ImNode::Config config;
 		config.SettingsFile = "Simple.json";
 		m_Context = ImNode::CreateEditor(&config);
-
-		m_HeaderBackground = RealEngine::Texture2D::Create("Resources/Icons/ShaderCreate/BlueprintHeader.png");
 
 		RegisterNodeType<ShaderTextureNode>("Textures");
 		
@@ -24,25 +22,25 @@ namespace RealEngine {
 		RegisterNodeType<ShaderConstantFloatNode>("Scalar/Constants");
 
 		//Init Testing Nodes
-		m_Nodes.emplace_back(CreateRef<FragmentShaderOutputNode>());
+		if (type == "Vertex")
+			m_Nodes.emplace_back(CreateRef<VertexShaderOutputNode>());
+		else if (type == "Fragment")
+			m_Nodes.emplace_back(CreateRef<FragmentShaderOutputNode>());
+		else
+			RE_CORE_ASSERT(false, "Shader Type not supported");
 
-		m_Nodes.emplace_back(CreateRef<ShaderConstantVec4Node>());
-		m_Nodes.emplace_back(CreateRef<ShaderConstantVec3Node>());
-		m_Nodes.emplace_back(CreateRef<ShaderConstantVec2Node>());
-		m_Nodes.emplace_back(CreateRef<ShaderConstantFloatNode>());
+		m_Nodes.emplace_back(CreateRef<ShaderTextureNode>());
 
 		BuildNodes();
-
-		m_QueuedCompile = true;
 	}
 
 	static const bool IsPinTypeConvertableTo(PinType pinType1, PinType pinType2) {
 		switch (pinType1) {
-			case PinType::Bool:			
-			case PinType::Int:			
-			case PinType::Float:		
-			case PinType::Vector2:		
-			case PinType::Vector3:		
+			case PinType::Bool:
+			case PinType::Int:
+			case PinType::Float:
+			case PinType::Vector2:
+			case PinType::Vector3:
 			case PinType::Vector4:		
 				//This is disgusting
 				switch (pinType2) {
@@ -92,7 +90,7 @@ namespace RealEngine {
 		return nullptr;
 	}
 
-	ImColor ShaderCreatePanel::GetIconColor(PinType type) {
+	ImColor ShaderPanel::GetIconColor(PinType type) {
 		switch (type) {
 			case PinType::Bool:			return ImColor(220, 48, 48);
 			case PinType::Int:			return ImColor(68, 201, 156);
@@ -107,7 +105,7 @@ namespace RealEngine {
 		return ImColor(255, 255, 255);
 	};
 
-	void ShaderCreatePanel::DrawPinIcon(const Pin& pin, bool connected, int alpha) {
+	void ShaderPanel::DrawPinIcon(const Pin& pin, bool connected, int alpha) {
 		//TODO: Implement!
 		IconType iconType;
 		ImColor  color = GetIconColor(pin.Type);
@@ -132,7 +130,7 @@ namespace RealEngine {
 		ax::Widgets::Icon(iconType, connected, color, ImColor(32, 32, 32, alpha));
 	};
 
-	void ShaderCreatePanel::RecursiveOptionsMenu(const std::vector<Node<CreateOptions>*>& children) {
+	void ShaderPanel::RecursiveOptionsMenu(const std::vector<Node<CreateOptions>*>& children) {
 		for (const Node<CreateOptions>* child : children) {
 			CreateOptions options = child->GetData();
 			if (options.CreateFunction != nullptr) {
@@ -150,25 +148,12 @@ namespace RealEngine {
 		}
 	}
 
-	void ShaderCreatePanel::OnImGuiRender() {
+	void ShaderPanel::OnImGuiRender() {
 		//Used for rendering tooltip outside of the ImNode::Begin() and ImNode::End()
 		std::string tooltip;
-		
-		static bool p_open = true;
-		ImGui::Begin("Shader Creation Editor", &p_open, ImGuiWindowFlags_MenuBar);
 
-		//Mostly differnt gui option menus
+		//GUI Setup
 		{
-			if (ImGui::BeginMenuBar()) {
-				if (ImGui::BeginMenu("Options")) {					
-					if (ImGui::MenuItem("Compile"))
-						m_QueuedCompile = true;
-					ImGui::EndMenu();
-				}
-
-				ImGui::EndMenuBar();
-			}
-
 			ImNode::SetCurrentEditor(m_Context);
 			ImNode::Begin("My Editor");
 
@@ -180,10 +165,6 @@ namespace RealEngine {
 			}
 
 			if (ImGui::BeginPopup("Create New Node")) {
-				if (ImGui::MenuItem("Compile")) m_QueuedCompile = true;
-				
-				ImGui::Separator();
-				
 				RecursiveOptionsMenu(m_CreateOptions.GetRoot()->GetChildren());
 				ImGui::EndPopup();
 			}
@@ -299,23 +280,6 @@ namespace RealEngine {
 
 		ImNode::SetCurrentEditor(nullptr);
 
-		//Overlays
-		{
-			ImGui::SetCursorPosX(16);
-			ImGui::SetCursorPosY(92);
-			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
-
-			ImGui::PushClipRect(ImVec2(4.0f, 110.0f), ImVec2(2556.0f, 1527.0f), true);
-			ImGui::Button("Test Button");
-			ImGui::PopClipRect();
-
-			ImGui::PopStyleVar();
-
-			//Reset Cursor Position for overlay
-			ImGui::SetCursorPosY(ImGui::GetStyle().WindowPadding.y);
-			ImGui::SetCursorPosX(ImGui::GetStyle().WindowPadding.x);
-		}
-
 		//Has to be outside of the ImNode::Begin() and ImNode::End()
 		if (!tooltip.empty()) {
 			static ImFont* boldFont = ImGui::GetIO().Fonts->Fonts[0];
@@ -325,11 +289,9 @@ namespace RealEngine {
 			
 			tooltip.clear();
 		}
-
-		ImGui::End();
 	}
 	
-	void ShaderCreatePanel::HandleInteraction() {
+	void ShaderPanel::HandleInteraction() {
 		// Handle creation action, returns true if editor want to create new object (node or link)
 		if (ImNode::BeginCreate()) {
 			ImNode::PinId inputPinId, outputPinId;
@@ -417,14 +379,7 @@ namespace RealEngine {
 		ImNode::EndDelete();
 	}
 
-	void ShaderCreatePanel::OnUpdate() {
-		if (m_QueuedCompile) {
-			Compile();
-			m_QueuedCompile = false;
-		}
-	}
-
-	void ShaderCreatePanel::RecursiveSearch(const ShaderNode* currentNode, StringBuilder& shaderCode, StringBuilder& globalCode, std::unordered_set<uint64_t>* nodeTracking) {
+	void ShaderPanel::RecursiveSearch(const ShaderNode* currentNode, StringBuilder& shaderCode, StringBuilder& globalCode, std::unordered_set<uint64_t>* nodeTracking) {
 		//Going down the chain of Nodes until it reaches the end
 		for (const Pin& inputPin: currentNode->Inputs) {
 			//If the Node isn't connected continue
@@ -549,39 +504,26 @@ namespace RealEngine {
 		globalCode += currentNode->GenerateGlobalCode(inputs);
 	}
 
-	void ShaderCreatePanel::Compile() {
-		StringBuilder fragShaderCode;
-		StringBuilder fragGlobalCode;
-		fragGlobalCode += "\n#version 450 core\n\n";
-		fragShaderCode += "void main() { \n";
+	std::string ShaderPanel::Compile() {
+		StringBuilder shaderCode;
+		StringBuilder globalCode;
+		globalCode += "\n#version 450 core\n\n";
+		shaderCode += "void main() { \n";
 
 		std::unordered_set<uint64_t> nodeTracking;
 
 		//m_Nodes[0] is always the output node
-		RecursiveSearch(m_Nodes[0].get(), fragShaderCode, fragGlobalCode, &nodeTracking);
+		RecursiveSearch(m_Nodes[0].get(), shaderCode, globalCode, &nodeTracking);
 
-		fragShaderCode += "}";
-		fragGlobalCode += "\n";
+		shaderCode += "}";
+		globalCode += "\n";
 
-		RE_CORE_WARN("{0}", fragGlobalCode.as_string() + fragShaderCode.as_string());
+		RE_CORE_WARN("{0}", globalCode.as_string() + shaderCode.as_string());
 
-		StringBuilder vertShaderCode;
-		StringBuilder vertGlobalCode;
-		vertShaderCode += "#version 450 core\n"
-			"in vec3 a_Position;\n"
-			"in vec2 a_UV;\n"
-			"out vec2 v_UV;\n"
-			"void main() {\n"
-			"   v_UV = a_UV;\n"
-			"   gl_Position = vec4(a_Position, 1.0);\n"
-			"}";
-
-		m_PreviewShader = Shader::Create("Preview Shader", vertGlobalCode.as_string() + vertShaderCode.as_string(), 
-															fragGlobalCode.as_string() + fragShaderCode.as_string(),
-															&m_PreviewShaderReflect);
+		return globalCode.as_string() + shaderCode.as_string();
 	}
 
-	Pin* ShaderCreatePanel::FindPin(ImNode::PinId id) {
+	Pin* ShaderPanel::FindPin(ImNode::PinId id) {
 		for (Ref<ShaderNode>& node : m_Nodes) {
 			for (Pin& pin : node->Inputs)
 				if (pin.ID == id)
@@ -596,7 +538,7 @@ namespace RealEngine {
 		return nullptr;
 	}
 
-	Link* ShaderCreatePanel::FindPinLink(ImNode::PinId id) {
+	Link* ShaderPanel::FindPinLink(ImNode::PinId id) {
 		for (Link& link : m_Links)
 			if (link.InputPin->ID == id || link.OutputPin->ID == id)
 				return &link;
@@ -604,7 +546,7 @@ namespace RealEngine {
 		return nullptr;
 	}
 
-	bool ShaderCreatePanel::IsPinLinked(ImNode::PinId id) {
+	bool ShaderPanel::IsPinLinked(ImNode::PinId id) {
 		for (Link& link : m_Links)
 			if (link.InputPin->ID == id || link.OutputPin->ID == id)
 				return true;
@@ -612,7 +554,7 @@ namespace RealEngine {
 		return false;
 	}
 
-	void ShaderCreatePanel::BuildNodes() {
+	void ShaderPanel::BuildNodes() {
 		for (Ref<ShaderNode> node : m_Nodes)
 			node->BuildNode();
 	}
