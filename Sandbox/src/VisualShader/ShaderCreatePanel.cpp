@@ -154,6 +154,20 @@ namespace RealEngine {
 		static bool p_open = true;
 		ImGui::Begin("Shader Creation Editor", &p_open, ImGuiWindowFlags_MenuBar);
 
+		//Overlays
+		{
+			ImGui::SetCursorPosX(ImGui::GetStyle().WindowPadding.x + ImGui::GetCursorPosX());
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
+
+			ImGui::Button("Test Button");
+
+			ImGui::PopStyleVar();
+
+			//Reset Cursor Position for overlay
+			ImGui::SetCursorPosY(ImGui::GetStyle().WindowPadding.y);
+			ImGui::SetCursorPosX(ImGui::GetStyle().WindowPadding.x);
+		}
+
 		//Mostly differnt gui option menus
 		{
 			if (ImGui::BeginMenuBar()) {
@@ -175,7 +189,6 @@ namespace RealEngine {
 				ImGui::OpenPopup("Create New Node");
 			}
 
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
 			if (ImGui::BeginPopup("Create New Node")) {
 				if (ImGui::MenuItem("Compile")) m_QueuedCompile = true;
 				
@@ -184,7 +197,6 @@ namespace RealEngine {
 				RecursiveOptionsMenu(m_CreateOptions.GetRoot()->GetChildren());
 				ImGui::EndPopup();
 			}
-			ImGui::PopStyleVar();
 			ImNode::Resume();
 		}
 
