@@ -89,8 +89,6 @@ namespace RealEngine {
 		std::vector<Ref<ShaderNode>> m_Nodes;
 		ImVector<Link> m_Links;
 
-		std::string m_Tooltip;
-
 		NaryTree<CreateOptions> m_CreateOptions;
 
 		int m_NextLinkId = 100;

@@ -151,6 +151,9 @@ namespace RealEngine {
 	}
 
 	void ShaderCreatePanel::OnImGuiRender() {
+		//Used for rendering tooltip outside of the ImNode::Begin() and ImNode::End()
+		std::string tooltip;
+		
 		static bool p_open = true;
 		ImGui::Begin("Shader Creation Editor", &p_open, ImGuiWindowFlags_MenuBar);
 
@@ -226,7 +229,7 @@ namespace RealEngine {
 					DrawPinIcon(input, IsPinLinked(input.ID), (int)(alpha * 255));
 
 					if (ImGui::IsItemHovered())
-						m_Tooltip = PinTypeToString(input.Type);
+						tooltip = PinTypeToString(input.Type);
 
 					ImGui::Spring(0);
 					if (!input.Name.empty()) {
@@ -275,7 +278,7 @@ namespace RealEngine {
 					ImGui::Spring(0);
 					DrawPinIcon(output, IsPinLinked(output.ID), (int)(alpha * 255));
 					if (ImGui::IsItemHovered())
-						m_Tooltip = PinTypeToString(output.Type);
+						tooltip = PinTypeToString(output.Type);
 
 					ImGui::PopStyleVar();
 					builder.EndOutput();
@@ -314,13 +317,13 @@ namespace RealEngine {
 		}
 
 		//Has to be outside of the ImNode::Begin() and ImNode::End()
-		if (!m_Tooltip.empty()) {
+		if (!tooltip.empty()) {
 			static ImFont* boldFont = ImGui::GetIO().Fonts->Fonts[0];
 			ImGui::PushFont(boldFont);
-			ImGui::SetTooltip(m_Tooltip.c_str());
+			ImGui::SetTooltip(tooltip.c_str());
 			ImGui::PopFont();
 			
-			m_Tooltip.clear();
+			tooltip.clear();
 		}
 
 		ImGui::End();
