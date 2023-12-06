@@ -9,7 +9,10 @@ project "Sandbox"
 
 	files {
 		"src/**.h",
-		"src/**.cpp"
+		"src/**.cpp",
+		"%{IncludeDir.ImNode}/*.h",
+		"%{IncludeDir.ImNode}/*.cpp",
+		"%{IncludeDir.ImNode}/*.inl"
 	}
 
 	includedirs {

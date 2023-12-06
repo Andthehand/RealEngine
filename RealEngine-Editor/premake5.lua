@@ -9,7 +9,10 @@ project "RealEngine-Editor"
 
 	files {
 		"src/**.h",
-		"src/**.cpp"
+		"src/**.cpp",
+		"vendor/ImNode/*.h",
+		"vendor/ImNode/*.cpp",
+		"vendor/ImNode/*.inl"
 	}
 
 	includedirs {
