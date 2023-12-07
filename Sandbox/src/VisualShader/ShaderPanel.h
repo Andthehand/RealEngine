@@ -80,6 +80,7 @@ namespace RealEngine {
 		//Added in the constructor
 		Ref<Texture2D> m_HeaderBackground;
 
+		std::string m_Type;
 		ImNode::EditorContext* m_Context = nullptr;
 
 		std::vector<Ref<ShaderNode>> m_Nodes;

@@ -28,5 +28,6 @@ namespace RealEngine {
 
 		bool m_QueuedCompile = true;
 		Ref<Shader> m_PreviewShader;
+		ShaderReflect m_Reflect;
 	};
 }

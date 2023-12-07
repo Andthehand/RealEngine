@@ -333,8 +333,11 @@ namespace RealEngine {
 	void OpenGLShader::GenerateReflectData(ShaderReflect* reflect) {
 		//Vertex shader
 		{
+			spirv_cross::CompilerGLSL glslCompiler(m_OpenGLSPIRV[GL_VERTEX_SHADER]);
 			spirv_cross::Compiler compiler(m_OpenGLSPIRV[GL_VERTEX_SHADER]);
 			spirv_cross::ShaderResources resources = compiler.get_shader_resources();
+
+			reflect->ShaderCode.push_back(glslCompiler.compile());
 
 			for (const auto& resource : resources.push_constant_buffers) {
 				uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
@@ -357,8 +360,11 @@ namespace RealEngine {
 	
 		//Fragment shader
 		{
+			spirv_cross::CompilerGLSL glslCompiler(m_OpenGLSPIRV[GL_FRAGMENT_SHADER]);
 			spirv_cross::Compiler compiler(m_OpenGLSPIRV[GL_FRAGMENT_SHADER]);
 			spirv_cross::ShaderResources resources = compiler.get_shader_resources();
+			
+			reflect->ShaderCode.push_back(glslCompiler.compile());
 
 			for (const auto& resource : resources.sampled_images) {
 				uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);

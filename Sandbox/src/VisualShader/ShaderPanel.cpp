@@ -9,8 +9,10 @@
 namespace RealEngine {
 	ShaderPanel::ShaderPanel(const char* type)
 		: m_CreateOptions(CreateOptions("Root")) {
+		m_Type = type + std::string(".json");
+
 		ImNode::Config config;
-		config.SettingsFile = "Simple.json";
+		config.SettingsFile = m_Type.c_str();
 		m_Context = ImNode::CreateEditor(&config);
 
 		RegisterNodeType<ShaderTextureNode>("Textures");
@@ -517,8 +519,6 @@ namespace RealEngine {
 
 		shaderCode += "}";
 		globalCode += "\n";
-
-		RE_CORE_WARN("{0}", globalCode.as_string() + shaderCode.as_string());
 
 		return globalCode.as_string() + shaderCode.as_string();
 	}

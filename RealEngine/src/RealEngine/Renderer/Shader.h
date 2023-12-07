@@ -15,10 +15,13 @@ namespace RealEngine {
 		std::vector<ReflectType> VertexInputs;
 		std::vector<ReflectType> Sampler2D;
 
+		std::vector<std::string> ShaderCode;
+
 		void clear() {
 			PushConstants.clear();
 			VertexInputs.clear();
 			Sampler2D.clear();
+			ShaderCode.clear();
 		}
 	};
 

@@ -2,17 +2,36 @@
 
 namespace RealEngine {
 	VertexShaderOutputNode::VertexShaderOutputNode() {
+		Inputs.emplace_back(GetNextId(), "UV", PinType::Vector2);
 		Inputs.emplace_back(GetNextId(), "Vertex", PinType::Vector3);
 	}
 
 	//TODO: Implement this
 	std::string VertexShaderOutputNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
-		return "";
+		std::string code;
+		
+		if (!inputVars[0].empty())
+			code += "\tv_UV = " + inputVars[1] + ";\n";
+		else
+			code += "\tv_UV = a_UV;\n";
+
+		if(!inputVars[1].empty())
+			code += "\tgl_Position = " + inputVars[0] + ";\n";
+		else
+			code += "\tgl_Position = vec4(a_Position, 1.0);\n";
+
+		return code;
 	}
 
 	//TODO: Implement this
 	std::string VertexShaderOutputNode::GenerateGlobalCode(std::string* inputVars) const {
-		return "";
+		std::string code;
+		
+		code += "in vec3 a_Position;\n";
+		code += "in vec2 a_UV;\n";
+		code += "out vec2 v_UV;\n";
+		
+		return code;
 	}
 
 	FragmentShaderOutputNode::FragmentShaderOutputNode()

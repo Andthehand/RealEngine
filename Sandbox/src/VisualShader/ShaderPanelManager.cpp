@@ -33,15 +33,17 @@ namespace RealEngine {
 		{
 			ImGui::SetCursorPosX(16);
 			ImGui::SetCursorPosY(92);
-			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
-
 			//Has to be overridden because the button won't render
 			ImGui::PushClipRect(ImVec2(4.0f, 110.0f), ImVec2(2556.0f, 1527.0f), true);
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
 
 			static const char* items[] = { "Vertex", "Fragment" };
 			static int item_current = 0;
 
-			ImGui::SetNextItemWidth(ImGui::CalcTextSize(items[item_current]).x + ImGui::GetFrameHeight() + (ImGui::GetStyle().FramePadding.x) * 2.0);
+			ImGui::SetNextItemWidth(ImGui::CalcTextSize(items[item_current]).x + 
+									ImGui::GetFrameHeight() + 
+									(ImGui::GetStyle().FramePadding.x) * 2.0);
+
 			if (ImGui::BeginCombo("##combo", items[item_current])) {
 				for (int n = 0; n < 2; n++) {
 					const bool is_selected = (item_current == n);
@@ -55,10 +57,9 @@ namespace RealEngine {
 				}
 				ImGui::EndCombo();
 			}
-			ImGui::PopClipRect();
 
 			ImGui::PopStyleVar();
-			//Reset Cursor Position for overlay
+			ImGui::PopClipRect();
 			ImGui::SetCursorPosY(ImGui::GetStyle().WindowPadding.y);
 			ImGui::SetCursorPosX(ImGui::GetStyle().WindowPadding.x);
 		}
@@ -77,17 +78,9 @@ namespace RealEngine {
 		std::string vertexShader = m_ShaderPanels[ShaderType::Vertex].Compile();
 		std::string fragmentShader = m_ShaderPanels[ShaderType::Fragment].Compile();
 
-		//Temp
-		std::string vertGlobalCode = "#version 450 core\n"
-			"in vec3 a_Position;\n"
-			"in vec2 a_UV;\n"
-			"out vec2 v_UV;\n"
-			"void main() {\n"
-			"   v_UV = a_UV;\n"
-			"   gl_Position = vec4(a_Position, 1.0);\n"
-			"}";
+		m_PreviewShader = Shader::Create("Preview Shader", vertexShader, fragmentShader, &m_Reflect);
 
-		//TODO: Add reflection
-		m_PreviewShader = Shader::Create("Preview Shader", vertGlobalCode, fragmentShader);
+		for (auto& shaderCode : m_Reflect.ShaderCode)
+			RE_CORE_WARN("ShaderCode:\n{0}", shaderCode);
 	}
 }
