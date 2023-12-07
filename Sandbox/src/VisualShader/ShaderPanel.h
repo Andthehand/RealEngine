@@ -40,6 +40,7 @@ namespace RealEngine {
 		void OnImGuiRender();
 		std::string Compile();
 
+		static void RegisterNodeTypes();
 	private:
 		ImColor GetIconColor(PinType type);
 		void DrawPinIcon(const Pin& pin, bool connected, int alpha);
@@ -57,9 +58,9 @@ namespace RealEngine {
 		void BuildNodes();
 
 		template<class CustomNode>
-		void RegisterNodeType(std::string category) {
+		static void RegisterNodeType(std::string category) {
 			size_t pos = category.find("/");
-			Node<CreateOptions>* currentNode = m_CreateOptions.GetRoot();
+			Node<CreateOptions>* currentNode = s_CreateOptions.GetRoot();
 
 			while(pos != std::string::npos) {
 				std::string subCategory = category.substr(0, pos);
@@ -73,7 +74,7 @@ namespace RealEngine {
 			if (!category.empty())
 				currentNode = currentNode->AddChild({ category });
 
-			m_CreateOptions.AddChild(currentNode, { CustomNode::s_Name, []() { return CreateRef<CustomNode>(); } });
+			s_CreateOptions.AddChild(currentNode, { CustomNode::s_Name, []() { return CreateRef<CustomNode>(); } });
 		}
 
 	private:
@@ -86,7 +87,7 @@ namespace RealEngine {
 		std::vector<Ref<ShaderNode>> m_Nodes;
 		ImVector<Link> m_Links;
 
-		NaryTree<CreateOptions> m_CreateOptions;
+		static NaryTree<CreateOptions> s_CreateOptions;
 
 		int m_NextLinkId = 100;
 	};

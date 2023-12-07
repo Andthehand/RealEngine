@@ -7,6 +7,8 @@ namespace RealEngine {
 
 		m_ShaderPanels[ShaderType::Vertex].SetHeaderBackground(m_HeaderBackground);
 		m_ShaderPanels[ShaderType::Fragment].SetHeaderBackground(m_HeaderBackground);
+
+		ShaderPanel::RegisterNodeTypes();
 	}
 	
 	ShaderPanelManager::~ShaderPanelManager() {

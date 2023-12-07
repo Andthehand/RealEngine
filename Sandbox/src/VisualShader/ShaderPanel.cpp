@@ -7,21 +7,14 @@
 #include "Nodes/ShaderNodes.h"
 
 namespace RealEngine {
-	ShaderPanel::ShaderPanel(const char* type)
-		: m_CreateOptions(CreateOptions("Root")) {
+	NaryTree<CreateOptions> ShaderPanel::s_CreateOptions(CreateOptions("Root"));
+
+	ShaderPanel::ShaderPanel(const char* type) {
 		m_Type = type + std::string(".json");
 
 		ImNode::Config config;
 		config.SettingsFile = m_Type.c_str();
 		m_Context = ImNode::CreateEditor(&config);
-
-		RegisterNodeType<ShaderTextureNode>("Textures");
-		
-		RegisterNodeType<ShaderConstantVec4Node>("Vectors/Constants");
-		RegisterNodeType<ShaderConstantVec3Node>("Vectors/Constants");
-		RegisterNodeType<ShaderConstantVec2Node>("Vectors/Constants");
-		
-		RegisterNodeType<ShaderConstantFloatNode>("Scalar/Constants");
 
 		//Init Testing Nodes
 		if (type == "Vertex")
@@ -167,7 +160,7 @@ namespace RealEngine {
 			}
 
 			if (ImGui::BeginPopup("Create New Node")) {
-				RecursiveOptionsMenu(m_CreateOptions.GetRoot()->GetChildren());
+				RecursiveOptionsMenu(s_CreateOptions.GetRoot()->GetChildren());
 				ImGui::EndPopup();
 			}
 			ImNode::Resume();
@@ -521,6 +514,16 @@ namespace RealEngine {
 		globalCode += "\n";
 
 		return globalCode.as_string() + shaderCode.as_string();
+	}
+
+	void ShaderPanel::RegisterNodeTypes() {
+		RegisterNodeType<ShaderTextureNode>("Textures");
+
+		RegisterNodeType<ShaderConstantVec4Node>("Vectors/Constants");
+		RegisterNodeType<ShaderConstantVec3Node>("Vectors/Constants");
+		RegisterNodeType<ShaderConstantVec2Node>("Vectors/Constants");
+
+		RegisterNodeType<ShaderConstantFloatNode>("Scalar/Constants");
 	}
 
 	Pin* ShaderPanel::FindPin(ImNode::PinId id) {
