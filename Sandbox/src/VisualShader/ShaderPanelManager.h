@@ -24,7 +24,7 @@ namespace RealEngine {
 		ShaderType m_CurrentShaderType = ShaderType::Vertex;
 
 		Ref<Texture2D> m_HeaderBackground;
-		ShaderPanel m_ShaderPanels[2];
+		Ref<ShaderPanel> m_ShaderPanels[2];
 
 		bool m_QueuedCompile = true;
 		Ref<Shader> m_PreviewShader;

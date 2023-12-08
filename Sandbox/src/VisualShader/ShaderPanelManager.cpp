@@ -1,18 +1,29 @@
 #include "ShaderPanelManager.h"
 
+#include "ShaderPanelSerializer.h"
+
 namespace RealEngine {
-	ShaderPanelManager::ShaderPanelManager() 
-		: m_ShaderPanels{ "Vertex", "Fragment" } {
+	ShaderPanelManager::ShaderPanelManager() {
 		m_HeaderBackground = Texture2D::Create("Resources/Icons/ShaderCreate/BlueprintHeader.png");
 
-		m_ShaderPanels[ShaderType::Vertex].SetHeaderBackground(m_HeaderBackground);
-		m_ShaderPanels[ShaderType::Fragment].SetHeaderBackground(m_HeaderBackground);
-
 		ShaderPanel::RegisterNodeTypes();
+
+		//m_ShaderPanels[ShaderType::Vertex] = CreateRef<ShaderPanel>("Vertex");
+		//m_ShaderPanels[ShaderType::Vertex]->SetHeaderBackground(m_HeaderBackground);
+		//
+		//m_ShaderPanels[ShaderType::Fragment] = CreateRef<ShaderPanel>("Fragment");
+		//m_ShaderPanels[ShaderType::Fragment]->SetHeaderBackground(m_HeaderBackground);
+
+		m_ShaderPanels[ShaderType::Vertex] = ShaderPanelSerializer::Deserialize("Vertex.shaderpanel");
+		m_ShaderPanels[ShaderType::Vertex]->SetHeaderBackground(m_HeaderBackground);
+		
+		m_ShaderPanels[ShaderType::Fragment] = ShaderPanelSerializer::Deserialize("Fragment.shaderpanel");
+		m_ShaderPanels[ShaderType::Fragment]->SetHeaderBackground(m_HeaderBackground);
 	}
 	
 	ShaderPanelManager::~ShaderPanelManager() {
-		
+		ShaderPanelSerializer::Serialize(m_ShaderPanels[ShaderType::Vertex], "Vertex.shaderpanel");
+		ShaderPanelSerializer::Serialize(m_ShaderPanels[ShaderType::Fragment], "Fragment.shaderpanel");
 	}
 	
 	void ShaderPanelManager::OnImGuiRender() {
@@ -29,7 +40,7 @@ namespace RealEngine {
 			ImGui::EndMenuBar();
 		}
 
-		m_ShaderPanels[m_CurrentShaderType].OnImGuiRender();
+		m_ShaderPanels[m_CurrentShaderType]->OnImGuiRender();
 
 		//Overlays
 		{
@@ -77,8 +88,8 @@ namespace RealEngine {
 	}
 	
 	void ShaderPanelManager::Compile() {
-		std::string vertexShader = m_ShaderPanels[ShaderType::Vertex].Compile();
-		std::string fragmentShader = m_ShaderPanels[ShaderType::Fragment].Compile();
+		std::string vertexShader = m_ShaderPanels[ShaderType::Vertex]->Compile();
+		std::string fragmentShader = m_ShaderPanels[ShaderType::Fragment]->Compile();
 
 		m_PreviewShader = Shader::Create("Preview Shader", vertexShader, fragmentShader, &m_Reflect);
 

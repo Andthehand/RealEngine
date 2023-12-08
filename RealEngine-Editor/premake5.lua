@@ -21,6 +21,7 @@ project "RealEngine-Editor"
 		"%{wks.location}/RealEngine/vendor",
 		"%{wks.location}/RealEngine/vendor/imgui",
 		"%{IncludeDir.filewatch}",
+		"%{IncludeDir.yaml_cpp}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.ImGuizmo}",

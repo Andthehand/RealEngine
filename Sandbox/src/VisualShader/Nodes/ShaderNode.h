@@ -53,6 +53,7 @@ namespace RealEngine {
 		}
 
 		virtual const char* GetName() const = 0;
+		virtual const char* GetOptionPath() const = 0;
 
 		virtual std::string GenerateCode(std::string* outputVars, std::string* inputVars) const = 0;
 		virtual std::string GenerateGlobalCode(std::string* inputVars) const { return ""; }

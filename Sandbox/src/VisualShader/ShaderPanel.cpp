@@ -17,14 +17,12 @@ namespace RealEngine {
 		m_Context = ImNode::CreateEditor(&config);
 
 		//Init Testing Nodes
-		if (type == "Vertex")
+		if (!strcmp(type, "Vertex"))
 			m_Nodes.emplace_back(CreateRef<VertexShaderOutputNode>());
-		else if (type == "Fragment")
+		else if (!strcmp(type, "Fragment"))
 			m_Nodes.emplace_back(CreateRef<FragmentShaderOutputNode>());
 		else
 			RE_CORE_ASSERT(false, "Shader Type not supported");
-
-		m_Nodes.emplace_back(CreateRef<ShaderTextureNode>());
 
 		BuildNodes();
 	}
@@ -54,7 +52,7 @@ namespace RealEngine {
 				return false;
 		}
 		RE_CORE_ASSERT(false);
-		return nullptr;
+		return false;
 	}
 
 	static const char* PinTypeToString(PinType pinType) {
@@ -517,13 +515,13 @@ namespace RealEngine {
 	}
 
 	void ShaderPanel::RegisterNodeTypes() {
-		RegisterNodeType<ShaderTextureNode>("Textures");
+		RegisterNodeType<ShaderTextureNode>();
 
-		RegisterNodeType<ShaderConstantVec4Node>("Vectors/Constants");
-		RegisterNodeType<ShaderConstantVec3Node>("Vectors/Constants");
-		RegisterNodeType<ShaderConstantVec2Node>("Vectors/Constants");
+		RegisterNodeType<ShaderConstantVec4Node>();
+		RegisterNodeType<ShaderConstantVec3Node>();
+		RegisterNodeType<ShaderConstantVec2Node>();
 
-		RegisterNodeType<ShaderConstantFloatNode>("Scalar/Constants");
+		RegisterNodeType<ShaderConstantFloatNode>();
 	}
 
 	Pin* ShaderPanel::FindPin(ImNode::PinId id) {

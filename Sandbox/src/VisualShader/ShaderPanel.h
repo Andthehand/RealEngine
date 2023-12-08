@@ -35,10 +35,54 @@ namespace RealEngine {
 	public:
 		ShaderPanel(const char* type);
 
-		void SetHeaderBackground(const Ref<Texture2D>& texture) { m_HeaderBackground = texture; }
+		void SetHeaderBackground(const Ref<Texture2D> texture) { m_HeaderBackground = texture; }
 
 		void OnImGuiRender();
 		std::string Compile();
+
+		const std::vector<Ref<ShaderNode>>& GetNodes() const { return m_Nodes; }
+		void AddNodeByRegisterTree(std::string category) {
+			if(category.empty())
+				return;
+
+			size_t pos = category.find("/");
+			Node<CreateOptions>* currentNode = s_CreateOptions.GetRoot();
+
+			while (pos != std::string::npos) {
+				std::string subCategory = category.substr(0, pos);
+				category = category.substr(pos + 1);
+
+				//Get Children
+				auto children = currentNode->GetChildren();
+				//Check if the subcategory exists
+				auto it = std::find_if(children.begin(), children.end(), 
+					[&subCategory](const Node<CreateOptions>* node) 
+					{ return node->GetData().Name == subCategory; });
+				if(it != children.end())
+					currentNode = *it;
+				else
+					return;
+
+				pos = category.find("/");
+			}
+
+			if (!category.empty()) {
+				//Get Children
+				auto children = currentNode->GetChildren();
+				//Check if the subcategory exists
+				auto it = std::find_if(children.begin(), children.end(),
+										[&category](const Node<CreateOptions>* node)
+									{ return node->GetData().Name == category; });
+				if (it != children.end())
+					currentNode = *it;
+				else
+					return;
+			}
+
+			m_Nodes.emplace_back(currentNode->GetData().CreateFunction());
+		}
+		//This has to be called every time a node is added because the node pointers inside of the pins will be corrupted
+		void BuildNodes();
 
 		static void RegisterNodeTypes();
 	private:
@@ -54,11 +98,9 @@ namespace RealEngine {
 		Link* FindPinLink(ImNode::PinId id);
 		bool IsPinLinked(ImNode::PinId id);
 
-		//This has to be called every time a node is added because the node pointers inside of the pins will be corrupted
-		void BuildNodes();
-
 		template<class CustomNode>
-		static void RegisterNodeType(std::string category) {
+		static void RegisterNodeType() {
+			std::string category = std::string(CustomNode::s_OptionPath);
 			size_t pos = category.find("/");
 			Node<CreateOptions>* currentNode = s_CreateOptions.GetRoot();
 

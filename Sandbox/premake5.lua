@@ -22,6 +22,7 @@ project "Sandbox"
 		"%{wks.location}/RealEngine/vendor/imgui",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
+		"%{IncludeDir.yaml_cpp}",
 		"%{IncludeDir.ImGuizmo}",
 		"%{IncludeDir.ImPlot}",
 		"%{IncludeDir.ImNode}",

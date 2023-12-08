@@ -11,9 +11,17 @@ using PinKind = ax::NodeEditor::PinKind;
 using ax::Widgets::IconType;
 
 namespace RealEngine {
-	inline int GetNextId() { 
-		static int m_UniqueId = 1;
-		return m_UniqueId++;
+	static int s_UniqueId = 1;
+
+	inline void SetNextID(int id) {
+		s_UniqueId = id;
+	}
+
+	inline int GetNextId() {
+		if(s_UniqueId == INT_MAX)
+			s_UniqueId = 0;
+
+		return s_UniqueId++;
 	}
 }
 

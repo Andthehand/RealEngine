@@ -1,0 +1,6 @@
+Shader Type: Vertex
+Nodes:
+  - Name: Fragment Output
+    Option Path: /Fragment Output
+    ID: 1
+Largest ID: 1
