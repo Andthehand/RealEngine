@@ -3,14 +3,21 @@ Nodes:
   - Name: Fragment Output
     Option Path: /Fragment Output
     ID: 1
+    Links:
+      []
 ---
 Shader Type: Fragment
 Nodes:
   - Name: Fragment Output
     Option Path: /Fragment Output
     ID: 4
+    Links:
+      - Input ID: 5
+        Output ID: 11
   - Name: Texture2D
     Option Path: Textures/Texture2D
     ID: 7
+    Links:
+      []
 ---
 Largest ID: 7

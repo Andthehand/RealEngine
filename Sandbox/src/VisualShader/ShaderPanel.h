@@ -17,8 +17,8 @@
 namespace RealEngine {
 	struct Link {
 		ImNode::LinkId Id;
-		Pin* InputPin;
-		Pin* OutputPin;
+		ImNode::PinId InputPin;
+		ImNode::PinId OutputPin;
 	};
 
 	struct CreateOptions {
@@ -83,6 +83,8 @@ namespace RealEngine {
 		}
 		//This has to be called every time a node is added because the node pointers inside of the pins will be corrupted
 		void BuildNodes();
+
+		void AddLink(ImNode::PinId inputPin, ImNode::PinId outputPin);
 
 		static void RegisterNodeTypes();
 	private:

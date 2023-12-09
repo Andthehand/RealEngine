@@ -264,7 +264,7 @@ namespace RealEngine {
 
 		// Submit Links for drawing
 		for (Link& linkInfo : m_Links)
-			ImNode::Link(linkInfo.Id, linkInfo.InputPin->ID, linkInfo.OutputPin->ID);
+			ImNode::Link(linkInfo.Id, linkInfo.InputPin, linkInfo.OutputPin);
 
 		HandleInteraction();
 
@@ -333,7 +333,7 @@ namespace RealEngine {
 					//If mouse released basically
 					if (ImNode::AcceptNewItem(ImColor(0, 255, 0), 2.0f)) {
 						//Just add the link to the list
-						m_Links.push_back({ ImNode::LinkId(m_NextLinkId++), inputPin, outputPin });
+						m_Links.push_back({ ImNode::LinkId(m_NextLinkId++), inputPinId, outputPinId });
 
 						inputPin->ConnectedPin = outputPin;
 						outputPin->ConnectedPin = inputPin;
@@ -362,8 +362,8 @@ namespace RealEngine {
 					//This is so scuffed
 					//It is now less scuffed
 					//and finally now it's way less scuffed
-					link.InputPin->ConnectedPin = nullptr;
-					link.OutputPin->ConnectedPin = nullptr;
+					FindPin(link.InputPin)->ConnectedPin = nullptr;
+					FindPin(link.OutputPin)->ConnectedPin = nullptr;
 
 					m_Links.erase(&link);
 				}
@@ -541,7 +541,7 @@ namespace RealEngine {
 
 	Link* ShaderPanel::FindPinLink(ImNode::PinId id) {
 		for (Link& link : m_Links)
-			if (link.InputPin->ID == id || link.OutputPin->ID == id)
+			if (link.InputPin == id || link.OutputPin == id)
 				return &link;
 
 		return nullptr;
@@ -549,7 +549,7 @@ namespace RealEngine {
 
 	bool ShaderPanel::IsPinLinked(ImNode::PinId id) {
 		for (Link& link : m_Links)
-			if (link.InputPin->ID == id || link.OutputPin->ID == id)
+			if (link.InputPin == id || link.OutputPin == id)
 				return true;
 
 		return false;
@@ -558,5 +558,14 @@ namespace RealEngine {
 	void ShaderPanel::BuildNodes() {
 		for (Ref<ShaderNode> node : m_Nodes)
 			node->BuildNode();
+	}
+
+	void ShaderPanel::AddLink(ImNode::PinId inputPin, ImNode::PinId outputPin) {
+		auto* input = FindPin(inputPin);
+		auto* output = FindPin(outputPin);
+		m_Links.push_back({ ImNode::LinkId(m_NextLinkId++), inputPin, outputPin });
+
+		input->ConnectedPin = output;
+		output->ConnectedPin = input;
 	}
 }
