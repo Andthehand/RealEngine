@@ -8,27 +8,35 @@
 #include "ImNode.h"
 
 namespace RealEngine {	
-	void ShaderPanelSerializer::Serialize(Ref<ShaderPanel> shaderPanel, const std::filesystem::path& filepath) {
+	void ShaderPanelSerializer::Serialize(Ref<ShaderPanel> shaderPanel[2], const std::filesystem::path& filepath) {
 		RE_PROFILE_FUNCTION();
 
 		YAML::Emitter out;
-		out << YAML::BeginMap;
-		out << YAML::Key << "Shader Type" << YAML::Value << filepath.stem().string();
-		out << YAML::Key << "Nodes" << YAML::Value << YAML::BeginSeq;
+
+		static std::string shaderType[2] = { "Vertex", "Fragment" };
 
 		uintptr_t largestID = 0;
-		for(const auto& node : shaderPanel->GetNodes()) {
+		for (int i = 0; i < 2; i++) {
 			out << YAML::BeginMap;
-			out << YAML::Key << "Name" << YAML::Value << node->GetName();
-			out << YAML::Key << "Option Path" << YAML::Value << node->GetOptionPath() + std::string("/") + node->GetName();
-			out << YAML::Key << "ID" << YAML::Value << node->ID.Get();
+			out << YAML::Key << "Shader Type" << YAML::Value << shaderType[i];
+			out << YAML::Key << "Nodes" << YAML::Value << YAML::BeginSeq;
 
-			if (node->ID.Get() > largestID)
-				largestID = node->ID.Get();
+			for (const auto& node : shaderPanel[i]->GetNodes()) {
+				out << YAML::BeginMap;
+				out << YAML::Key << "Name" << YAML::Value << node->GetName();
+				out << YAML::Key << "Option Path" << YAML::Value << node->GetOptionPath() + std::string("/") + node->GetName();
+				out << YAML::Key << "ID" << YAML::Value << node->ID.Get();
+
+				if (node->ID.Get() > largestID)
+					largestID = node->ID.Get();
+				out << YAML::EndMap;
+			};
+
+			out << YAML::EndSeq;
 			out << YAML::EndMap;
-		};
+		}
 
-		out << YAML::EndSeq;
+		out << YAML::BeginMap;
 		out << YAML::Key << "Largest ID" << YAML::Value << largestID;
 		out << YAML::EndMap;
 
@@ -36,33 +44,34 @@ namespace RealEngine {
 		fout << out.c_str();
 	}
 
-	Ref<ShaderPanel> ShaderPanelSerializer::Deserialize(const std::filesystem::path& filepath) {
-		YAML::Node data;
+	void ShaderPanelSerializer::Deserialize(const std::filesystem::path& filepath, Ref<ShaderPanel>* shaderPanels) {
+		std::vector<YAML::Node> data;
 		try {
-			data = YAML::LoadFile(filepath.string());
+			data = YAML::LoadAllFromFile(filepath.string());
 		}
 		catch (YAML::ParserException e) {
 			RE_CORE_CRITICAL("{0}: On line {1}", e.msg, e.mark.line);
 			RE_CORE_ASSERT(false);
-			return nullptr;
+			return;
 		}
 
-		if (!data["Shader Type"]) {
-			RE_CORE_ASSERT(false);
-			return nullptr;
+		for (int i = 0; i < 2; i++) {
+			if (!data[i]["Shader Type"]) {
+				RE_CORE_ASSERT(false);
+				return;
+			}
+			
+			shaderPanels[i] = CreateRef<ShaderPanel>(data[i]["Shader Type"].as<std::string>().c_str());
+			
+			for (const auto& node : data[i]["Nodes"]) {
+				std::string name = node["Name"].as<std::string>();
+				std::string optionPath = node["Option Path"].as<std::string>();
+				SetNextID(node["ID"].as<int>());
+				shaderPanels[i]->AddNodeByRegisterTree(optionPath);
+			};
+			shaderPanels[i]->BuildNodes();
 		}
-
-		Ref<ShaderPanel> shaderPanel = CreateRef<ShaderPanel>(data["Shader Type"].as<std::string>().c_str());
-		for (const auto& node : data["Nodes"]) {
-			std::string name = node["Name"].as<std::string>();
-			std::string optionPath = node["Option Path"].as<std::string>();
-			SetNextID(node["ID"].as<int>());
-			shaderPanel->AddNodeByRegisterTree(optionPath);
-		};
-		shaderPanel->BuildNodes();
-
-		SetNextID(data["Largest ID"].as<int>());
-
-		return shaderPanel;
+		
+		SetNextID(data[2]["Largest ID"].as<int>());
 	}
 }

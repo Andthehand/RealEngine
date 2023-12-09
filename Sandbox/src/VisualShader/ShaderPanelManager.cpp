@@ -14,16 +14,13 @@ namespace RealEngine {
 		//m_ShaderPanels[ShaderType::Fragment] = CreateRef<ShaderPanel>("Fragment");
 		//m_ShaderPanels[ShaderType::Fragment]->SetHeaderBackground(m_HeaderBackground);
 
-		m_ShaderPanels[ShaderType::Vertex] = ShaderPanelSerializer::Deserialize("Vertex.shaderpanel");
+		ShaderPanelSerializer::Deserialize("Combined.shaderpanel", m_ShaderPanels);
 		m_ShaderPanels[ShaderType::Vertex]->SetHeaderBackground(m_HeaderBackground);
-		
-		m_ShaderPanels[ShaderType::Fragment] = ShaderPanelSerializer::Deserialize("Fragment.shaderpanel");
 		m_ShaderPanels[ShaderType::Fragment]->SetHeaderBackground(m_HeaderBackground);
 	}
 	
 	ShaderPanelManager::~ShaderPanelManager() {
-		ShaderPanelSerializer::Serialize(m_ShaderPanels[ShaderType::Vertex], "Vertex.shaderpanel");
-		ShaderPanelSerializer::Serialize(m_ShaderPanels[ShaderType::Fragment], "Fragment.shaderpanel");
+		ShaderPanelSerializer::Serialize(m_ShaderPanels, "Combined.shaderpanel");
 	}
 	
 	void ShaderPanelManager::OnImGuiRender() {

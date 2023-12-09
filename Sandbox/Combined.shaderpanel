@@ -1,3 +1,9 @@
+Shader Type: Vertex
+Nodes:
+  - Name: Fragment Output
+    Option Path: /Fragment Output
+    ID: 1
+---
 Shader Type: Fragment
 Nodes:
   - Name: Fragment Output
@@ -6,4 +12,5 @@ Nodes:
   - Name: Texture2D
     Option Path: Textures/Texture2D
     ID: 7
+---
 Largest ID: 7
