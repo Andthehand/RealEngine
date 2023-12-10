@@ -11,26 +11,15 @@ namespace RealEngine {
 		std::string code;
 		
 		if (!inputVars[0].empty())
-			code += "\tv_UV = " + inputVars[1] + ";\n";
+			code += "\tv_UV = " + inputVars[0] + ";\n";
 		else
 			code += "\tv_UV = a_UV;\n";
 
 		if(!inputVars[1].empty())
-			code += "\tgl_Position = " + inputVars[0] + ";\n";
+			code += "\tgl_Position = " + inputVars[1] + ";\n";
 		else
 			code += "\tgl_Position = vec4(a_Position, 1.0);\n";
 
-		return code;
-	}
-
-	//TODO: Implement this
-	std::string VertexShaderOutputNode::GenerateGlobalCode(std::string* inputVars) const {
-		std::string code;
-		
-		code += "in vec3 a_Position;\n";
-		code += "in vec2 a_UV;\n";
-		code += "out vec2 v_UV;\n";
-		
 		return code;
 	}
 
@@ -41,27 +30,15 @@ namespace RealEngine {
 	}
 
 	std::string FragmentShaderOutputNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
+		std::string code;
 		//Color
-		std::string color;
 		if (!inputVars[0].empty())
-			color = "\to_Color = " + inputVars[0] + ";\n";
+			code += "\to_Color = " + inputVars[0] + ";\n";
 
 		//Normal
 		std::string normal;
 		if (!inputVars[1].empty()) 
-			normal = "\to_Normal = " + inputVars[1] + ";\n";
-
-		return color + normal;
-	}
-
-	std::string FragmentShaderOutputNode::GenerateGlobalCode(std::string* inputVars) const {
-		std::string code;
-		
-		if (!inputVars[0].empty())
-			code += "out vec4 o_Color;\n";
-
-		if (!inputVars[1].empty())
-			code += "out vec3 o_Normal;\n";
+			code += "\to_Normal = " + inputVars[1] + ";\n";
 
 		return code;
 	}
@@ -108,10 +85,6 @@ namespace RealEngine {
 
 		if (inputVars[0].empty()) {
 			code += "uniform sampler2D " + GetUniformName(&Inputs[0]) + ";\n";
-		}
-
-		if (inputVars[1].empty()) {
-			code += "in vec2 v_UV;\n";
 		}
 		
 		return code;

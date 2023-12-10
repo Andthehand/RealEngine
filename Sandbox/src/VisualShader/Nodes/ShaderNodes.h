@@ -12,7 +12,6 @@ namespace RealEngine {
 		const char* GetOptionPath() const override { return ""; }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
-		std::string GenerateGlobalCode(std::string* inputVars) const override;
 
 	public:
 		inline static const char* s_Name = "Fragment Output";
@@ -26,7 +25,6 @@ namespace RealEngine {
 		const char* GetOptionPath() const override { return ""; }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
-		std::string GenerateGlobalCode(std::string* inputVars) const override;
 
 	public:
 		inline static const char* s_Name = "Fragment Output";
@@ -81,8 +79,8 @@ namespace RealEngine {
 		const char* GetName() const override { return s_Name; }
 		const char* GetOptionPath() const override { return s_OptionPath; }
 
-		void* GetConstant() const { return (void*)&m_Constant; }
-		void SetConstant(void* constant) { m_Constant = (glm::vec3&)constant; }
+		void* GetConstant() const override { return (void*)&m_Constant; }
+		void SetConstant(void* constant) override { m_Constant = (glm::vec3&)constant; }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 	public:

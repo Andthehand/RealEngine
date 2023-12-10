@@ -38,7 +38,7 @@ namespace RealEngine {
 		void SetHeaderBackground(const Ref<Texture2D> texture) { m_HeaderBackground = texture; }
 
 		void OnImGuiRender();
-		std::string Compile();
+		void Compile(std::string* uberShader);
 
 		const std::vector<Ref<ShaderNode>>& GetNodes() const { return m_Nodes; }
 		void AddNodeByRegisterTree(std::string category) {

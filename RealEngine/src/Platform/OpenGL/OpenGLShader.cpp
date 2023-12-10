@@ -122,7 +122,7 @@ namespace RealEngine {
 		}
 	}
 
-	OpenGLShader::OpenGLShader(const std::filesystem::path& filepath)
+	OpenGLShader::OpenGLShader(const std::filesystem::path& filepath, std::vector<std::string>& defines)
 		: m_FilePath(filepath) {
 		RE_PROFILE_FUNCTION();
 
@@ -139,14 +139,14 @@ namespace RealEngine {
 
 		{
 			Timer timer;
-			CompileOrGetOpenGLBinaries(shaderSources);
+			CompileOrGetOpenGLBinaries(shaderSources, defines);
 			CreateProgram();
 			RE_CORE_WARN("Shader {0} took {1} ms to create", filepath.stem().string(), timer.ElapsedMillis());
 		}
 
 	}
 
-	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, ShaderReflect* reflect)
+	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, std::vector<std::string>& defines, ShaderReflect* reflect)
 		: m_Name(name), m_FilePath(name) {
 		RE_PROFILE_FUNCTION();
 
@@ -157,7 +157,7 @@ namespace RealEngine {
 
 		{
 			Timer timer;
-			CompileOrGetOpenGLBinaries(sources);
+			CompileOrGetOpenGLBinaries(sources, defines);
 			if (reflect != nullptr) {
 				reflect->clear();
 				GenerateReflectData(reflect);
@@ -223,7 +223,7 @@ namespace RealEngine {
 		return shaderSources;
 	}
 
-	void OpenGLShader::CompileOrGetOpenGLBinaries(const std::unordered_map<GLenum, std::string>& shaderSources) {
+	void OpenGLShader::CompileOrGetOpenGLBinaries(const std::unordered_map<GLenum, std::string>& shaderSources, std::vector<std::string>& defines) {
 		RE_PROFILE_FUNCTION();
 		
 		GLuint program = glCreateProgram();
@@ -239,6 +239,9 @@ namespace RealEngine {
 		options.SetAutoBindUniforms(true);
 
 		options.SetGenerateDebugInfo();
+
+		for(auto& define : defines)
+			options.AddMacroDefinition(define);
 
 		std::filesystem::path cacheDirectory = Utils::GetCacheDirectory();
 
@@ -280,8 +283,8 @@ namespace RealEngine {
 			}
 		}
 
-		for (auto&& [stage, data] : shaderData)
-			DebugReflect(stage, data);
+		//for (auto&& [stage, data] : shaderData)
+		//	DebugReflect(stage, data);
 	}
 
 	void OpenGLShader::CreateProgram() {

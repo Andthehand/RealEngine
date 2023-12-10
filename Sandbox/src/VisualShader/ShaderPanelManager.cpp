@@ -2,6 +2,8 @@
 
 #include "ShaderPanelSerializer.h"
 
+#include <fstream>
+
 namespace RealEngine {
 	ShaderPanelManager::ShaderPanelManager() {
 		m_HeaderBackground = Texture2D::Create("Resources/Icons/ShaderCreate/BlueprintHeader.png");
@@ -83,14 +85,70 @@ namespace RealEngine {
 			m_QueuedCompile = false;
 		}
 	}
+
+	std::string ShaderPanelManager::ReadFile(const std::filesystem::path& filepath) {
+		RE_PROFILE_FUNCTION();
+
+		std::string result;
+		std::ifstream in(filepath, std::ios::in | std::ios::binary); // ifstream closes itself due to RAII
+		if (in) {
+			in.seekg(0, std::ios::end);
+			size_t size = in.tellg();
+			if (size != -1) {
+				result.resize(size);
+				in.seekg(0, std::ios::beg);
+				in.read(&result[0], size);
+			}
+			else {
+				RE_CORE_ERROR("Could not read from file '{0}'", filepath);
+			}
+		}
+		else {
+			RE_CORE_ERROR("Could not open file '{0}'", filepath);
+		}
+
+		return result;
+	}
 	
+	void ShaderPanelManager::PreProcessUbershader(std::filesystem::path& ubershader, std::string* vertex, std::string* fragment) {
+		std::string ubershaderSource = ReadFile(ubershader);
+		
+		std::string* shaders[2] = { vertex, fragment };
+
+		const char* typeToken = "#type";
+		size_t typeTokenLength = strlen(typeToken);
+		size_t pos = ubershaderSource.find(typeToken, 0); //Start of shader type declaration line
+		int shaderIndex = 0;
+		while (pos != std::string::npos) {
+			size_t eol = ubershaderSource.find_first_of("\r\n", pos); //End of shader type declaration line
+			RE_CORE_ASSERT(eol != std::string::npos, "Syntax error");
+			size_t begin = pos + typeTokenLength + 1; //Start of shader type name (after "#type " keyword)
+			std::string type = ubershaderSource.substr(begin, eol - begin);
+
+			size_t nextLinePos = ubershaderSource.find_first_not_of("\r\n", eol); //Start of shader code after shader type declaration line
+			RE_CORE_ASSERT(nextLinePos != std::string::npos, "Syntax error");
+			pos = ubershaderSource.find(typeToken, nextLinePos); //Start of next shader type declaration line
+
+			*shaders[shaderIndex] = (pos == std::string::npos) ? ubershaderSource.substr(nextLinePos) : ubershaderSource.substr(nextLinePos, pos - nextLinePos);
+			shaderIndex++;
+		}
+	}
+
 	void ShaderPanelManager::Compile() {
-		std::string vertexShader = m_ShaderPanels[ShaderType::Vertex]->Compile();
-		std::string fragmentShader = m_ShaderPanels[ShaderType::Fragment]->Compile();
+		std::string vertexShader;
+		std::string fragmentShader;
 
-		m_PreviewShader = Shader::Create("Preview Shader", vertexShader, fragmentShader, &m_Reflect);
+		PreProcessUbershader((std::filesystem::path)"assets/shaders/UberShader.glsl", &vertexShader, &fragmentShader);
 
-		for (auto& shaderCode : m_Reflect.ShaderCode)
-			RE_CORE_WARN("ShaderCode:\n{0}", shaderCode);
+		m_ShaderPanels[ShaderType::Vertex]->Compile(&vertexShader);
+		m_ShaderPanels[ShaderType::Fragment]->Compile(&fragmentShader);
+
+		RE_CORE_WARN("ShaderCode:\n{0}", vertexShader);
+		RE_CORE_WARN("ShaderCode:\n{0}", fragmentShader);
+
+		m_PreviewShader = Shader::Create("Preview Shader", vertexShader, fragmentShader, std::vector<std::string>{ "IMPLEMENTUV" }, &m_Reflect);
+
+		//for (auto& shaderCode : m_Reflect.ShaderCode)
+		//	RE_CORE_WARN("ShaderCode:\n{0}", shaderCode);
 	}
 }

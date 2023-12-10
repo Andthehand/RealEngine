@@ -224,6 +224,7 @@ namespace RealEngine {
 					builder.Output(output.ID);
 					static glm::vec4 test = glm::vec4(1.0f);
 
+					// Check if the output pin is connected to a constant node
 					ShaderNodeConstant* constantNode = dynamic_cast<ShaderNodeConstant*>(output.Node);
 					if (constantNode != nullptr) {
 						switch (output.Type) {
@@ -497,21 +498,22 @@ namespace RealEngine {
 		globalCode += currentNode->GenerateGlobalCode(inputs);
 	}
 
-	std::string ShaderPanel::Compile() {
+	void ShaderPanel::Compile(std::string* shader) {
 		StringBuilder shaderCode;
 		StringBuilder globalCode;
-		globalCode += "\n#version 450 core\n\n";
-		shaderCode += "void main() { \n";
 
 		std::unordered_set<uint64_t> nodeTracking;
 
 		//m_Nodes[0] is always the output node
 		RecursiveSearch(m_Nodes[0].get(), shaderCode, globalCode, &nodeTracking);
 
-		shaderCode += "}";
-		globalCode += "\n";
+		std::string globalCodeStr = globalCode.as_string();
 
-		return globalCode.as_string() + shaderCode.as_string();
+		size_t pos = shader->find("#GlobalCustomCode");
+		shader->replace(pos, 17, globalCodeStr);
+
+		pos = shader->find("#CustomCode", pos);
+		shader->replace(pos, 11, shaderCode.as_string());
 	}
 
 	void ShaderPanel::RegisterNodeTypes() {
@@ -535,7 +537,7 @@ namespace RealEngine {
 					return &pin;
 		}
 
-		RE_CORE_CRITICAL("Coundn't find Pin");
+		RE_CORE_ASSERT(false, "Coundn't find Pin");
 		return nullptr;
 	}
 
@@ -561,6 +563,8 @@ namespace RealEngine {
 	}
 
 	void ShaderPanel::AddLink(ImNode::PinId inputPin, ImNode::PinId outputPin) {
+		RE_PROFILE_FUNCTION();
+
 		auto* input = FindPin(inputPin);
 		auto* output = FindPin(outputPin);
 		m_Links.push_back({ ImNode::LinkId(m_NextLinkId++), inputPin, outputPin });

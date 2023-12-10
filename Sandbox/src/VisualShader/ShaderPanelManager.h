@@ -4,8 +4,10 @@
 #include "RealEngine/Renderer/Shader.h"
 #include "RealEngine/Renderer/Texture.h"
 
+#include <filesystem>
+
 namespace RealEngine {
-	enum ShaderType  : int {
+	enum ShaderType : int {
 		Vertex		= 0,
 		Fragment	= 1,
 	};
@@ -17,6 +19,9 @@ namespace RealEngine {
 
 		void OnImGuiRender();
 		void OnUpdate();
+
+		std::string ShaderPanelManager::ReadFile(const std::filesystem::path& filepath);
+		void PreProcessUbershader(std::filesystem::path& ubershader, std::string* vertex, std::string* fragment);
 		void Compile();
 		
 		Ref<Shader> GetShader() { return m_PreviewShader; }
