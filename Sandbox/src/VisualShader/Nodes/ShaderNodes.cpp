@@ -2,8 +2,8 @@
 
 namespace RealEngine {
 	VertexShaderOutputNode::VertexShaderOutputNode() {
-		Inputs.emplace_back(GetNextId(), "UV", PinType::Vector2);
-		Inputs.emplace_back(GetNextId(), "Vertex", PinType::Vector3);
+		Inputs.emplace_back("UV", PinType::Vector2);
+		Inputs.emplace_back("Vertex", PinType::Vector3);
 	}
 
 	//TODO: Implement this
@@ -25,8 +25,8 @@ namespace RealEngine {
 
 	FragmentShaderOutputNode::FragmentShaderOutputNode()
 		: ShaderNode() {
-		Inputs.emplace_back(GetNextId(), "Color", PinType::Vector4);
-		Inputs.emplace_back(GetNextId(), "Normal", PinType::Vector3);
+		Inputs.emplace_back("Color", PinType::Vector4);
+		Inputs.emplace_back("Normal", PinType::Vector3);
 	}
 
 	std::string FragmentShaderOutputNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
@@ -45,10 +45,10 @@ namespace RealEngine {
 
 	ShaderTextureNode::ShaderTextureNode()
 		: ShaderNode() {
-		Inputs.emplace_back(GetNextId(), "Sampler2D", PinType::Sampler2D);
-		Inputs.emplace_back(GetNextId(), "UV", PinType::Vector2);
-		Inputs.emplace_back(GetNextId(), "LOD", PinType::Float);
-		Outputs.emplace_back(GetNextId(), "Color", PinType::Vector4);
+		Inputs.emplace_back("Sampler2D", PinType::Sampler2D);
+		Inputs.emplace_back("UV", PinType::Vector2);
+		Inputs.emplace_back("LOD", PinType::Float);
+		Outputs.emplace_back("Color", PinType::Vector4);
 	}
 
 	std::string ShaderTextureNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
@@ -92,7 +92,7 @@ namespace RealEngine {
 
 	ShaderConstantVec4Node::ShaderConstantVec4Node() 
 		: ShaderNodeConstant() {
-		Outputs.emplace_back(GetNextId(), "Vector4", PinType::Vector4);
+		Outputs.emplace_back("Vector4", PinType::Vector4);
 	}
 
 	std::string ShaderConstantVec4Node::GenerateCode(std::string* outputVars, std::string* inputVars) const {
@@ -101,7 +101,7 @@ namespace RealEngine {
 
 	ShaderConstantVec3Node::ShaderConstantVec3Node()
 		: ShaderNodeConstant() {
-		Outputs.emplace_back(GetNextId(), "Vector3", PinType::Vector3);
+		Outputs.emplace_back("Vector3", PinType::Vector3);
 	}
 
 	std::string ShaderConstantVec3Node::GenerateCode(std::string* outputVars, std::string* inputVars) const {
@@ -110,7 +110,7 @@ namespace RealEngine {
 
 	ShaderConstantVec2Node::ShaderConstantVec2Node()
 		: ShaderNodeConstant() {
-		Outputs.emplace_back(GetNextId(), "Vector2", PinType::Vector2);
+		Outputs.emplace_back("Vector2", PinType::Vector2);
 	}
 
 	std::string ShaderConstantVec2Node::GenerateCode(std::string* outputVars, std::string* inputVars) const {
@@ -119,7 +119,7 @@ namespace RealEngine {
 
 	ShaderConstantFloatNode::ShaderConstantFloatNode()
 		: ShaderNodeConstant() {
-		Outputs.emplace_back(GetNextId(), "Float", PinType::Float);
+		Outputs.emplace_back("Float", PinType::Float);
 	}
 
 	std::string ShaderConstantFloatNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {

@@ -20,8 +20,8 @@ namespace RealEngine {
 	};
 
 	struct Pin {
-		Pin(ImNode::PinId id, const char* name, PinType type)
-			: ID(id), Name(name), Type(type), Kind(PinKind::Input) {}
+		Pin(const char* name, PinType type)
+			: ID(UniqueId::GetNextId()), Name(name), Type(type), Kind(PinKind::Input) {}
 
 		ImNode::PinId ID;
 		ShaderNode* Node = nullptr;
@@ -38,7 +38,7 @@ namespace RealEngine {
 	class ShaderNode {
 	public:
 		ShaderNode()
-			: ID(GetNextId()) {}
+			: ID(UniqueId::GetNextId()) {}
 
 		void BuildNode() {
 			for (Pin& input : Inputs) {
