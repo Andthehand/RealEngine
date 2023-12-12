@@ -46,7 +46,7 @@ namespace ax::NodeEditor {
 		ImGui::TextUnformatted(label);
 	};
 
-	static bool DrawNodeControlN(void* p_data, int components, float v_speed = 1.0f, const void* p_min = NULL, const void* p_max = NULL, const char* format = NULL) {
+	static bool DrawNodeControlN(void* p_data, int components, ImGuiDataType dataType, float v_speed = 1.0f, const void* p_min = NULL, const void* p_max = NULL, const char* format = NULL) {
 		RE_ASSERT(components <= 4, "Cant't create a node greater than a vec4");
 		RE_ASSERT(components > 0, "Cant't create a node no components?");
 		if (components > 4 || components < 0) {
@@ -59,6 +59,12 @@ namespace ax::NodeEditor {
 		//For some reason the compiler doesn't like this
 		//ImGui::PushMultiItemsWidths(4, 64 * components);
 
+		float width;
+		if (components == 1)
+			width = 128 + ImGui::GetStyle().FramePadding.x;
+		else
+			width = 64;
+
 		for (int i = 0; i < components; i++) {
 			static const ImU32 colors[] = {
 				0xBB0000FF, // red
@@ -68,8 +74,8 @@ namespace ax::NodeEditor {
 			};
 
 			ImGui::PushID(i);
-			ImGui::SetNextItemWidth(64);
-			value_changed |= ImGui::DragScalar("", ImGuiDataType_Float, p_data, v_speed, p_min, p_max, format);
+			ImGui::SetNextItemWidth(width);
+			value_changed |= ImGui::DragScalar("", dataType, p_data, v_speed, p_min, p_max, format);
 			p_data = (void*)((char*)p_data + sizeof(float));
 
 			const ImVec2 min = ImGui::GetItemRectMin();
@@ -91,14 +97,14 @@ namespace ax::NodeEditor {
 	}
 
 	static bool DrawNodeVec4Control(glm::vec4* v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f") {
-		return DrawNodeControlN(v, 4, v_speed, &v_min, &v_max, format);
+		return DrawNodeControlN(v, 4, v_speed, ImGuiDataType_Float, &v_min, &v_max, format);
 	}
 
 	static bool DrawNodeVec3Control(glm::vec3* v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f") {
-		return DrawNodeControlN(v, 3, v_speed, &v_min, &v_max, format);
+		return DrawNodeControlN(v, 3, v_speed, ImGuiDataType_Float, &v_min, &v_max, format);
 	}
 
 	static bool DrawNodeVec2Control(glm::vec2* v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f") {
-		return DrawNodeControlN(v, 2, v_speed, &v_min, &v_max, format);
+		return DrawNodeControlN(v, 2, v_speed, ImGuiDataType_Float, &v_min, &v_max, format);
 	}
 }

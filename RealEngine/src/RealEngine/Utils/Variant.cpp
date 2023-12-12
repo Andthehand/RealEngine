@@ -133,34 +133,6 @@ namespace RealEngine {
 		return *this;
 	}
 
-	Variant::operator void* () const {
-		switch (m_Type) {
-			case NIL:
-				return nullptr;
-			case BOOL:
-				return (void*)m_Data._bool;
-			case INT:
-				return (void*)m_Data._int;
-			case FLOAT:
-				return (void*)(int)m_Data._float;
-			case VECTOR2:
-				return m_Data._vec2;
-			case VECTOR2I:
-				return m_Data._vec2i;
-			case VECTOR3:
-				return m_Data._vec3;
-			case VECTOR3I:
-				return m_Data._vec3i;
-			case VECTOR4:
-				return m_Data._vec4;
-			case VECTOR4I:
-				return m_Data._vec4i;
-			default:
-				RE_ASSERT(false, "Variant type not supported");
-				return nullptr;
-		}
-	}
-
 	// We consider all uninitialized or empty types to be false based on the type's
 	// zeroiness.
 	Variant::operator bool() const {
@@ -229,6 +201,32 @@ namespace RealEngine {
 		}
 	}
 
+	Variant::operator float* () {
+		switch (m_Type) {
+			case BOOL:
+				return (float*)&m_Data._bool;
+			case INT:
+				return (float*)&m_Data._int;
+			case FLOAT:
+				return &m_Data._float;
+			case VECTOR2:
+				return (float*)m_Data._vec2;
+			case VECTOR2I:
+				return (float*)m_Data._vec2i;
+			case VECTOR3:
+				return (float*)m_Data._vec3;
+			case VECTOR3I:
+				return (float*)m_Data._vec3i;
+			case VECTOR4:
+				return (float*)m_Data._vec4;
+			case VECTOR4I:
+				return (float*)m_Data._vec4i;
+			default:
+				RE_ASSERT(false, "Variant type not convertable to float*!");
+				return nullptr;
+		}
+	}
+
 	Variant::operator std::string() const {
 		switch (m_Type) {
 			case NIL:
@@ -256,6 +254,16 @@ namespace RealEngine {
 			default:
 				RE_ASSERT(false, "Variant type not convertable to string!");
 				return "ERROR";
+		}
+	}
+
+	Variant::operator std::string* () {
+		switch (m_Type) {
+			case STRING:
+				return m_Data._string;
+			default:
+				RE_ASSERT(false, "Variant type not convertable to string*!");
+				return nullptr;
 		}
 	}
 

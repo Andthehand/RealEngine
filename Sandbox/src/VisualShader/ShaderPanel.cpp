@@ -108,7 +108,7 @@ namespace RealEngine {
 				iconType = IconType::Diamond; break;
 			case PinType::Int:      
 			case PinType::Float:    
-			case PinType::Vector2:  
+			case PinType::Vector2:
 			case PinType::Vector3:  
 			case PinType::Vector4:  
 				iconType = IconType::Circle; break;
@@ -143,7 +143,7 @@ namespace RealEngine {
 
 	void ShaderPanel::OnImGuiRender() {
 		//Used for rendering tooltip outside of the ImNode::Begin() and ImNode::End()
-		std::string tooltip;
+		static std::string tooltip;
 
 		//GUI Setup
 		{
@@ -229,16 +229,22 @@ namespace RealEngine {
 					if (constantNode != nullptr) {
 						switch (output.Type) {
 							case PinType::Vector4:
-								ImNode::DrawNodeControlN(constantNode->GetConstant(), 4);
+								ImNode::DrawNodeControlN((float*)constantNode->GetConstant(), 4, ImGuiDataType_Float);
 								break;
 							case PinType::Vector3:
-								ImNode::DrawNodeControlN(constantNode->GetConstant(), 3);
+								ImNode::DrawNodeControlN((float*)constantNode->GetConstant(), 3, ImGuiDataType_Float);
 								break;
 							case PinType::Vector2:
-								ImNode::DrawNodeControlN(constantNode->GetConstant(), 2);
+								ImNode::DrawNodeControlN((float*)constantNode->GetConstant(), 2, ImGuiDataType_Float);
 								break;
 							case PinType::Float:
-								ImNode::DrawNodeControlN(constantNode->GetConstant(), 1);
+								ImNode::DrawNodeControlN((float*)constantNode->GetConstant(), 1, ImGuiDataType_Float);
+								break;
+							case PinType::Int:
+								ImNode::DrawNodeControlN((void*)(float*)constantNode->GetConstant(), 1, ImGuiDataType_S64);
+								break;
+							case PinType::Bool:
+								ImGui::Checkbox("##bool", (bool*)(float*)constantNode->GetConstant());
 								break;
 							default:
 								RE_ASSERT(false, "Constant pin type not implemented");
@@ -524,6 +530,8 @@ namespace RealEngine {
 		RegisterNodeType<ShaderConstantVec2Node>();
 
 		RegisterNodeType<ShaderConstantFloatNode>();
+		RegisterNodeType<ShaderConstantIntNode>();
+		RegisterNodeType<ShaderConstantBoolNode>();
 	}
 
 	Pin* ShaderPanel::FindPin(ImNode::PinId id) {

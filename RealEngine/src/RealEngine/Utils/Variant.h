@@ -22,12 +22,12 @@ namespace RealEngine {
 
 		Variant& operator=(const Variant& p_other);
 
-		operator void*() const;
-
 		operator bool() const;
 		operator int() const;
 		operator float() const;
+		operator float*();
 		operator std::string() const;
+		operator std::string*();
 
 		operator glm::vec2() const;
 		operator glm::ivec2() const;

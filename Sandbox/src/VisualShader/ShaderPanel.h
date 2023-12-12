@@ -8,8 +8,7 @@
 
 #include <imgui_node_editor.h>
 
-#include "RealEngine/Utils/StringBuilder.h"
-#include "RealEngine/Renderer/Texture.h"
+#include <RealEngine.h>
 
 #include "Nodes/ShaderNode.h"
 #include "../Utils/NaryTree.h"

@@ -408,7 +408,8 @@ namespace RealEngine {
 				shaderPanels[i]->AddLink(inputIDs[j], outputIDs[j]);
 		}
 		
-		UniqueId::SetNextID(data[2]["Largest ID"].as<int>());
+		//Set the largest ID + 10 offset so no ID's are the same
+		UniqueId::SetNextID(data[2]["Largest ID"].as<int>() + 10);
 	
 		return true;
 	}

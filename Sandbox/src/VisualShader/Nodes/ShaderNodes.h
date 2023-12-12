@@ -60,7 +60,7 @@ namespace RealEngine {
 		const char* GetName() const override { return s_Name; }
 		const char* GetOptionPath() const override { return s_OptionPath; }
 		
-		const Variant& GetConstant() const { return m_Constant; }
+		Variant& GetConstant() { return m_Constant; }
 		void SetConstant(Variant constant) { m_Constant = std::move(constant); }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
@@ -79,7 +79,7 @@ namespace RealEngine {
 		const char* GetName() const override { return s_Name; }
 		const char* GetOptionPath() const override { return s_OptionPath; }
 
-		const Variant& GetConstant() const override { return m_Constant; }
+		Variant& GetConstant() override { return m_Constant; }
 		void SetConstant(Variant constant) override { m_Constant = std::move(constant); }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
@@ -98,7 +98,7 @@ namespace RealEngine {
 		const char* GetName() const override { return s_Name; }
 		const char* GetOptionPath() const override { return s_OptionPath; }
 
-		const Variant& GetConstant() const { return m_Constant; }
+		Variant& GetConstant() { return m_Constant; }
 		void SetConstant(Variant constant) { m_Constant = std::move(constant); }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
@@ -117,15 +117,53 @@ namespace RealEngine {
 		const char* GetName() const override { return s_Name; }
 		const char* GetOptionPath() const override { return s_OptionPath; }
 
-		const Variant& GetConstant() const { return m_Constant; }
+		Variant& GetConstant() { return m_Constant; }
 		void SetConstant(Variant constant) { m_Constant = std::move(constant); }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 	public:
 		inline static const char* s_Name = "Constanct Float";
-		inline static const char* s_OptionPath = "Vectors/Constants";
+		inline static const char* s_OptionPath = "Generic/Constants";
 
 	private:
-		Variant m_Constant = 1.0f;
+		Variant m_Constant = 0.0f;
+	};
+
+	class ShaderConstantIntNode : public ShaderNodeConstant {
+	public:
+		ShaderConstantIntNode();
+
+		const char* GetName() const override { return s_Name; }
+		const char* GetOptionPath() const override { return s_OptionPath; }
+
+		Variant& GetConstant() { return m_Constant; }
+		void SetConstant(Variant constant) { m_Constant = std::move(constant); }
+
+		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
+	public:
+		inline static const char* s_Name = "Constanct Int";
+		inline static const char* s_OptionPath = "Generic/Constants";
+
+	private:
+		Variant m_Constant = 0;
+	};
+
+	class ShaderConstantBoolNode : public ShaderNodeConstant {
+	public:
+		ShaderConstantBoolNode();
+
+		const char* GetName() const override { return s_Name; }
+		const char* GetOptionPath() const override { return s_OptionPath; }
+
+		Variant& GetConstant() { return m_Constant; }
+		void SetConstant(Variant constant) { m_Constant = std::move(constant); }
+
+		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
+	public:
+		inline static const char* s_Name = "Constanct Bool";
+		inline static const char* s_OptionPath = "Generic/Constants";
+
+	private:
+		Variant m_Constant = false;
 	};
 }

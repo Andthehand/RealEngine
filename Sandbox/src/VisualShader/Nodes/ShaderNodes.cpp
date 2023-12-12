@@ -125,5 +125,23 @@ namespace RealEngine {
 	std::string ShaderConstantFloatNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
 		return "\t" + outputVars[0] + " = " + (std::string)m_Constant + "; \n";
 	}
+
+	ShaderConstantIntNode::ShaderConstantIntNode()
+		: ShaderNodeConstant() {
+		Outputs.emplace_back("Int", PinType::Int);
+	}
+
+	std::string ShaderConstantIntNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
+		return "\t" + outputVars[0] + " = " + (std::string)m_Constant + "; \n";
+	}
+
+	ShaderConstantBoolNode::ShaderConstantBoolNode()
+		: ShaderNodeConstant() {
+		Outputs.emplace_back("Bool", PinType::Bool);
+	}
+
+	std::string ShaderConstantBoolNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
+		return "\t" + outputVars[0] + " = " + (std::string)m_Constant + "; \n";
+	}
 }
 
