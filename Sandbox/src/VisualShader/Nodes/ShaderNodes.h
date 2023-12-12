@@ -60,7 +60,7 @@ namespace RealEngine {
 		const char* GetName() const override { return s_Name; }
 		const char* GetOptionPath() const override { return s_OptionPath; }
 		
-		void* GetConstant() const { return (void*)&m_Constant; }
+		const Variant& GetConstant() const { return m_Constant; }
 		void SetConstant(void* constant) { m_Constant = (glm::vec4&)constant; }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
@@ -69,7 +69,7 @@ namespace RealEngine {
 		inline static const char* s_OptionPath = "Vectors/Constants";
 
 	private:
-		glm::vec4 m_Constant = glm::vec4(1.0f);
+		Variant m_Constant = glm::vec4(1.0f);
 	};
 
 	class ShaderConstantVec3Node : public ShaderNodeConstant {
@@ -79,7 +79,7 @@ namespace RealEngine {
 		const char* GetName() const override { return s_Name; }
 		const char* GetOptionPath() const override { return s_OptionPath; }
 
-		void* GetConstant() const override { return (void*)&m_Constant; }
+		const Variant& GetConstant() const override { return m_Constant; }
 		void SetConstant(void* constant) override { m_Constant = (glm::vec3&)constant; }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
@@ -88,7 +88,7 @@ namespace RealEngine {
 		inline static const char* s_OptionPath = "Vectors/Constants";
 
 	private:
-		glm::vec3 m_Constant = glm::vec3(1.0f);
+		Variant m_Constant = glm::vec3(1.0f);
 	};
 
 	class ShaderConstantVec2Node : public ShaderNodeConstant {
@@ -98,7 +98,7 @@ namespace RealEngine {
 		const char* GetName() const override { return s_Name; }
 		const char* GetOptionPath() const override { return s_OptionPath; }
 
-		void* GetConstant() const { return (void*)&m_Constant; }
+		const Variant& GetConstant() const { return m_Constant; }
 		void SetConstant(void* constant) { m_Constant = (glm::vec2&)constant; }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
@@ -107,7 +107,7 @@ namespace RealEngine {
 		inline static const char* s_OptionPath = "Vectors/Constants";
 
 	private:
-		glm::vec2 m_Constant = glm::vec2(1.0f);
+		Variant m_Constant = glm::vec2(1.0f);
 	};
 
 	class ShaderConstantFloatNode : public ShaderNodeConstant {
@@ -117,7 +117,7 @@ namespace RealEngine {
 		const char* GetName() const override { return s_Name; }
 		const char* GetOptionPath() const override { return s_OptionPath; }
 
-		void* GetConstant() const { return (void*)&m_Constant; }
+		const Variant& GetConstant() const { return m_Constant; }
 		void SetConstant(void* constant) { m_Constant = *(float*)constant; }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
@@ -126,6 +126,6 @@ namespace RealEngine {
 		inline static const char* s_OptionPath = "Vectors/Constants";
 
 	private:
-		float m_Constant = 1.0f;
+		Variant m_Constant = 1.0f;
 	};
 }

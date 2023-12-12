@@ -96,7 +96,7 @@ namespace RealEngine {
 	}
 
 	std::string ShaderConstantVec4Node::GenerateCode(std::string* outputVars, std::string* inputVars) const {
-		return "\t" + outputVars[0] + " = " + glm::to_string(m_Constant) + "; \n";
+		return "\t" + outputVars[0] + " = " + (std::string)m_Constant + "; \n";
 	}
 
 	ShaderConstantVec3Node::ShaderConstantVec3Node()
@@ -105,7 +105,7 @@ namespace RealEngine {
 	}
 
 	std::string ShaderConstantVec3Node::GenerateCode(std::string* outputVars, std::string* inputVars) const {
-		return "\t" + outputVars[0] + " = " + glm::to_string(m_Constant) + "; \n";
+		return "\t" + outputVars[0] + " = " + (std::string)m_Constant + "; \n";
 	}
 
 	ShaderConstantVec2Node::ShaderConstantVec2Node()
@@ -114,7 +114,7 @@ namespace RealEngine {
 	}
 
 	std::string ShaderConstantVec2Node::GenerateCode(std::string* outputVars, std::string* inputVars) const {
-		return "\t" + outputVars[0] + " = " + glm::to_string(m_Constant) + "; \n";
+		return "\t" + outputVars[0] + " = " + (std::string)m_Constant + "; \n";
 	}
 
 	ShaderConstantFloatNode::ShaderConstantFloatNode()
@@ -123,7 +123,7 @@ namespace RealEngine {
 	}
 
 	std::string ShaderConstantFloatNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
-		return "\t" + outputVars[0] + " = " + std::to_string(m_Constant) + "; \n";
+		return "\t" + outputVars[0] + " = " + (std::string)m_Constant + "; \n";
 	}
 }
 

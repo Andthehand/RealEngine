@@ -229,16 +229,16 @@ namespace RealEngine {
 					if (constantNode != nullptr) {
 						switch (output.Type) {
 							case PinType::Vector4:
-								ImNode::DrawNodeVec4Control((glm::vec4*)constantNode->GetConstant());
+								ImNode::DrawNodeControlN(constantNode->GetConstant(), 4);
 								break;
 							case PinType::Vector3:
-								ImNode::DrawNodeVec3Control((glm::vec3*)constantNode->GetConstant());
+								ImNode::DrawNodeControlN(constantNode->GetConstant(), 3);
 								break;
 							case PinType::Vector2:
-								ImNode::DrawNodeVec2Control((glm::vec2*)constantNode->GetConstant());
+								ImNode::DrawNodeControlN(constantNode->GetConstant(), 2);
 								break;
 							case PinType::Float:
-								ImNode::DrawNodeControlN((float*)constantNode->GetConstant(), 1);
+								ImNode::DrawNodeControlN(constantNode->GetConstant(), 1);
 								break;
 							default:
 								RE_ASSERT(false, "Constant pin type not implemented");

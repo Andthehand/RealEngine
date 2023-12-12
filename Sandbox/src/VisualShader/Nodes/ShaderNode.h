@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 
+#include <RealEngine/Utils/Variant.h>
+
 #include "../ImNode.h"
 
 namespace RealEngine {
@@ -73,7 +75,7 @@ namespace RealEngine {
 		ShaderNodeConstant()
 			: ShaderNode() {}
 
-		virtual void* GetConstant() const = 0;
+		virtual const Variant& GetConstant() const = 0;
 		virtual void SetConstant(void* constant) = 0;
 	};
 }
