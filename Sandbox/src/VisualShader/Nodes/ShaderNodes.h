@@ -61,7 +61,7 @@ namespace RealEngine {
 		const char* GetOptionPath() const override { return s_OptionPath; }
 		
 		const Variant& GetConstant() const { return m_Constant; }
-		void SetConstant(void* constant) { m_Constant = (glm::vec4&)constant; }
+		void SetConstant(Variant constant) { m_Constant = std::move(constant); }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 	public:
@@ -80,7 +80,7 @@ namespace RealEngine {
 		const char* GetOptionPath() const override { return s_OptionPath; }
 
 		const Variant& GetConstant() const override { return m_Constant; }
-		void SetConstant(void* constant) override { m_Constant = (glm::vec3&)constant; }
+		void SetConstant(Variant constant) override { m_Constant = std::move(constant); }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 	public:
@@ -99,7 +99,7 @@ namespace RealEngine {
 		const char* GetOptionPath() const override { return s_OptionPath; }
 
 		const Variant& GetConstant() const { return m_Constant; }
-		void SetConstant(void* constant) { m_Constant = (glm::vec2&)constant; }
+		void SetConstant(Variant constant) { m_Constant = std::move(constant); }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 	public:
@@ -118,7 +118,7 @@ namespace RealEngine {
 		const char* GetOptionPath() const override { return s_OptionPath; }
 
 		const Variant& GetConstant() const { return m_Constant; }
-		void SetConstant(void* constant) { m_Constant = *(float*)constant; }
+		void SetConstant(Variant constant) { m_Constant = std::move(constant); }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 	public:

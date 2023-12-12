@@ -52,6 +52,33 @@ namespace RealEngine {
 		m_Type = VECTOR4I;
 	}
 
+	Variant::Variant(const Variant& p_other) {
+		m_Type = p_other.m_Type;
+		switch (m_Type) {
+			case STRING:
+				m_Data._string = new std::string(*p_other.m_Data._string);
+				break;
+			case VECTOR2:
+				m_Data._vec2 = new glm::vec2(*p_other.m_Data._vec2);
+				break;
+			case VECTOR2I:
+				m_Data._vec2i = new glm::ivec2(*p_other.m_Data._vec2i);
+				break;
+			case VECTOR3:
+				m_Data._vec3 = new glm::vec3(*p_other.m_Data._vec3);
+				break;
+			case VECTOR3I:
+				m_Data._vec3i = new glm::ivec3(*p_other.m_Data._vec3i);
+				break;
+			case VECTOR4:
+				m_Data._vec4 = new glm::vec4(*p_other.m_Data._vec4);
+				break;
+			case VECTOR4I:
+				m_Data._vec4i = new glm::ivec4(*p_other.m_Data._vec4i);
+				break;
+		}
+	}
+
 	Variant::~Variant() {
 		switch (m_Type) {
 			case STRING:
@@ -76,6 +103,34 @@ namespace RealEngine {
 				delete m_Data._vec4i;
 				break;
 		}
+	}
+
+	Variant& Variant::operator=(const Variant& p_other) {
+		m_Type = p_other.m_Type;
+		switch (m_Type) {
+			case STRING:
+				m_Data._string = new std::string(*p_other.m_Data._string);
+				break;
+			case VECTOR2:
+				m_Data._vec2 = new glm::vec2(*p_other.m_Data._vec2);
+				break;
+			case VECTOR2I:
+				m_Data._vec2i = new glm::ivec2(*p_other.m_Data._vec2i);
+				break;
+			case VECTOR3:
+				m_Data._vec3 = new glm::vec3(*p_other.m_Data._vec3);
+				break;
+			case VECTOR3I:
+				m_Data._vec3i = new glm::ivec3(*p_other.m_Data._vec3i);
+				break;
+			case VECTOR4:
+				m_Data._vec4 = new glm::vec4(*p_other.m_Data._vec4);
+				break;
+			case VECTOR4I:
+				m_Data._vec4i = new glm::ivec4(*p_other.m_Data._vec4i);
+				break;
+		}
+		return *this;
 	}
 
 	Variant::operator void* () const {

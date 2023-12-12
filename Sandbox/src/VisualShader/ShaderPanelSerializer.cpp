@@ -1,13 +1,220 @@
 #include "ShaderPanelSerializer.h"
+#include "ImNode.h"
 
 #include <filesystem>
 #include <fstream>
 
 #include <yaml-cpp/yaml.h>
 
-#include "ImNode.h"
+//TODO: Move this to a separate utils file in RealEngine
+namespace YAML {
+	template<>
+	struct convert<glm::vec2> {
+		static Node encode(const glm::vec2& rhs) {
+			Node node;
+			node.push_back(rhs.x);
+			node.push_back(rhs.y);
+			node.SetStyle(EmitterStyle::Flow);
+			return node;
+		}
+
+		static bool decode(const Node& node, glm::vec2& rhs) {
+			if (!node.IsSequence() || node.size() != 2)
+				return false;
+
+			rhs.x = node[0].as<float>();
+			rhs.y = node[1].as<float>();
+			return true;
+		}
+	};
+
+	template<>
+	struct convert<glm::ivec2> {
+		static Node encode(const glm::ivec2& rhs) {
+			Node node;
+			node.push_back(rhs.x);
+			node.push_back(rhs.y);
+			node.SetStyle(EmitterStyle::Flow);
+			return node;
+		}
+
+		static bool decode(const Node& node, glm::ivec2& rhs) {
+			if (!node.IsSequence() || node.size() != 2)
+				return false;
+
+			rhs.x = node[0].as<int>();
+			rhs.y = node[1].as<int>();
+			return true;
+		}
+	};
+
+	template<>
+	struct convert<glm::vec3> {
+		static Node encode(const glm::vec3& rhs) {
+			Node node;
+			node.push_back(rhs.x);
+			node.push_back(rhs.y);
+			node.push_back(rhs.z);
+			node.SetStyle(EmitterStyle::Flow);
+			return node;
+		}
+
+		static bool decode(const Node& node, glm::vec3& rhs) {
+			if (!node.IsSequence() || node.size() != 3)
+				return false;
+
+			rhs.x = node[0].as<float>();
+			rhs.y = node[1].as<float>();
+			rhs.z = node[2].as<float>();
+			return true;
+		}
+	};
+
+	template<>
+	struct convert<glm::ivec3> {
+		static Node encode(const glm::ivec3& rhs) {
+			Node node;
+			node.push_back(rhs.x);
+			node.push_back(rhs.y);
+			node.push_back(rhs.z);
+			node.SetStyle(EmitterStyle::Flow);
+			return node;
+		}
+
+		static bool decode(const Node& node, glm::ivec3& rhs) {
+			if (!node.IsSequence() || node.size() != 3)
+				return false;
+
+			rhs.x = node[0].as<int>();
+			rhs.y = node[1].as<int>();
+			rhs.z = node[2].as<int>();
+			return true;
+		}
+	};
+
+	template<>
+	struct convert<glm::vec4> {
+		static Node encode(const glm::vec4& rhs) {
+			Node node;
+			node.push_back(rhs.x);
+			node.push_back(rhs.y);
+			node.push_back(rhs.z);
+			node.push_back(rhs.w);
+			node.SetStyle(EmitterStyle::Flow);
+			return node;
+		}
+
+		static bool decode(const Node& node, glm::vec4& rhs) {
+			if (!node.IsSequence() || node.size() != 4)
+				return false;
+
+			rhs.x = node[0].as<float>();
+			rhs.y = node[1].as<float>();
+			rhs.z = node[2].as<float>();
+			rhs.w = node[3].as<float>();
+			return true;
+		}
+	};
+
+	template<>
+	struct convert<glm::ivec4> {
+		static Node encode(const glm::ivec4& rhs) {
+			Node node;
+			node.push_back(rhs.x);
+			node.push_back(rhs.y);
+			node.push_back(rhs.z);
+			node.push_back(rhs.w);
+			node.SetStyle(EmitterStyle::Flow);
+			return node;
+		}
+
+		static bool decode(const Node& node, glm::ivec4& rhs) {
+			if (!node.IsSequence() || node.size() != 4)
+				return false;
+
+			rhs.x = node[0].as<int>();
+			rhs.y = node[1].as<int>();
+			rhs.z = node[2].as<int>();
+			rhs.w = node[3].as<int>();
+			return true;
+		}
+	};
+}
 
 namespace RealEngine {	
+	namespace Utils {
+		static inline std::string GetVariantTypeName(const Variant& variant) {
+			switch (variant.m_Type) {
+				case Variant::Type::BOOL:		return "Bool";
+				case Variant::Type::INT:		return "Int";
+				case Variant::Type::FLOAT:		return "Float";
+				case Variant::Type::STRING:		return "String";
+				case Variant::Type::VECTOR2:	return "Vector2";
+				case Variant::Type::VECTOR2I:	return "Vector2i";
+				case Variant::Type::VECTOR3:	return "Vector3";
+				case Variant::Type::VECTOR3I:	return "Vector3i";
+				case Variant::Type::VECTOR4:	return "Vector4";
+				case Variant::Type::VECTOR4I:	return "Vector4i";
+				default:
+					RE_CORE_ASSERT(false, "Variant type unknown");
+					return "Unknown";
+			}
+		}
+
+		static inline Variant::Type GetVariantTypeFromString(const std::string& type) {
+			if (type == "Bool")				return Variant::Type::BOOL;
+			else if (type == "Int")			return Variant::Type::INT;
+			else if (type == "Float")		return Variant::Type::FLOAT;
+			else if (type == "String")		return Variant::Type::STRING;
+			else if (type == "Vector2")		return Variant::Type::VECTOR2;
+			else if (type == "Vector2i")	return Variant::Type::VECTOR2I;
+			else if (type == "Vector3")		return Variant::Type::VECTOR3;
+			else if (type == "Vector3i")	return Variant::Type::VECTOR3I;
+			else if (type == "Vector4")		return Variant::Type::VECTOR4;
+			else if (type == "Vector4i")	return Variant::Type::VECTOR4I;
+			
+			RE_CORE_ASSERT(false, "Variant type unknown");
+			return Variant::Type::NIL;
+		}
+	}
+
+	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec2& v) {
+		out << YAML::Flow;
+		out << YAML::BeginSeq << v.x << v.y << YAML::EndSeq;
+		return out;
+	}
+
+	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::ivec2& v) {
+		out << YAML::Flow;
+		out << YAML::BeginSeq << v.x << v.y << YAML::EndSeq;
+		return out;
+	}
+
+
+	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& v) {
+		out << YAML::Flow;
+		out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
+		return out;
+	}
+
+	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::ivec3& v) {
+		out << YAML::Flow;
+		out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
+		return out;
+	}
+
+	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec4& v) {
+		out << YAML::Flow;
+		out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
+		return out;
+	}
+
+	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::ivec4& v) {
+		out << YAML::Flow;
+		out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
+		return out;
+	}
+
 	void ShaderPanelSerializer::Serialize(Ref<ShaderPanel> shaderPanel[2], const std::filesystem::path& filepath) {
 		RE_PROFILE_FUNCTION();
 
@@ -37,6 +244,58 @@ namespace RealEngine {
 					}
 				}
 				out << YAML::EndSeq;
+
+				//Constant Node
+				ShaderNodeConstant* constantNode = dynamic_cast<ShaderNodeConstant*>(node.get());
+				if (constantNode) {
+					const Variant& constant = constantNode->GetConstant();
+					out << YAML::Key << "Constant" << YAML::Value << YAML::BeginSeq;
+					
+					out << YAML::BeginMap;
+					out << YAML::Key << "Type" << YAML::Value << Utils::GetVariantTypeName(constant);
+					out << YAML::Key << "Value" << YAML::Value;
+					
+					//Use C style casts
+					switch (constant.m_Type) {
+						case Variant::Type::BOOL:
+							out << (bool)constant;
+							break;
+						case Variant::Type::INT:
+							out << (int)constant;
+							break;
+						case Variant::Type::FLOAT:
+							out << (float)constant;
+							break;
+						case Variant::Type::STRING:
+							out << (std::string)constant;
+							break;
+						case Variant::Type::VECTOR2:
+							out << (glm::vec2)constant;
+							break;
+						case Variant::Type::VECTOR2I:
+							out << (glm::ivec2)constant;
+							break;
+						case Variant::Type::VECTOR3:
+							out << (glm::vec3)constant;
+							break;
+						case Variant::Type::VECTOR3I:
+							out << (glm::ivec3)constant;
+							break;
+						case Variant::Type::VECTOR4:
+							out << (glm::vec4)constant;
+							break;
+						case Variant::Type::VECTOR4I:
+							out << (glm::ivec4)constant;
+							break;
+						default:
+							RE_CORE_ASSERT(false, "Variant type unknown");
+							break;
+					}
+
+					out << YAML::EndMap;
+					
+					out << YAML::EndSeq;
+				}
 
 				if (node->ID.Get() > largestID)
 					largestID = node->ID.Get();
@@ -96,7 +355,52 @@ namespace RealEngine {
 				std::string optionPath = node["Option Path"].as<std::string>();
 				int nextID = node["ID"].as<int>();
 				UniqueId::SetNextID(nextID);
-				shaderPanels[i]->AddNodeByRegisterTree(optionPath);
+				Ref<ShaderNode> shaderNode = shaderPanels[i]->AddNodeByRegisterTree(optionPath);
+
+				//Constant Node
+				ShaderNodeConstant* constantNode = dynamic_cast<ShaderNodeConstant*>(shaderNode.get());
+				if (constantNode) {
+					const auto& constant = node["Constant"][0];
+					Variant::Type type = Utils::GetVariantTypeFromString(constant["Type"].as<std::string>());
+					
+					switch (type) {
+						case Variant::Type::BOOL:
+							constantNode->SetConstant(constant["Value"].as<bool>());
+							break;
+						case Variant::Type::INT:
+							constantNode->SetConstant(constant["Value"].as<int>());
+							break;
+						case Variant::Type::FLOAT:
+							constantNode->SetConstant(constant["Value"].as<float>());
+							break;
+						case Variant::Type::STRING:
+							constantNode->SetConstant(constant["Value"].as<std::string>());
+							break;
+						case Variant::Type::VECTOR2:
+							constantNode->SetConstant(constant["Value"].as<glm::vec2>());
+							break;
+						case Variant::Type::VECTOR2I:
+							constantNode->SetConstant(constant["Value"].as<glm::ivec2>());
+							break;
+						case Variant::Type::VECTOR3:
+							constantNode->SetConstant(constant["Value"].as<glm::vec3>());
+							break;
+						case Variant::Type::VECTOR3I:
+							constantNode->SetConstant(constant["Value"].as<glm::ivec3>());
+							break;
+						case Variant::Type::VECTOR4:
+							constantNode->SetConstant(constant["Value"].as<glm::vec4>());
+							break;
+						case Variant::Type::VECTOR4I:
+							constantNode->SetConstant(constant["Value"].as<glm::ivec4>());
+							break;
+						default:
+							RE_CORE_ASSERT(false, "Variant type unknown");
+							break;
+					}
+
+
+				}
 			}
 			shaderPanels[i]->BuildNodes();
 

@@ -41,9 +41,9 @@ namespace RealEngine {
 		void Compile(std::string* uberShader);
 
 		const std::vector<Ref<ShaderNode>>& GetNodes() const { return m_Nodes; }
-		void AddNodeByRegisterTree(std::string category) {
+		Ref<ShaderNode> AddNodeByRegisterTree(std::string category) {
 			if(category.empty())
-				return;
+				return nullptr;
 
 			size_t pos = category.find("/");
 			Node<CreateOptions>* currentNode = s_CreateOptions.GetRoot();
@@ -61,7 +61,7 @@ namespace RealEngine {
 				if(it != children.end())
 					currentNode = *it;
 				else
-					return;
+					return nullptr;
 
 				pos = category.find("/");
 			}
@@ -76,10 +76,10 @@ namespace RealEngine {
 				if (it != children.end())
 					currentNode = *it;
 				else
-					return;
+					return nullptr;
 			}
 
-			m_Nodes.emplace_back(currentNode->GetData().CreateFunction());
+			return m_Nodes.emplace_back(currentNode->GetData().CreateFunction());
 		}
 		//This has to be called every time a node is added because the node pointers inside of the pins will be corrupted
 		void BuildNodes();

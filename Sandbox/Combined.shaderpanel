@@ -4,7 +4,16 @@ Nodes:
     Option Path: /Fragment Output
     ID: 1
     Links:
+      - Input ID: 2
+        Output ID: 8
+  - Name: Constanct Vector2
+    Option Path: Vectors/Constants/Constanct Vector2
+    ID: 7
+    Links:
       []
+    Constant:
+      - Type: Vector2
+        Value: [0.25, 0.5]
 ---
 Shader Type: Fragment
 Nodes:

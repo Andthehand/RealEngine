@@ -76,6 +76,6 @@ namespace RealEngine {
 			: ShaderNode() {}
 
 		virtual const Variant& GetConstant() const = 0;
-		virtual void SetConstant(void* constant) = 0;
+		virtual void SetConstant(Variant constant) = 0;
 	};
 }

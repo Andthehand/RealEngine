@@ -16,7 +16,11 @@ namespace RealEngine {
 		Variant(const glm::vec4& p_vec4);
 		Variant(const glm::ivec4& p_vec4i);
 
+		Variant(const Variant& p_other);
+
 		~Variant();
+
+		Variant& operator=(const Variant& p_other);
 
 		operator void*() const;
 
