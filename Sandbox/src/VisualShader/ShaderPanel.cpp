@@ -352,7 +352,6 @@ namespace RealEngine {
 		ImNode::EndCreate(); // Wraps up object creation action handling.
 
 
-		// Handle deletion action
 		if (ImNode::BeginDelete()) {
 			// There may be many links marked for deletion, let's loop over them.
 			ImNode::LinkId deletedLinkId;
@@ -374,6 +373,30 @@ namespace RealEngine {
 
 					m_Links.erase(&link);
 				}
+			}
+
+			ImNode::NodeId deletedNodeId;
+			while (ImNode::QueryDeletedNode(&deletedNodeId)) {
+				// If you agree that node can be deleted, accept deletion.
+				if (!ImNode::AcceptDeletedItem())
+					continue;
+
+				Ref<ShaderNode> deletedNode = FindNode(deletedNodeId);
+				for (Pin& input : deletedNode->Inputs) {
+					m_Links.erase(FindPinLink(input.ID));
+
+					input.ConnectedPin->ConnectedPin = nullptr;
+					input.ConnectedPin = nullptr;
+				}
+
+				for (Pin& output : deletedNode->Outputs) {
+					m_Links.erase(FindPinLink(output.ID));
+
+					output.ConnectedPin->ConnectedPin = nullptr;
+					output.ConnectedPin = nullptr;
+				}
+
+				m_Nodes.erase(std::find(m_Nodes.begin(), m_Nodes.end(), deletedNode));
 			}
 		}
 		ImNode::EndDelete();
@@ -532,6 +555,15 @@ namespace RealEngine {
 		RegisterNodeType<ShaderConstantFloatNode>();
 		RegisterNodeType<ShaderConstantIntNode>();
 		RegisterNodeType<ShaderConstantBoolNode>();
+	}
+
+	Ref<ShaderNode> ShaderPanel::FindNode(ImNode::NodeId id) {
+		for (Ref<ShaderNode>& node : m_Nodes)
+			if (node->ID == id)
+				return node;
+
+		RE_CORE_ASSERT(false, "Coundn't find Node");
+		return nullptr;
 	}
 
 	Pin* ShaderPanel::FindPin(ImNode::PinId id) {

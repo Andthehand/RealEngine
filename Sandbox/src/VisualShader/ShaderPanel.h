@@ -95,6 +95,7 @@ namespace RealEngine {
 		void RecursiveOptionsMenu(const std::vector<Node<CreateOptions>*>& children);
 		void RecursiveSearch(const ShaderNode* currentNode, StringBuilder& shaderCode, StringBuilder& globalCode, std::unordered_set<uint64_t>* nodeTracking);
 
+		Ref<ShaderNode> FindNode(ImNode::NodeId id);
 		Pin* FindPin(ImNode::PinId id);
 		Link* FindPinLink(ImNode::PinId id);
 		bool IsPinLinked(ImNode::PinId id);
