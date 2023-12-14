@@ -402,7 +402,7 @@ namespace RealEngine {
 		ImNode::EndDelete();
 	}
 
-	void ShaderPanel::RecursiveSearch(const ShaderNode* currentNode, StringBuilder& shaderCode, StringBuilder& globalCode, std::unordered_set<uint64_t>* nodeTracking) {
+	void ShaderPanel::RecursiveSearch(const ShaderNode* currentNode, CompileData* shaderCode, std::unordered_set<uint64_t>* nodeTracking) {
 		//Going down the chain of Nodes until it reaches the end
 		for (const Pin& inputPin: currentNode->Inputs) {
 			//If the Node isn't connected continue
@@ -413,7 +413,7 @@ namespace RealEngine {
 			const uint64_t nextNodeID = (uint64_t)inputPin.ConnectedPin->Node->ID;
 			if(nodeTracking->find(nextNodeID) == nodeTracking->end()) {
 				nodeTracking->insert(nextNodeID);
-				RecursiveSearch(inputPin.ConnectedPin->Node, shaderCode, globalCode, nodeTracking);
+				RecursiveSearch(inputPin.ConnectedPin->Node, shaderCode, nodeTracking);
 			}
 		}
 
@@ -523,26 +523,18 @@ namespace RealEngine {
 		}
 
 		//Variable names are always out_NodeName_PinName
-		shaderCode += currentNode->GenerateCode(outputs, inputs);
-		globalCode += currentNode->GenerateGlobalCode(inputs);
+		shaderCode->ShaderCode += currentNode->GenerateCode(outputs, inputs);
+		shaderCode->ShaderGlobalCode += currentNode->GenerateGlobalCode(inputs, &shaderCode->ShaderDefines);
 	}
 
-	void ShaderPanel::Compile(std::string* shader) {
-		StringBuilder shaderCode;
-		StringBuilder globalCode;
-
+	CompileData ShaderPanel::Compile() {
 		std::unordered_set<uint64_t> nodeTracking;
 
+		CompileData shaderCode;
 		//m_Nodes[0] is always the output node
-		RecursiveSearch(m_Nodes[0].get(), shaderCode, globalCode, &nodeTracking);
+		RecursiveSearch(m_Nodes[0].get(), &shaderCode, &nodeTracking);
 
-		std::string globalCodeStr = globalCode.as_string();
-
-		size_t pos = shader->find("#GlobalCustomCode");
-		shader->replace(pos, 17, globalCodeStr);
-
-		pos = shader->find("#CustomCode", pos);
-		shader->replace(pos, 11, shaderCode.as_string());
+		return shaderCode;
 	}
 
 	void ShaderPanel::RegisterNodeTypes() {

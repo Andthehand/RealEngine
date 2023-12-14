@@ -42,7 +42,7 @@ namespace RealEngine {
 		const char* GetOptionPath() const override { return s_OptionPath; }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
-		std::string GenerateGlobalCode(std::string* inputVars) const override;
+		std::string GenerateGlobalCode(std::string* inputVars, std::vector<std::string>* defines) const override;
 	public:
 		inline static const char* s_Name = "Texture2D";
 		inline static const char* s_OptionPath = "Textures";

@@ -172,9 +172,9 @@ namespace RealEngine {
 			case BOOL:
 				return m_Data._bool;
 			case INT:
-				return m_Data._int;
+				return (int)m_Data._int;
 			case FLOAT:
-				return m_Data._float;
+				return (int)m_Data._float;
 			case STRING:
 				return std::stoi(*m_Data._string);
 			default:
@@ -190,7 +190,7 @@ namespace RealEngine {
 			case BOOL:
 				return m_Data._bool;
 			case INT:
-				return m_Data._int;
+				return (float)m_Data._int;
 			case FLOAT:
 				return m_Data._float;
 			case STRING:

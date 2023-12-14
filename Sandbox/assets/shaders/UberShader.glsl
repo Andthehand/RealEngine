@@ -4,8 +4,6 @@
 in vec3 a_Position;
 in vec2 a_UV;
 
-#define IMPLEMENTUV
-
 #ifdef IMPLEMENTUV
 out vec2 v_UV;
 #endif
@@ -22,8 +20,6 @@ void main() {
 
 #type fragment
 #version 450 core
-
-#define IMPLEMENTUV
 
 #ifdef IMPLEMENTUV
 in vec2 v_UV;

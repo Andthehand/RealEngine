@@ -110,11 +110,9 @@ namespace RealEngine {
 		return result;
 	}
 	
-	void ShaderPanelManager::PreProcessUbershader(std::filesystem::path& ubershader, std::string* vertex, std::string* fragment) {
+	void ShaderPanelManager::PreProcess(std::filesystem::path& ubershader, std::string shaders[2], CompileData shaderData[2]) {
 		std::string ubershaderSource = ReadFile(ubershader);
 		
-		std::string* shaders[2] = { vertex, fragment };
-
 		const char* typeToken = "#type";
 		size_t typeTokenLength = strlen(typeToken);
 		size_t pos = ubershaderSource.find(typeToken, 0); //Start of shader type declaration line
@@ -129,24 +127,33 @@ namespace RealEngine {
 			RE_CORE_ASSERT(nextLinePos != std::string::npos, "Syntax error");
 			pos = ubershaderSource.find(typeToken, nextLinePos); //Start of next shader type declaration line
 
-			*shaders[shaderIndex] = (pos == std::string::npos) ? ubershaderSource.substr(nextLinePos) : ubershaderSource.substr(nextLinePos, pos - nextLinePos);
+			shaders[shaderIndex] = (pos == std::string::npos) ? ubershaderSource.substr(nextLinePos) : ubershaderSource.substr(nextLinePos, pos - nextLinePos);
+
+			size_t pos = shaders[shaderIndex].find("#GlobalCustomCode");
+			shaders[shaderIndex].replace(pos, 17, shaderData[shaderIndex].ShaderGlobalCode);
+			pos = shaders[shaderIndex].find("#CustomCode", pos);
+			shaders[shaderIndex].replace(pos, 11, shaderData[shaderIndex].ShaderCode);
 			shaderIndex++;
 		}
 	}
 
 	void ShaderPanelManager::Compile() {
-		std::string vertexShader;
-		std::string fragmentShader;
+		std::string shaders[2];
+		CompileData shaderData[2];
+		
+		shaderData[0] = m_ShaderPanels[ShaderType::Vertex]->Compile();
+		shaderData[1] = m_ShaderPanels[ShaderType::Fragment]->Compile();
+		PreProcess((std::filesystem::path)"assets/shaders/UberShader.glsl", shaders, shaderData);
 
-		PreProcessUbershader((std::filesystem::path)"assets/shaders/UberShader.glsl", &vertexShader, &fragmentShader);
+		RE_CORE_WARN("ShaderCode:\n{0}", shaders[0]);
+		RE_CORE_WARN("ShaderCode:\n{0}", shaders[1]);
 
-		m_ShaderPanels[ShaderType::Vertex]->Compile(&vertexShader);
-		m_ShaderPanels[ShaderType::Fragment]->Compile(&fragmentShader);
+		std::vector<std::string> defines;
+		defines.reserve(shaderData[0].ShaderDefines.size() + shaderData[1].ShaderDefines.size());
+		defines.insert(defines.end(), shaderData[0].ShaderDefines.begin(), shaderData[0].ShaderDefines.end());
+		defines.insert(defines.end(), shaderData[1].ShaderDefines.begin(), shaderData[1].ShaderDefines.end());
 
-		RE_CORE_WARN("ShaderCode:\n{0}", vertexShader);
-		RE_CORE_WARN("ShaderCode:\n{0}", fragmentShader);
-
-		m_PreviewShader = Shader::Create("Preview Shader", vertexShader, fragmentShader, std::vector<std::string>{ "IMPLEMENTUV" }, &m_Reflect);
+		m_PreviewShader = Shader::Create("Preview Shader", shaders[0], shaders[1], defines, &m_Reflect);
 
 		//for (auto& shaderCode : m_Reflect.ShaderCode)
 		//	RE_CORE_WARN("ShaderCode:\n{0}", shaderCode);

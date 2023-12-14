@@ -30,6 +30,12 @@ namespace RealEngine {
 		std::function<Ref<ShaderNode>()> CreateFunction;
 	};
 
+	struct CompileData {
+		StringBuilder ShaderGlobalCode;
+		StringBuilder ShaderCode;
+		std::vector<std::string> ShaderDefines;
+	};
+
 	class ShaderPanel {
 	public:
 		ShaderPanel(const char* type);
@@ -37,7 +43,7 @@ namespace RealEngine {
 		void SetHeaderBackground(const Ref<Texture2D> texture) { m_HeaderBackground = texture; }
 
 		void OnImGuiRender();
-		void Compile(std::string* uberShader);
+		CompileData Compile();
 
 		const std::vector<Ref<ShaderNode>>& GetNodes() const { return m_Nodes; }
 		Ref<ShaderNode> AddNodeByRegisterTree(std::string category) {
@@ -93,7 +99,7 @@ namespace RealEngine {
 		void HandleInteraction();
 
 		void RecursiveOptionsMenu(const std::vector<Node<CreateOptions>*>& children);
-		void RecursiveSearch(const ShaderNode* currentNode, StringBuilder& shaderCode, StringBuilder& globalCode, std::unordered_set<uint64_t>* nodeTracking);
+		void RecursiveSearch(const ShaderNode* currentNode, CompileData* shaderCode, std::unordered_set<uint64_t>* nodeTracking);
 
 		Ref<ShaderNode> FindNode(ImNode::NodeId id);
 		Pin* FindPin(ImNode::PinId id);

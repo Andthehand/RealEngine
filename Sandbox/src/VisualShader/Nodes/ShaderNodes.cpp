@@ -80,12 +80,15 @@ namespace RealEngine {
 		}
 	}
 
-	std::string ShaderTextureNode::GenerateGlobalCode(std::string* inputVars) const {
+	std::string ShaderTextureNode::GenerateGlobalCode(std::string* inputVars, std::vector<std::string>* defines) const {
 		std::string code;
 
 		if (inputVars[0].empty()) {
 			code += "uniform sampler2D " + GetUniformName(&Inputs[0]) + ";\n";
 		}
+
+		if(inputVars[1].empty())
+			defines->emplace_back("IMPLEMENTUV");
 		
 		return code;
 	}

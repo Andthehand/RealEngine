@@ -21,7 +21,7 @@ namespace RealEngine {
 		void OnUpdate();
 
 		std::string ShaderPanelManager::ReadFile(const std::filesystem::path& filepath);
-		void PreProcessUbershader(std::filesystem::path& ubershader, std::string* vertex, std::string* fragment);
+		void PreProcess(std::filesystem::path& ubershader, std::string shaders[2], CompileData shaderData[2]);
 		void Compile();
 		
 		Ref<Shader> GetShader() { return m_PreviewShader; }
