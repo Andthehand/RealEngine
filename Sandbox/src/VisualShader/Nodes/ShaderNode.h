@@ -21,6 +21,10 @@ namespace RealEngine {
 		Sampler2D,
 	};
 
+	enum class ContentType {
+		ComboBox
+	};
+
 	struct Pin {
 		Pin(const char* name, PinType type)
 			: ID(UniqueId::GetNextId()), Name(name), Type(type), Kind(PinKind::Input) {}
@@ -57,6 +61,18 @@ namespace RealEngine {
 		virtual const char* GetName() const = 0;
 		virtual const char* GetOptionPath() const = 0;
 
+		virtual const std::vector<const char*>& GetVariantOptions(int index) const {
+			RE_CORE_ASSERT(false); 
+			return std::vector<const char*>();
+		};
+		virtual const std::vector<int>& GetVariantOptionsIndex() const { 
+			RE_CORE_ASSERT(false);
+			return std::vector<int>();
+		};
+		virtual void SetVariantOptionsIndex(int vectorIndex, int stringIndex) {
+			RE_CORE_ASSERT(false);
+		};
+
 		virtual std::string GenerateCode(std::string* outputVars, std::string* inputVars) const = 0;
 		virtual std::string GenerateGlobalCode(std::string* inputVars, std::vector<std::string>* defines) const { return ""; }
 
@@ -68,6 +84,7 @@ namespace RealEngine {
 
 		std::vector<Pin> Inputs;
 		std::vector<Pin> Outputs;
+		std::vector<ContentType> Content;
 	};
 
 	class ShaderNodeConstant : public ShaderNode {

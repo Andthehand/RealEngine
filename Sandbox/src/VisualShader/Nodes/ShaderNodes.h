@@ -48,10 +48,130 @@ namespace RealEngine {
 		inline static const char* s_OptionPath = "Textures";
 	};
 
+	////////////////////////////////
+	///////////Inputs///////////////
+	////////////////////////////////
+
+	class ShaderInputNode : public ShaderNode {
+	public:
+		ShaderInputNode();
+
+		const char* GetName() const override { return s_Name; }
+		const char* GetOptionPath() const override { return s_OptionPath; }
+
+		const std::vector<const char*>& GetVariantOptions(int index) const override { return m_InputTypes[index]; };
+		const std::vector<int>& GetVariantOptionsIndex() const override { return m_InputTypesIndex; };
+		void SetVariantOptionsIndex(int vectorIndex, int stringIndex) override { m_InputTypesIndex[vectorIndex] = stringIndex; };
+
+		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
+		std::string GenerateGlobalCode(std::string* inputVars, std::vector<std::string>* defines) const override;
+	public:
+		inline static const char* s_Name = "Input";
+		inline static const char* s_OptionPath = "Inputs";
+
+	private:
+		std::vector<int> m_InputTypesIndex = { 0 };
+
+		static inline std::array<std::vector<const char*>, 1> m_InputTypes = {
+			{
+				{"Position", "UV"}
+			}
+		};
+	};
 
 	////////////////////////////////
-	///////////Constants////////////
+	///////////Vectors//////////////
 	////////////////////////////////
+
+	class ShaderVectorComposeNode : public ShaderNode {
+	public:
+		ShaderVectorComposeNode();
+
+		const char* GetName() const override { return s_Name; }
+		const char* GetOptionPath() const override { return s_OptionPath; }
+
+		const std::vector<const char*>& GetVariantOptions(int index) const override { return m_VectorTypes[index]; };
+		const std::vector<int>& GetVariantOptionsIndex() const override { return m_VectorTypesIndex; };
+		void SetVariantOptionsIndex(int vectorIndex, int stringIndex) override { m_VectorTypesIndex[vectorIndex] = stringIndex; };
+
+		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
+	public:
+		inline static const char* s_Name = "Vector Compose";
+		inline static const char* s_OptionPath = "Vectors/Composition";
+	private:
+		std::vector<int> m_VectorTypesIndex = { 0 };
+
+		static inline std::array<std::vector<const char*>, 1> m_VectorTypes = {
+			{
+				{"Vector2", "Vector3", "Vector4"}
+			}
+		};
+	};
+
+	class ShaderVectorDecomposeNode : public ShaderNode {
+	public:
+		ShaderVectorDecomposeNode();
+
+		const char* GetName() const override { return s_Name; }
+		const char* GetOptionPath() const override { return s_OptionPath; }
+
+		const std::vector<const char*>& GetVariantOptions(int index) const override { return m_VectorTypes[index]; };
+		const std::vector<int>& GetVariantOptionsIndex() const override { return m_VectorTypesIndex; };
+		void SetVariantOptionsIndex(int vectorIndex, int stringIndex) override { m_VectorTypesIndex[vectorIndex] = stringIndex; };
+
+		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
+	public:
+		inline static const char* s_Name = "Vector Decompose";
+		inline static const char* s_OptionPath = "Vectors/Composition";
+	private:
+		std::vector<int> m_VectorTypesIndex = { 0 };
+
+		static inline std::array<std::vector<const char*>, 1> m_VectorTypes = {
+			{
+				{"Vector2", "Vector3", "Vector4"}
+			}
+		};
+	};;
+
+	class ShaderDotProductNode : public ShaderNode {
+	public:
+		ShaderDotProductNode();
+
+		const char* GetName() const override { return s_Name; }
+		const char* GetOptionPath() const override { return s_OptionPath; }
+
+		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
+	public:
+		inline static const char* s_Name = "Dot Product";
+		inline static const char* s_OptionPath = "Vectors/Operations";
+	};
+
+	class ShaderVectorOpsNode : public ShaderNode {
+	public:
+		ShaderVectorOpsNode();
+
+		const char* GetName() const override { return s_Name; }
+		const char* GetOptionPath() const override { return s_OptionPath; }
+
+		virtual const std::vector<const char*>& GetVariantOptions(int index) const { return m_Operations[index]; };
+		virtual const std::vector<int>& GetVariantOptionsIndex() const { return m_OperationsIndex; };
+		virtual void SetVariantOptionsIndex(int vectorIndex, int stringIndex) { m_OperationsIndex[vectorIndex] = stringIndex; };
+
+		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
+	public:
+		inline static const char* s_Name = "Vector Operations";
+		inline static const char* s_OptionPath = "Vectors/Operations";
+
+	private:
+		std::vector<int> m_OperationsIndex = { 0, 0 };
+
+		static inline std::array<std::vector<const char*>, 2> m_Operations = {
+			{
+				{"Vector2", "Vector3", "Vector4"},
+				{"Add", "Subtract", "Multiply", "Divide"}
+			}
+		};
+	};
 
 	class ShaderConstantVec4Node : public ShaderNodeConstant {
 	public:
@@ -109,6 +229,10 @@ namespace RealEngine {
 	private:
 		Variant m_Constant = glm::vec2(1.0f);
 	};
+
+	////////////////////////////////
+	///////////Generic//////////////
+	////////////////////////////////
 
 	class ShaderConstantFloatNode : public ShaderNodeConstant {
 	public:

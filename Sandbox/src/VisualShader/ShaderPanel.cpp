@@ -170,26 +170,56 @@ namespace RealEngine {
 				m_HeaderBackground->GetWidth(), m_HeaderBackground->GetHeight());
 
 			for (Ref<ShaderNode> node : m_Nodes) {
-
-				//TODO: Implement
-				/*if (node.Type != NodeType::Blueprint && node.Type != NodeType::Simple)
-					continue;*/
-
-				//const bool isSimple = node.Type == NodeType::Simple;
-				const bool isSimple = false;
-
 				builder.Begin(node->ID);
-				if (!isSimple) {
-					//TODO: Implement
-					//builder.Header(node.Color);
-					builder.Header();
-					ImGui::Spring(0);
-					ImGui::TextUnformatted(node->GetName());
-					ImGui::Spring(1);
-					ImGui::Dummy(ImVec2(0, 28));
-					ImGui::Spring(0);
-					builder.EndHeader();
+
+				//builder.Header(node.Color);
+				builder.Header();
+				ImGui::Spring(0);
+				ImGui::TextUnformatted(node->GetName());
+				ImGui::Spring(1);
+				ImGui::Dummy(ImVec2(0, 28));
+				ImGui::Spring(0);
+
+				builder.BypassEndHeader();
+				ImGui::BeginVertical("ContentFrame");
+				int comboBoxIndex = 0;
+				for (ContentType type : node->Content) {
+					ImGui::BeginHorizontal(comboBoxIndex);
+
+					switch (type) {
+					case ContentType::ComboBox: {
+						int variantOptionsIndex = node->GetVariantOptionsIndex()[comboBoxIndex];
+						const std::vector<const char*>& options = node->GetVariantOptions(comboBoxIndex);
+
+						ImGui::SetNextItemWidth(256);
+
+						if (ImNode::BeginNodeCombo("##combo", options[variantOptionsIndex])) {
+							for (int n = 0; n < node->GetVariantOptions(comboBoxIndex).size(); n++) {
+								const bool is_selected = (variantOptionsIndex == n);
+								if (ImGui::Selectable(options[n], is_selected)) {
+									node->SetVariantOptionsIndex(comboBoxIndex, n);
+								}
+
+								if (is_selected)
+									ImGui::SetItemDefaultFocus();
+							}
+
+							ImNode::EndNodeCombo();
+						}
+
+						comboBoxIndex++;
+						break;
+					}
+					default:
+						RE_CORE_ASSERT(false, "Content Type not implemented");
+						break;
+					}
+
+					ImGui::EndHorizontal();
 				}
+				ImGui::EndVertical();
+
+				builder.EndHeader();
 
 				for (Pin& input : node->Inputs) {
 					float alpha = ImGui::GetStyle().Alpha;
@@ -199,17 +229,19 @@ namespace RealEngine {
 
 					builder.Input(input.ID);
 					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
-					//TODO: Implement!
-					DrawPinIcon(input, IsPinLinked(input.ID), (int)(alpha * 255));
 
-					if (ImGui::IsItemHovered())
-						tooltip = PinTypeToString(input.Type);
+					DrawPinIcon(input, IsPinLinked(input.ID), (int)(alpha * 255));
 
 					ImGui::Spring(0);
 					if (!input.Name.empty()) {
-						ImGui::TextUnformatted(input.Name.c_str());						
+						ImGui::TextUnformatted(input.Name.c_str());
 						ImGui::Spring(0);
 					}
+
+					//Set the tooltip to the name of the pin type
+					if (ImGui::IsItemHovered())
+						tooltip = PinTypeToString(input.Type);
+
 					ImGui::PopStyleVar();
 					builder.EndInput();
 				}
@@ -383,17 +415,21 @@ namespace RealEngine {
 
 				Ref<ShaderNode> deletedNode = FindNode(deletedNodeId);
 				for (Pin& input : deletedNode->Inputs) {
-					m_Links.erase(FindPinLink(input.ID));
+					if (input.ConnectedPin != nullptr) {
+						m_Links.erase(FindPinLink(input.ID));
 
-					input.ConnectedPin->ConnectedPin = nullptr;
-					input.ConnectedPin = nullptr;
+						input.ConnectedPin->ConnectedPin = nullptr;
+						input.ConnectedPin = nullptr;
+					}
 				}
 
 				for (Pin& output : deletedNode->Outputs) {
-					m_Links.erase(FindPinLink(output.ID));
+					if (output.ConnectedPin != nullptr) {
+						m_Links.erase(FindPinLink(output.ID));
 
-					output.ConnectedPin->ConnectedPin = nullptr;
-					output.ConnectedPin = nullptr;
+						output.ConnectedPin->ConnectedPin = nullptr;
+						output.ConnectedPin = nullptr;
+					}
 				}
 
 				m_Nodes.erase(std::find(m_Nodes.begin(), m_Nodes.end(), deletedNode));
@@ -539,6 +575,14 @@ namespace RealEngine {
 
 	void ShaderPanel::RegisterNodeTypes() {
 		RegisterNodeType<ShaderTextureNode>();
+
+		RegisterNodeType<ShaderInputNode>();
+
+		RegisterNodeType<ShaderVectorComposeNode>();
+		RegisterNodeType<ShaderVectorDecomposeNode>();
+
+		RegisterNodeType<ShaderDotProductNode>();
+		RegisterNodeType<ShaderVectorOpsNode>();
 
 		RegisterNodeType<ShaderConstantVec4Node>();
 		RegisterNodeType<ShaderConstantVec3Node>();

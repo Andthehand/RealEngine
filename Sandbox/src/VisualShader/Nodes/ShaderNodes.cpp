@@ -146,5 +146,117 @@ namespace RealEngine {
 	std::string ShaderConstantBoolNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
 		return "\t" + outputVars[0] + " = " + (std::string)m_Constant + "; \n";
 	}
+	
+	ShaderDotProductNode::ShaderDotProductNode() {
+		Inputs.emplace_back("A", PinType::Vector3);
+		Inputs.emplace_back("B", PinType::Vector3);
+		Outputs.emplace_back("Dot", PinType::Float);
+	}
+
+	std::string ShaderDotProductNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
+		return "\t" + outputVars[0] + " = dot(" + inputVars[0] + ", " + inputVars[1] + ");\n";
+	}
+
+	ShaderVectorOpsNode::ShaderVectorOpsNode() {
+		//Type
+		Content.emplace_back(ContentType::ComboBox);
+		//Operation
+		Content.emplace_back(ContentType::ComboBox);
+
+		Inputs.emplace_back("A", PinType::Vector3);
+		Inputs.emplace_back("B", PinType::Vector3);
+		Outputs.emplace_back("Result", PinType::Vector3);
+	}
+
+	std::string ShaderVectorOpsNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
+		std::string code;
+
+		if(m_Operations[1][m_OperationsIndex[1]] == "Add")
+			code += "\t" + outputVars[0] + " = " + inputVars[2] + " + " + inputVars[3] + ";\n";
+		else if (m_Operations[1][m_OperationsIndex[1]] == "Subtract")
+			code += "\t" + outputVars[0] + " = " + inputVars[2] + " - " + inputVars[3] + ";\n";
+		else if (m_Operations[1][m_OperationsIndex[1]] == "Multiply")
+			code += "\t" + outputVars[0] + " = " + inputVars[2] + " * " + inputVars[3] + ";\n";
+		else if (m_Operations[1][m_OperationsIndex[1]] == "Divide")
+			code += "\t" + outputVars[0] + " = " + inputVars[2] + " / " + inputVars[3] + ";\n";
+
+		return code;
+	}
+
+	ShaderInputNode::ShaderInputNode() {
+		Content.emplace_back(ContentType::ComboBox);
+
+		Outputs.emplace_back("Result", PinType::Vector2);
+	}
+
+	std::string ShaderInputNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
+		std::string code;
+
+		if (m_InputTypes[0][m_InputTypesIndex[0]] == "Position")
+			code += "\t" + outputVars[0] + " = a_Position;\n";
+		else if (m_InputTypes[0][m_InputTypesIndex[0]] == "UV")
+			code += "\t" + outputVars[0] + " = v_UV;\n";
+
+		return code;
+	}
+	std::string ShaderInputNode::GenerateGlobalCode(std::string* inputVars, std::vector<std::string>* defines) const {
+		if (m_InputTypes[0][m_InputTypesIndex[0]] == "UV")
+			defines->emplace_back("IMPLEMENTUV");
+
+		return std::string();
+	}
+
+	ShaderVectorComposeNode::ShaderVectorComposeNode() {
+		Content.emplace_back(ContentType::ComboBox);
+
+		Inputs.emplace_back("X", PinType::Float);
+		Inputs.emplace_back("Y", PinType::Float);
+		Inputs.emplace_back("Z", PinType::Float);
+		Inputs.emplace_back("W", PinType::Float);
+		Outputs.emplace_back("Result", PinType::Vector4);
+	}
+
+	std::string ShaderVectorComposeNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
+		std::string code;
+
+		if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector2")
+			code += "\t" + outputVars[0] + " = vec2(" + inputVars[0] + ", " + inputVars[1] + ");\n";
+		else if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector3")
+			code += "\t" + outputVars[0] + " = vec3(" + inputVars[0] + ", " + inputVars[1] + ", " + inputVars[3] + ");\n";
+		else if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector4")
+			code += "\t" + outputVars[0] + " = vec4(" + inputVars[0] + ", " + inputVars[1] + ", " + inputVars[2] + ", " + inputVars[3] + ");\n";
+
+		return code;
+	}
+
+	ShaderVectorDecomposeNode::ShaderVectorDecomposeNode() {
+		Content.emplace_back(ContentType::ComboBox);
+
+		Inputs.emplace_back("Vector", PinType::Vector2);
+		Outputs.emplace_back("X", PinType::Float);
+		Outputs.emplace_back("Y", PinType::Float);
+	}
+
+	std::string ShaderVectorDecomposeNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
+		std::string code;
+
+		if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector2") {
+			code += "\t" + outputVars[0] + " = " + inputVars[0] + ".x;\n";
+			code += "\t" + outputVars[1] + " = " + inputVars[0] + ".y;\n";
+		}
+		else if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector3") {
+			code += "\t" + outputVars[0] + " = " + inputVars[0] + ".x;\n";
+			code += "\t" + outputVars[1] + " = " + inputVars[0] + ".y;\n";
+			code += "\t" + outputVars[2] + " = " + inputVars[0] + ".z;\n";
+		}
+		else if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector4") {
+			code += "\t" + outputVars[0] + " = " + inputVars[0] + ".x;\n";
+			code += "\t" + outputVars[1] + " = " + inputVars[0] + ".y;\n";
+			code += "\t" + outputVars[2] + " = " + inputVars[0] + ".z;\n";
+			code += "\t" + outputVars[3] + " = " + inputVars[0] + ".w;\n";
+		}
+
+		return code;
+	}
 }
 

@@ -12,28 +12,25 @@ struct BlueprintNodeBuilder {
     void Header(const ImVec4& color = ImVec4(1, 1, 1, 1));
     void EndHeader();
 
+	void BypassEndHeader();
+
     void Input(PinId id);
     void EndInput();
 
-    void Middle();
-
     void Output(PinId id);
     void EndOutput();
-
-
 private:
-    enum class Stage {
-        Invalid,
-        Begin,
-        Header,
-        Content,
-        Input,
-        Output,
-        Middle,
-        End
-    };
+	enum class Stage {
+		Invalid,
+		Begin,
+		Header,
+		Content,
+		Input,
+		Output,
+		End
+	};
 
-    bool SetStage(Stage stage);
+	bool SetStage(Stage stage);
 
     void Pin(PinId id, ax::NodeEditor::PinKind kind);
     void EndPin();

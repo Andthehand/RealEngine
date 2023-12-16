@@ -148,6 +148,7 @@ namespace RealEngine {
 		RE_CORE_WARN("ShaderCode:\n{0}", shaders[0]);
 		RE_CORE_WARN("ShaderCode:\n{0}", shaders[1]);
 
+		//Combine vector and fragment defines together
 		std::vector<std::string> defines;
 		defines.reserve(shaderData[0].ShaderDefines.size() + shaderData[1].ShaderDefines.size());
 		defines.insert(defines.end(), shaderData[0].ShaderDefines.begin(), shaderData[0].ShaderDefines.end());

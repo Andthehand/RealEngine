@@ -78,6 +78,10 @@ void util::BlueprintNodeBuilder::EndHeader() {
     SetStage(Stage::Content);
 }
 
+void ax::NodeEditor::Utilities::BlueprintNodeBuilder::BypassEndHeader() {
+	SetStage(Stage::Invalid);
+}
+
 void util::BlueprintNodeBuilder::Input(ed::PinId id) {
     if (CurrentStage == Stage::Begin)
         SetStage(Stage::Content);
@@ -98,13 +102,6 @@ void util::BlueprintNodeBuilder::EndInput() {
     ImGui::EndHorizontal();
 
     EndPin();
-}
-
-void util::BlueprintNodeBuilder::Middle() {
-    if (CurrentStage == Stage::Begin)
-        SetStage(Stage::Content);
-
-    SetStage(Stage::Middle);
 }
 
 void util::BlueprintNodeBuilder::Output(ed::PinId id) {
@@ -146,7 +143,7 @@ bool util::BlueprintNodeBuilder::SetStage(Stage stage) {
             HeaderMin = ImGui::GetItemRectMin();
             HeaderMax = ImGui::GetItemRectMax();
 
-            // spacing between header and content
+            // Horizontal spacing between header and content
             ImGui::Spring(0, ImGui::GetStyle().ItemSpacing.y * 2.0f);
 
             break;
@@ -158,15 +155,6 @@ bool util::BlueprintNodeBuilder::SetStage(Stage stage) {
             ed::PopStyleVar(2);
 
             ImGui::Spring(1, 0);
-            ImGui::EndVertical();
-
-            // #debug
-            // ImGui::GetWindowDrawList()->AddRect(
-            //     ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(255, 0, 0, 255));
-
-            break;
-
-        case Stage::Middle:
             ImGui::EndVertical();
 
             // #debug
@@ -223,13 +211,8 @@ bool util::BlueprintNodeBuilder::SetStage(Stage stage) {
                 ImGui::Spring(1, 0);
             break;
 
-        case Stage::Middle:
-            ImGui::Spring(1);
-            ImGui::BeginVertical("middle", ImVec2(0, 0), 1.0f);
-            break;
-
         case Stage::Output:
-            if (oldStage == Stage::Middle || oldStage == Stage::Input)
+            if (oldStage == Stage::Input)
                 ImGui::Spring(1);
             else
                 ImGui::Spring(1, 0);
