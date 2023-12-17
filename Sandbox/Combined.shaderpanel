@@ -13,48 +13,40 @@ Nodes:
     ID: 4
     Links:
       - Input ID: 5
-        Output ID: 22
-  - Name: Vector Compose
-    Option Path: Vectors/Composition/Vector Compose
-    ID: 17
-    Links:
-      - Input ID: 18
         Output ID: 25
-      - Input ID: 19
-        Output ID: 26
-      - Input ID: 20
-        Output ID: 30
-      - Input ID: 21
-        Output ID: 28
-    Content: [2]
   - Name: Vector Decompose
     Option Path: Vectors/Composition/Vector Decompose
-    ID: 23
+    ID: 14
     Links:
+      - Input ID: 19
+        Output ID: 31
+    Content: [1]
+  - Name: Vector Compose
+    Option Path: Vectors/Composition/Vector Compose
+    ID: 20
+    Links:
+      - Input ID: 21
+        Output ID: 15
+      - Input ID: 22
+        Output ID: 16
+      - Input ID: 23
+        Output ID: 17
       - Input ID: 24
-        Output ID: 32
-    Content: [0]
+        Output ID: 27
+    Content: [2]
   - Name: Constanct Float
     Option Path: Generic/Constants/Constanct Float
-    ID: 27
+    ID: 26
     Links:
       []
     Constant:
       - Type: Float
         Value: 1
-  - Name: Constanct Float
-    Option Path: Generic/Constants/Constanct Float
-    ID: 29
-    Links:
-      []
-    Constant:
-      - Type: Float
-        Value: 0
   - Name: Input
     Option Path: Inputs/Input
-    ID: 31
+    ID: 30
     Links:
       []
     Content: [1]
 ---
-Largest ID: 31
+Largest ID: 30

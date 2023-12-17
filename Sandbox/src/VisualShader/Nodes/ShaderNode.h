@@ -87,6 +87,8 @@ namespace RealEngine {
 			RE_CORE_ASSERT(false);
 			return std::vector<int>();
 		};
+
+		//Returns true if the node needs to be rebuilt
 		virtual void SetVariantOptionsIndex(int vectorIndex, int stringIndex) {
 			RE_CORE_ASSERT(false);
 		};

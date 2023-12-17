@@ -219,9 +219,10 @@ namespace RealEngine {
 	}
 
 	void ShaderVectorComposeNode::SetVariantOptionsIndex(int vectorIndex, int stringIndex) {
-		m_VectorTypesIndex[vectorIndex] = stringIndex;
-
-		ChangePinTypes();
+		if (m_VectorTypesIndex[vectorIndex] != stringIndex) {
+			m_VectorTypesIndex[vectorIndex] = stringIndex;
+			ChangePinTypes();
+		}
 	}
 
 	std::string ShaderVectorComposeNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
@@ -262,14 +263,27 @@ namespace RealEngine {
 
 			Outputs[0].Type = PinType::Vector4;
 		}
+
+		BuildNode();
 	}
 
 	ShaderVectorDecomposeNode::ShaderVectorDecomposeNode() {
 		Content.emplace_back(ContentType::ComboBox);
+		m_VectorTypesIndex[0] = 2;
 
-		Inputs.emplace_back("Vector", PinType::Vector2);
 		Outputs.emplace_back("X", PinType::Float);
 		Outputs.emplace_back("Y", PinType::Float);
+		Outputs.emplace_back("Z", PinType::Float);
+		Outputs.emplace_back("W", PinType::Float);
+
+		Inputs.emplace_back("Vector", PinType::Vector4);
+	}
+
+	void ShaderVectorDecomposeNode::SetVariantOptionsIndex(int vectorIndex, int stringIndex) {
+		if (m_VectorTypesIndex[vectorIndex] != stringIndex) {
+			m_VectorTypesIndex[vectorIndex] = stringIndex;
+			ChangePinTypes();
+		}
 	}
 
 	std::string ShaderVectorDecomposeNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
@@ -292,6 +306,35 @@ namespace RealEngine {
 		}
 
 		return code;
+	}
+
+	void ShaderVectorDecomposeNode::ChangePinTypes() {
+		ScopeUniqueIdChange ID(ID.Get() + 1);
+
+		Outputs.clear();
+		if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector2") {
+			Outputs.emplace_back("X", PinType::Float);
+			Outputs.emplace_back("Y", PinType::Float);
+
+			Inputs[0].Type = PinType::Vector2;
+		}
+		else if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector3") {
+			Outputs.emplace_back("X", PinType::Float);
+			Outputs.emplace_back("Y", PinType::Float);
+			Outputs.emplace_back("Z", PinType::Float);
+
+			Inputs[0].Type = PinType::Vector3;
+		}
+		else if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector4") {
+			Outputs.emplace_back("X", PinType::Float);
+			Outputs.emplace_back("Y", PinType::Float);
+			Outputs.emplace_back("Z", PinType::Float);
+			Outputs.emplace_back("W", PinType::Float);
+
+			Inputs[0].Type = PinType::Vector4;
+		}
+
+		BuildNode();
 	}
 }
 
