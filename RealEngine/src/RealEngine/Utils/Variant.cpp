@@ -129,6 +129,9 @@ namespace RealEngine {
 			case VECTOR4I:
 				m_Data._vec4i = new glm::ivec4(*p_other.m_Data._vec4i);
 				break;
+			default:
+				m_Data = p_other.m_Data;
+				break;
 		}
 		return *this;
 	}
