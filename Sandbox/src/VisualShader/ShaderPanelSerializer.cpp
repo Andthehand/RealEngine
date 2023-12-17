@@ -248,9 +248,7 @@ namespace RealEngine {
 				//ContentType
 				if (!node->Content.empty()) {
 					out << YAML::Key << "Content" << YAML::Value;
-					for (const auto& content : node->Content) {
-						out << YAML::Flow << node->GetVariantOptionsIndex();
-					}
+					out << YAML::Flow << node->GetVariantOptionsIndex();
 				}
 
 				//Constant Node
