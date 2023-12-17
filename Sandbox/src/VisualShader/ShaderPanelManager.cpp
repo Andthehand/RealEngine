@@ -54,7 +54,7 @@ namespace RealEngine {
 
 			ImGui::SetNextItemWidth(ImGui::CalcTextSize(items[item_current]).x + 
 									ImGui::GetFrameHeight() + 
-									(ImGui::GetStyle().FramePadding.x) * 2.0);
+									(ImGui::GetStyle().FramePadding.x) * 2.0f);
 
 			if (ImGui::BeginCombo("##combo", items[item_current])) {
 				for (int n = 0; n < 2; n++) {

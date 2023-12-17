@@ -112,15 +112,15 @@ namespace ax::NodeEditor {
 	}
 
 	static bool DrawNodeVec4Control(glm::vec4* v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f") {
-		return DrawNodeControlN(v, 4, v_speed, ImGuiDataType_Float, &v_min, &v_max, format);
+		return DrawNodeControlN(v, 4, ImGuiDataType_Float, v_speed, &v_min, &v_max, format);
 	}
 
 	static bool DrawNodeVec3Control(glm::vec3* v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f") {
-		return DrawNodeControlN(v, 3, v_speed, ImGuiDataType_Float, &v_min, &v_max, format);
+		return DrawNodeControlN(v, 3, ImGuiDataType_Float, v_speed, &v_min, &v_max, format);
 	}
 
 	static bool DrawNodeVec2Control(glm::vec2* v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f") {
-		return DrawNodeControlN(v, 2, v_speed, ImGuiDataType_Float, &v_min, &v_max, format);
+		return DrawNodeControlN(v, 2, ImGuiDataType_Float, v_speed, &v_min, &v_max, format);
 	}
 
 	static float CalcMaxPopupHeightFromItemCount(int items_count) {
