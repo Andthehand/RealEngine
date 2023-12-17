@@ -16,8 +16,8 @@
 namespace RealEngine {
 	struct Link {
 		ImNode::LinkId Id;
-		ImNode::PinId InputPin;
-		ImNode::PinId OutputPin;
+		Pin* InputPin;
+		Pin* OutputPin;
 	};
 
 	struct CreateOptions {
@@ -87,8 +87,10 @@ namespace RealEngine {
 			return m_Nodes.emplace_back(currentNode->GetData().CreateFunction());
 		}
 		//This has to be called every time a node is added because the node pointers inside of the pins will be corrupted
+		//TODO: Look into optimizing this
 		void BuildNodes();
 
+		void AddLink(Pin* inputPin, Pin* outputPin);
 		void AddLink(ImNode::PinId inputPin, ImNode::PinId outputPin);
 
 		static void RegisterNodeTypes();
@@ -104,7 +106,7 @@ namespace RealEngine {
 		Ref<ShaderNode> FindNode(ImNode::NodeId id);
 		Pin* FindPin(ImNode::PinId id);
 		Link* FindPinLink(ImNode::PinId id);
-		bool IsPinLinked(ImNode::PinId id);
+		bool IsPinLinked(Pin* pin);
 
 		template<class CustomNode>
 		static void RegisterNodeType() {

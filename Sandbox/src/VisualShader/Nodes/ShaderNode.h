@@ -29,6 +29,24 @@ namespace RealEngine {
 		Pin(const char* name, PinType type)
 			: ID(UniqueId::GetNextId()), Name(name), Type(type), Kind(PinKind::Input) {}
 
+		~Pin() {
+			Dissconnect();
+		}
+
+		bool IsConnected() const { return ConnectedPin; }
+
+		void Connect(Pin* pin) {
+			ConnectedPin = pin;
+			pin->ConnectedPin = this;
+		}
+
+		void Dissconnect() {
+			if (IsConnected()) {
+				ConnectedPin->ConnectedPin = nullptr;
+				ConnectedPin = nullptr;
+			}
+		}
+
 		ImNode::PinId ID;
 		ShaderNode* Node = nullptr;
 		PinType Type;

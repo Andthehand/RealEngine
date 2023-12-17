@@ -92,12 +92,14 @@ namespace RealEngine {
 
 		const std::vector<const char*>& GetVariantOptions(int index) const override { return m_VectorTypes[index]; };
 		const std::vector<int>& GetVariantOptionsIndex() const override { return m_VectorTypesIndex; };
-		void SetVariantOptionsIndex(int vectorIndex, int stringIndex) override { m_VectorTypesIndex[vectorIndex] = stringIndex; };
+		void SetVariantOptionsIndex(int vectorIndex, int stringIndex) override;
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 	public:
 		inline static const char* s_Name = "Vector Compose";
 		inline static const char* s_OptionPath = "Vectors/Composition";
+	private:
+		void ChangePinTypes();
 	private:
 		std::vector<int> m_VectorTypesIndex = { 0 };
 

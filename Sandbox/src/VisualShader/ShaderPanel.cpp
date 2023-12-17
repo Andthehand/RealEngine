@@ -230,7 +230,7 @@ namespace RealEngine {
 					builder.Input(input.ID);
 					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
-					DrawPinIcon(input, IsPinLinked(input.ID), (int)(alpha * 255));
+					DrawPinIcon(input, IsPinLinked(&input), (int)(alpha * 255));
 
 					ImGui::Spring(0);
 					if (!input.Name.empty()) {
@@ -289,7 +289,7 @@ namespace RealEngine {
 						ImGui::TextUnformatted(output.Name.c_str());
 					}
 					ImGui::Spring(0);
-					DrawPinIcon(output, IsPinLinked(output.ID), (int)(alpha * 255));
+					DrawPinIcon(output, IsPinLinked(&output), (int)(alpha * 255));
 					if (ImGui::IsItemHovered())
 						tooltip = PinTypeToString(output.Type);
 
@@ -302,8 +302,13 @@ namespace RealEngine {
 		}
 
 		// Submit Links for drawing
-		for (Link& linkInfo : m_Links)
-			ImNode::Link(linkInfo.Id, linkInfo.InputPin, linkInfo.OutputPin);
+		for (Link& linkInfo : m_Links) {
+			//Check if the link is still valid
+			if(linkInfo.InputPin->IsConnected() && linkInfo.OutputPin->IsConnected())
+				ImNode::Link(linkInfo.Id, linkInfo.InputPin->ID, linkInfo.OutputPin->ID);
+			else
+				m_Links.erase(&linkInfo);
+		}
 
 		HandleInteraction();
 
@@ -360,7 +365,7 @@ namespace RealEngine {
 					ImNode::NodeLabel("Pin Types are Not Compatible", ImColor(171, 44, 44, 180));
 					ImNode::RejectNewItem(ImColor(255, 0, 0), 2.0f);
 				}
-				else if (IsPinLinked(inputPinId)) {
+				else if (IsPinLinked(inputPin)) {
 					//Inputs can't have 2 connections
 					ImNode::NodeLabel("Pin Already Connected", ImColor(171, 44, 44, 180));
 					ImNode::RejectNewItem(ImColor(255, 0, 0), 2.0f);
@@ -372,10 +377,9 @@ namespace RealEngine {
 					//If mouse released basically
 					if (ImNode::AcceptNewItem(ImColor(0, 255, 0), 2.0f)) {
 						//Just add the link to the list
-						m_Links.push_back({ ImNode::LinkId(m_NextLinkId++), inputPinId, outputPinId });
+						m_Links.push_back({ ImNode::LinkId(m_NextLinkId++), inputPin, outputPin });
 
-						inputPin->ConnectedPin = outputPin;
-						outputPin->ConnectedPin = inputPin;
+						inputPin->Connect(outputPin);
 					}
 				}
 			}
@@ -400,8 +404,7 @@ namespace RealEngine {
 					//This is so scuffed
 					//It is now less scuffed
 					//and finally now it's way less scuffed
-					FindPin(link.InputPin)->ConnectedPin = nullptr;
-					FindPin(link.OutputPin)->ConnectedPin = nullptr;
+					link.InputPin->Dissconnect();
 
 					m_Links.erase(&link);
 				}
@@ -415,20 +418,18 @@ namespace RealEngine {
 
 				Ref<ShaderNode> deletedNode = FindNode(deletedNodeId);
 				for (Pin& input : deletedNode->Inputs) {
-					if (input.ConnectedPin != nullptr) {
+					if (input.IsConnected()) {
 						m_Links.erase(FindPinLink(input.ID));
 
-						input.ConnectedPin->ConnectedPin = nullptr;
-						input.ConnectedPin = nullptr;
+						input.Dissconnect();
 					}
 				}
 
 				for (Pin& output : deletedNode->Outputs) {
-					if (output.ConnectedPin != nullptr) {
+					if (output.IsConnected()) {
 						m_Links.erase(FindPinLink(output.ID));
 
-						output.ConnectedPin->ConnectedPin = nullptr;
-						output.ConnectedPin = nullptr;
+						output.Dissconnect();
 					}
 				}
 
@@ -442,7 +443,7 @@ namespace RealEngine {
 		//Going down the chain of Nodes until it reaches the end
 		for (const Pin& inputPin: currentNode->Inputs) {
 			//If the Node isn't connected continue
-			if (inputPin.ConnectedPin == nullptr)
+			if (!inputPin.IsConnected())
 				continue;
 
 			//If connected node hasn't been visited yet then visit it
@@ -463,7 +464,7 @@ namespace RealEngine {
 		std::string* outputs = outputVars.data();
 
 		for (int i = 0; i < currentNode->Outputs.size(); i++) {
-			if(currentNode->Outputs[i].ConnectedPin == nullptr)
+			if(!currentNode->Outputs[i].IsConnected())
 				continue;
 
 			std::string varName;
@@ -480,10 +481,10 @@ namespace RealEngine {
 
 		//Add to the shader code
 		for(int i = 0; i < currentNode->Inputs.size(); i++) {
-			const Pin* connectedPin = currentNode->Inputs[i].ConnectedPin;
-
-			if(connectedPin == nullptr)
+			if (!currentNode->Inputs[i].IsConnected())
 				continue;
+
+			const Pin* connectedPin = currentNode->Inputs[i].ConnectedPin;
 
 			inputs[i] = "out_";
 			inputs[i] += std::to_string(connectedPin->Node->ID.Get());
@@ -603,6 +604,7 @@ namespace RealEngine {
 	}
 
 	Pin* ShaderPanel::FindPin(ImNode::PinId id) {
+		RE_PROFILE_FUNCTION();
 		for (Ref<ShaderNode>& node : m_Nodes) {
 			for (Pin& pin : node->Inputs)
 				if (pin.ID == id)
@@ -619,17 +621,15 @@ namespace RealEngine {
 
 	Link* ShaderPanel::FindPinLink(ImNode::PinId id) {
 		for (Link& link : m_Links)
-			if (link.InputPin == id || link.OutputPin == id)
+			if (link.InputPin->ID == id || link.OutputPin->ID == id)
 				return &link;
 
 		return nullptr;
 	}
 
-	bool ShaderPanel::IsPinLinked(ImNode::PinId id) {
-		for (Link& link : m_Links)
-			if (link.InputPin == id || link.OutputPin == id)
-				return true;
-
+	bool ShaderPanel::IsPinLinked(Pin* pin) {
+		if(pin->IsConnected())
+			return true;
 		return false;
 	}
 
@@ -638,14 +638,15 @@ namespace RealEngine {
 			node->BuildNode();
 	}
 
-	void ShaderPanel::AddLink(ImNode::PinId inputPin, ImNode::PinId outputPin) {
+	void ShaderPanel::AddLink(Pin* inputPin, Pin* outputPin) {
 		RE_PROFILE_FUNCTION();
-
-		auto* input = FindPin(inputPin);
-		auto* output = FindPin(outputPin);
 		m_Links.push_back({ ImNode::LinkId(m_NextLinkId++), inputPin, outputPin });
 
-		input->ConnectedPin = output;
-		output->ConnectedPin = input;
+		inputPin->Connect(outputPin);
+	}
+
+	void ShaderPanel::AddLink(ImNode::PinId inputPin, ImNode::PinId outputPin) {
+		RE_PROFILE_FUNCTION();
+		AddLink(FindPin(inputPin), FindPin(outputPin));
 	}
 }

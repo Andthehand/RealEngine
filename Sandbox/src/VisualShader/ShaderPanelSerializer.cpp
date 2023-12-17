@@ -236,7 +236,7 @@ namespace RealEngine {
 
 				out << YAML::Key << "Links" << YAML::Value << YAML::BeginSeq;
 				for (const auto& input : node->Inputs) {
-					if (input.ConnectedPin) {
+					if (input.IsConnected()) {
 						out << YAML::BeginMap; //Link Data
 						out << YAML::Key << "Input ID" << YAML::Value << input.ID.Get();
 						out << YAML::Key << "Output ID" << YAML::Value << input.ConnectedPin->ID.Get();
@@ -244,6 +244,14 @@ namespace RealEngine {
 					}
 				}
 				out << YAML::EndSeq;
+
+				//ContentType
+				if (!node->Content.empty()) {
+					out << YAML::Key << "Content" << YAML::Value;
+					for (const auto& content : node->Content) {
+						out << YAML::Flow << node->GetVariantOptionsIndex();
+					}
+				}
 
 				//Constant Node
 				ShaderNodeConstant* constantNode = dynamic_cast<ShaderNodeConstant*>(node.get());
@@ -356,6 +364,13 @@ namespace RealEngine {
 				int nextID = node["ID"].as<int>();
 				UniqueId::SetNextID(nextID);
 				Ref<ShaderNode> shaderNode = shaderPanels[i]->AddNodeByRegisterTree(optionPath);
+
+				//Setup the node Content
+				if (node["Content"]) {
+					for (int k = 0; k < node["Content"].size(); k++) {
+						shaderNode->SetVariantOptionsIndex(k, node["Content"][k].as<int>());
+					}
+				}
 
 				//Constant Node
 				ShaderNodeConstant* constantNode = dynamic_cast<ShaderNodeConstant*>(shaderNode.get());

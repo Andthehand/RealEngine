@@ -208,12 +208,20 @@ namespace RealEngine {
 
 	ShaderVectorComposeNode::ShaderVectorComposeNode() {
 		Content.emplace_back(ContentType::ComboBox);
+		m_VectorTypesIndex[0] = 2;
 
 		Inputs.emplace_back("X", PinType::Float);
 		Inputs.emplace_back("Y", PinType::Float);
 		Inputs.emplace_back("Z", PinType::Float);
 		Inputs.emplace_back("W", PinType::Float);
-		Outputs.emplace_back("Result", PinType::Vector4);
+
+		Outputs.emplace_back("Results", PinType::Vector4);
+	}
+
+	void ShaderVectorComposeNode::SetVariantOptionsIndex(int vectorIndex, int stringIndex) {
+		m_VectorTypesIndex[vectorIndex] = stringIndex;
+
+		ChangePinTypes();
 	}
 
 	std::string ShaderVectorComposeNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
@@ -227,6 +235,33 @@ namespace RealEngine {
 			code += "\t" + outputVars[0] + " = vec4(" + inputVars[0] + ", " + inputVars[1] + ", " + inputVars[2] + ", " + inputVars[3] + ");\n";
 
 		return code;
+	}
+
+	void ShaderVectorComposeNode::ChangePinTypes() {
+		ScopeUniqueIdChange ID(ID.Get() + 1);
+
+		Inputs.clear();
+		if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector2") {
+			Inputs.emplace_back("X", PinType::Float);
+			Inputs.emplace_back("Y", PinType::Float);
+
+			Outputs[0].Type = PinType::Vector2;
+		}
+		else if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector3") {
+			Inputs.emplace_back("X", PinType::Float);
+			Inputs.emplace_back("Y", PinType::Float);
+			Inputs.emplace_back("Z", PinType::Float);
+
+			Outputs[0].Type = PinType::Vector3;
+		}
+		else if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector4") {
+			Inputs.emplace_back("X", PinType::Float);
+			Inputs.emplace_back("Y", PinType::Float);
+			Inputs.emplace_back("Z", PinType::Float);
+			Inputs.emplace_back("W", PinType::Float);
+
+			Outputs[0].Type = PinType::Vector4;
+		}
 	}
 
 	ShaderVectorDecomposeNode::ShaderVectorDecomposeNode() {

@@ -27,6 +27,20 @@ namespace RealEngine {
 	public:
 		static inline int s_UniqueId = 1;
 	};
+
+	class ScopeUniqueIdChange {
+	public:
+		ScopeUniqueIdChange(int id) {
+			m_OldId = UniqueId::s_UniqueId;
+			UniqueId::SetNextID(id);
+		}
+
+		~ScopeUniqueIdChange() {
+			UniqueId::SetNextID(m_OldId);
+		}
+	private:
+		int m_OldId;
+	};
 }
 
 namespace ax::NodeEditor {

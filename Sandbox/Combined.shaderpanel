@@ -4,16 +4,7 @@ Nodes:
     Option Path: /Fragment Output
     ID: 1
     Links:
-      - Input ID: 2
-        Output ID: 8
-  - Name: Constanct Vector2
-    Option Path: Vectors/Constants/Constanct Vector2
-    ID: 7
-    Links:
       []
-    Constant:
-      - Type: Vector2
-        Value: [0.25, 0.5]
 ---
 Shader Type: Fragment
 Nodes:
@@ -22,11 +13,48 @@ Nodes:
     ID: 4
     Links:
       - Input ID: 5
-        Output ID: 11
-  - Name: Texture2D
-    Option Path: Textures/Texture2D
-    ID: 7
+        Output ID: 22
+  - Name: Vector Compose
+    Option Path: Vectors/Composition/Vector Compose
+    ID: 17
+    Links:
+      - Input ID: 18
+        Output ID: 25
+      - Input ID: 19
+        Output ID: 26
+      - Input ID: 20
+        Output ID: 30
+      - Input ID: 21
+        Output ID: 28
+    Content: [2]
+  - Name: Vector Decompose
+    Option Path: Vectors/Composition/Vector Decompose
+    ID: 23
+    Links:
+      - Input ID: 24
+        Output ID: 32
+    Content: [0]
+  - Name: Constanct Float
+    Option Path: Generic/Constants/Constanct Float
+    ID: 27
     Links:
       []
+    Constant:
+      - Type: Float
+        Value: 1
+  - Name: Constanct Float
+    Option Path: Generic/Constants/Constanct Float
+    ID: 29
+    Links:
+      []
+    Constant:
+      - Type: Float
+        Value: 0
+  - Name: Input
+    Option Path: Inputs/Input
+    ID: 31
+    Links:
+      []
+    Content: [1]
 ---
-Largest ID: 7
+Largest ID: 31
