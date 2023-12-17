@@ -157,15 +157,16 @@ namespace RealEngine {
 		const char* GetName() const override { return s_Name; }
 		const char* GetOptionPath() const override { return s_OptionPath; }
 
-		virtual const std::vector<const char*>& GetVariantOptions(int index) const { return m_Operations[index]; };
-		virtual const std::vector<int>& GetVariantOptionsIndex() const { return m_OperationsIndex; };
-		virtual void SetVariantOptionsIndex(int vectorIndex, int stringIndex) { m_OperationsIndex[vectorIndex] = stringIndex; };
+		const std::vector<const char*>& GetVariantOptions(int index) const override { return m_Operations[index]; };
+		const std::vector<int>& GetVariantOptionsIndex() const override { return m_OperationsIndex; } ;
+		void SetVariantOptionsIndex(int vectorIndex, int stringIndex) override;
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 	public:
 		inline static const char* s_Name = "Vector Operations";
 		inline static const char* s_OptionPath = "Vectors/Operations";
-
+	private:
+		void ChangePinTypes();
 	private:
 		std::vector<int> m_OperationsIndex = { 0, 0 };
 
@@ -184,8 +185,8 @@ namespace RealEngine {
 		const char* GetName() const override { return s_Name; }
 		const char* GetOptionPath() const override { return s_OptionPath; }
 		
-		Variant& GetConstant() { return m_Constant; }
-		void SetConstant(Variant constant) { m_Constant = std::move(constant); }
+		Variant& GetConstant() override { return m_Constant; }
+		void SetConstant(Variant constant) override { m_Constant = std::move(constant); }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 	public:
@@ -222,8 +223,8 @@ namespace RealEngine {
 		const char* GetName() const override { return s_Name; }
 		const char* GetOptionPath() const override { return s_OptionPath; }
 
-		Variant& GetConstant() { return m_Constant; }
-		void SetConstant(Variant constant) { m_Constant = std::move(constant); }
+		Variant& GetConstant() override { return m_Constant; }
+		void SetConstant(Variant constant) override { m_Constant = std::move(constant); }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 	public:
@@ -245,8 +246,8 @@ namespace RealEngine {
 		const char* GetName() const override { return s_Name; }
 		const char* GetOptionPath() const override { return s_OptionPath; }
 
-		Variant& GetConstant() { return m_Constant; }
-		void SetConstant(Variant constant) { m_Constant = std::move(constant); }
+		Variant& GetConstant() override { return m_Constant; }
+		void SetConstant(Variant constant) override { m_Constant = std::move(constant); }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 	public:
@@ -264,8 +265,8 @@ namespace RealEngine {
 		const char* GetName() const override { return s_Name; }
 		const char* GetOptionPath() const override { return s_OptionPath; }
 
-		Variant& GetConstant() { return m_Constant; }
-		void SetConstant(Variant constant) { m_Constant = std::move(constant); }
+		Variant& GetConstant() override { return m_Constant; }
+		void SetConstant(Variant constant) override { m_Constant = std::move(constant); }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 	public:
@@ -283,8 +284,8 @@ namespace RealEngine {
 		const char* GetName() const override { return s_Name; }
 		const char* GetOptionPath() const override { return s_OptionPath; }
 
-		Variant& GetConstant() { return m_Constant; }
-		void SetConstant(Variant constant) { m_Constant = std::move(constant); }
+		Variant& GetConstant() override { return m_Constant; }
+		void SetConstant(Variant constant) override { m_Constant = std::move(constant); }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 	public:

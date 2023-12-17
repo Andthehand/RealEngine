@@ -168,19 +168,48 @@ namespace RealEngine {
 		Outputs.emplace_back("Result", PinType::Vector3);
 	}
 
+	void ShaderVectorOpsNode::SetVariantOptionsIndex(int vectorIndex, int stringIndex) {
+		if (m_OperationsIndex[vectorIndex] != stringIndex) {
+			m_OperationsIndex[vectorIndex] = stringIndex;
+			if(vectorIndex == 0)
+				ChangePinTypes();
+		}
+	}
+
 	std::string ShaderVectorOpsNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
 		std::string code;
 
 		if(m_Operations[1][m_OperationsIndex[1]] == "Add")
-			code += "\t" + outputVars[0] + " = " + inputVars[2] + " + " + inputVars[3] + ";\n";
+			code += "\t" + outputVars[0] + " = " + inputVars[0] + " + " + inputVars[1] + ";\n";
 		else if (m_Operations[1][m_OperationsIndex[1]] == "Subtract")
-			code += "\t" + outputVars[0] + " = " + inputVars[2] + " - " + inputVars[3] + ";\n";
+			code += "\t" + outputVars[0] + " = " + inputVars[0] + " - " + inputVars[1] + ";\n";
 		else if (m_Operations[1][m_OperationsIndex[1]] == "Multiply")
-			code += "\t" + outputVars[0] + " = " + inputVars[2] + " * " + inputVars[3] + ";\n";
+			code += "\t" + outputVars[0] + " = " + inputVars[0] + " * " + inputVars[1] + ";\n";
 		else if (m_Operations[1][m_OperationsIndex[1]] == "Divide")
-			code += "\t" + outputVars[0] + " = " + inputVars[2] + " / " + inputVars[3] + ";\n";
+			code += "\t" + outputVars[0] + " = " + inputVars[0] + " / " + inputVars[1] + ";\n";
 
 		return code;
+	}
+
+	void ShaderVectorOpsNode::ChangePinTypes() {
+		if (m_Operations[0][m_OperationsIndex[0]] == "Vector2") {
+			Inputs[0].Type = PinType::Vector2;
+			Inputs[1].Type = PinType::Vector2;
+
+			Outputs[0].Type = PinType::Vector2;
+		}
+		else if (m_Operations[0][m_OperationsIndex[0]] == "Vector3") {
+			Inputs[0].Type = PinType::Vector3;
+			Inputs[1].Type = PinType::Vector3;
+
+			Outputs[0].Type = PinType::Vector3;
+		}
+		else if (m_Operations[0][m_OperationsIndex[0]] == "Vector4") {
+			Inputs[0].Type = PinType::Vector4;
+			Inputs[1].Type = PinType::Vector4;
+
+			Outputs[0].Type = PinType::Vector4;
+		}
 	}
 
 	ShaderInputNode::ShaderInputNode() {
