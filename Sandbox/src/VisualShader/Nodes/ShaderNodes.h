@@ -94,6 +94,9 @@ namespace RealEngine {
 		const std::vector<int>& GetVariantOptionsIndex() const override { return m_VectorTypesIndex; };
 		void SetVariantOptionsIndex(int vectorIndex, int stringIndex) override;
 
+		Variant& GetConstant(int index) override { return m_Constant[index]; }
+		void SetConstant(int index, Variant constant) override { m_Constant[index] = std::move(constant); }
+
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 	public:
 		inline static const char* s_Name = "Vector Compose";
@@ -108,6 +111,8 @@ namespace RealEngine {
 				{"Vector2", "Vector3", "Vector4"}
 			}
 		};
+
+		Variant m_Constant[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	};
 
 	class ShaderVectorDecomposeNode : public ShaderNode {
@@ -178,15 +183,15 @@ namespace RealEngine {
 		};
 	};
 
-	class ShaderConstantVec4Node : public ShaderNodeConstant {
+	class ShaderConstantVec4Node : public ShaderNode {
 	public:
 		ShaderConstantVec4Node();
 
 		const char* GetName() const override { return s_Name; }
 		const char* GetOptionPath() const override { return s_OptionPath; }
 		
-		Variant& GetConstant() override { return m_Constant; }
-		void SetConstant(Variant constant) override { m_Constant = std::move(constant); }
+		Variant& GetConstant(int index) override { return m_Constant; }
+		void SetConstant(int index, Variant constant) override { m_Constant = std::move(constant); }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 	public:
@@ -197,15 +202,15 @@ namespace RealEngine {
 		Variant m_Constant = glm::vec4(1.0f);
 	};
 
-	class ShaderConstantVec3Node : public ShaderNodeConstant {
+	class ShaderConstantVec3Node : public ShaderNode {
 	public:
 		ShaderConstantVec3Node();
 
 		const char* GetName() const override { return s_Name; }
 		const char* GetOptionPath() const override { return s_OptionPath; }
 
-		Variant& GetConstant() override { return m_Constant; }
-		void SetConstant(Variant constant) override { m_Constant = std::move(constant); }
+		Variant& GetConstant(int index) override { return m_Constant; }
+		void SetConstant(int index, Variant constant) override { m_Constant = std::move(constant); }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 	public:
@@ -216,15 +221,15 @@ namespace RealEngine {
 		Variant m_Constant = glm::vec3(1.0f);
 	};
 
-	class ShaderConstantVec2Node : public ShaderNodeConstant {
+	class ShaderConstantVec2Node : public ShaderNode {
 	public:
 		ShaderConstantVec2Node();
 
 		const char* GetName() const override { return s_Name; }
 		const char* GetOptionPath() const override { return s_OptionPath; }
 
-		Variant& GetConstant() override { return m_Constant; }
-		void SetConstant(Variant constant) override { m_Constant = std::move(constant); }
+		Variant& GetConstant(int index) override { return m_Constant; }
+		void SetConstant(int index, Variant constant) override { m_Constant = std::move(constant); }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 	public:
@@ -239,15 +244,43 @@ namespace RealEngine {
 	///////////Generic//////////////
 	////////////////////////////////
 
-	class ShaderConstantFloatNode : public ShaderNodeConstant {
+	class ShaderGenericOpsNode : public ShaderNode {
+	public:
+		ShaderGenericOpsNode();
+
+		const char* GetName() const override { return s_Name; }
+		const char* GetOptionPath() const override { return s_OptionPath; }
+		
+		const std::vector<const char*>& GetVariantOptions(int index) const override { return m_Operations[index]; };
+		const std::vector<int>& GetVariantOptionsIndex() const override { return m_OperationsIndex; };
+		void SetVariantOptionsIndex(int vectorIndex, int stringIndex) override;
+
+		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
+	public:
+		inline static const char* s_Name = "Generic Operations";
+		inline static const char* s_OptionPath = "Generic/Operations";
+	private:
+		void ChangePinTypes();
+	private:
+		std::vector<int> m_OperationsIndex = { 0, 0 };
+
+		static inline std::array<std::vector<const char*>, 2> m_Operations = {
+			{
+				{"Float", "Int", "Bool"},
+				{"Add", "Subtract", "Multiply", "Divide"}
+			}
+		};
+	};
+
+	class ShaderConstantFloatNode : public ShaderNode {
 	public:
 		ShaderConstantFloatNode();
 
 		const char* GetName() const override { return s_Name; }
 		const char* GetOptionPath() const override { return s_OptionPath; }
 
-		Variant& GetConstant() override { return m_Constant; }
-		void SetConstant(Variant constant) override { m_Constant = std::move(constant); }
+		Variant& GetConstant(int index) override { return m_Constant; }
+		void SetConstant(int index, Variant constant) override { m_Constant = std::move(constant); }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 	public:
@@ -258,15 +291,15 @@ namespace RealEngine {
 		Variant m_Constant = 0.0f;
 	};
 
-	class ShaderConstantIntNode : public ShaderNodeConstant {
+	class ShaderConstantIntNode : public ShaderNode {
 	public:
 		ShaderConstantIntNode();
 
 		const char* GetName() const override { return s_Name; }
 		const char* GetOptionPath() const override { return s_OptionPath; }
 
-		Variant& GetConstant() override { return m_Constant; }
-		void SetConstant(Variant constant) override { m_Constant = std::move(constant); }
+		Variant& GetConstant(int index) override { return m_Constant; }
+		void SetConstant(int index, Variant constant) override { m_Constant = std::move(constant); }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 	public:
@@ -277,15 +310,15 @@ namespace RealEngine {
 		Variant m_Constant = 0;
 	};
 
-	class ShaderConstantBoolNode : public ShaderNodeConstant {
+	class ShaderConstantBoolNode : public ShaderNode {
 	public:
 		ShaderConstantBoolNode();
 
 		const char* GetName() const override { return s_Name; }
 		const char* GetOptionPath() const override { return s_OptionPath; }
 
-		Variant& GetConstant() override { return m_Constant; }
-		void SetConstant(Variant constant) override { m_Constant = std::move(constant); }
+		Variant& GetConstant(int index) override { return m_Constant; }
+		void SetConstant(int index, Variant constant) override { m_Constant = std::move(constant); }
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 	public:

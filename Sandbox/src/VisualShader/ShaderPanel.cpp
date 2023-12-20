@@ -221,6 +221,7 @@ namespace RealEngine {
 
 				builder.EndHeader();
 
+				int constantIndex = 0;
 				for (Pin& input : node->Inputs) {
 					float alpha = ImGui::GetStyle().Alpha;
 					//TODO: Implement!
@@ -230,13 +231,45 @@ namespace RealEngine {
 					builder.Input(input.ID);
 					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
 
-					DrawPinIcon(input, IsPinLinked(&input), (int)(alpha * 255));
+					bool isLinked = IsPinLinked(&input);
+					DrawPinIcon(input, isLinked, (int)(alpha * 255));
 
 					ImGui::Spring(0);
 					if (!input.Name.empty()) {
 						ImGui::TextUnformatted(input.Name.c_str());
 						ImGui::Spring(0);
 					}
+
+					// Check if the input pin is connected to a constant node or alreadt linked
+					if (input.HasDefaultValue) {
+						if (!isLinked) {
+							switch (input.Type) {
+							case PinType::Vector4:
+								ImNode::DrawNodeControlN((float*)node->GetConstant(constantIndex), 4, ImGuiDataType_Float);
+								break;
+							case PinType::Vector3:
+								ImNode::DrawNodeControlN((float*)node->GetConstant(constantIndex), 3, ImGuiDataType_Float);
+								break;
+							case PinType::Vector2:
+								ImNode::DrawNodeControlN((float*)node->GetConstant(constantIndex), 2, ImGuiDataType_Float);
+								break;
+							case PinType::Float:
+								ImNode::DrawNodeControlN((float*)node->GetConstant(constantIndex), 1, ImGuiDataType_Float);
+								break;
+							case PinType::Int:
+								ImNode::DrawNodeControlN((void*)(float*)node->GetConstant(constantIndex), 1, ImGuiDataType_S64);
+								break;
+							case PinType::Bool:
+								ImGui::Checkbox("##bool", (bool*)(float*)node->GetConstant(constantIndex));
+								break;
+							default:
+								RE_ASSERT(false, "Constant pin type not implemented");
+								break;
+							}
+						}
+						constantIndex++;
+					}
+
 
 					//Set the tooltip to the name of the pin type
 					if (ImGui::IsItemHovered())
@@ -257,26 +290,25 @@ namespace RealEngine {
 					static glm::vec4 test = glm::vec4(1.0f);
 
 					// Check if the output pin is connected to a constant node
-					ShaderNodeConstant* constantNode = dynamic_cast<ShaderNodeConstant*>(output.Node);
-					if (constantNode != nullptr) {
+					if (output.HasDefaultValue) {
 						switch (output.Type) {
 							case PinType::Vector4:
-								ImNode::DrawNodeControlN((float*)constantNode->GetConstant(), 4, ImGuiDataType_Float);
+								ImNode::DrawNodeControlN((float*)node->GetConstant(constantIndex++), 4, ImGuiDataType_Float);
 								break;
 							case PinType::Vector3:
-								ImNode::DrawNodeControlN((float*)constantNode->GetConstant(), 3, ImGuiDataType_Float);
+								ImNode::DrawNodeControlN((float*)node->GetConstant(constantIndex++), 3, ImGuiDataType_Float);
 								break;
 							case PinType::Vector2:
-								ImNode::DrawNodeControlN((float*)constantNode->GetConstant(), 2, ImGuiDataType_Float);
+								ImNode::DrawNodeControlN((float*)node->GetConstant(constantIndex++), 2, ImGuiDataType_Float);
 								break;
 							case PinType::Float:
-								ImNode::DrawNodeControlN((float*)constantNode->GetConstant(), 1, ImGuiDataType_Float);
+								ImNode::DrawNodeControlN((float*)node->GetConstant(constantIndex++), 1, ImGuiDataType_Float);
 								break;
 							case PinType::Int:
-								ImNode::DrawNodeControlN((void*)(float*)constantNode->GetConstant(), 1, ImGuiDataType_S64);
+								ImNode::DrawNodeControlN((void*)(float*)node->GetConstant(constantIndex++), 1, ImGuiDataType_S64);
 								break;
 							case PinType::Bool:
-								ImGui::Checkbox("##bool", (bool*)(float*)constantNode->GetConstant());
+								ImGui::Checkbox("##bool", (bool*)(float*)node->GetConstant(constantIndex++));
 								break;
 							default:
 								RE_ASSERT(false, "Constant pin type not implemented");
@@ -302,9 +334,10 @@ namespace RealEngine {
 		}
 
 		// Submit Links for drawing
-		for (Link& linkInfo : m_Links) {
+		for (int i = m_Links.size() - 1; i >= 0; i--) {
+			Link& linkInfo = m_Links[i];
 			//Check if the link is still valid
-			if(linkInfo.InputPin->IsConnected() && linkInfo.OutputPin->IsConnected())
+			if (linkInfo.InputPin->IsConnected() && linkInfo.OutputPin->IsConnected())
 				ImNode::Link(linkInfo.Id, linkInfo.InputPin->ID, linkInfo.OutputPin->ID);
 			else
 				m_Links.erase(&linkInfo);
@@ -434,8 +467,10 @@ namespace RealEngine {
 
 				for (Pin& output : deletedNode->Outputs) {
 					if (output.IsConnected()) {
-						m_Links.erase(FindPinLink(output.ID));
-
+						while (Link* link = FindPinLink(output.ID)) {
+							link->InputPin->ConnectedPin = nullptr;
+							m_Links.erase(link);
+						}
 						output.Dissconnect();
 					}
 				}
@@ -595,6 +630,8 @@ namespace RealEngine {
 		RegisterNodeType<ShaderConstantVec4Node>();
 		RegisterNodeType<ShaderConstantVec3Node>();
 		RegisterNodeType<ShaderConstantVec2Node>();
+
+		RegisterNodeType<ShaderGenericOpsNode>();
 
 		RegisterNodeType<ShaderConstantFloatNode>();
 		RegisterNodeType<ShaderConstantIntNode>();

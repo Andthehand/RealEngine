@@ -251,16 +251,20 @@ namespace RealEngine {
 					out << YAML::Flow << node->GetVariantOptionsIndex();
 				}
 
-				//Constant Node
-				ShaderNodeConstant* constantNode = dynamic_cast<ShaderNodeConstant*>(node.get());
-				if (constantNode) {
-					const Variant& constant = constantNode->GetConstant();
-					out << YAML::Key << "Constant" << YAML::Value << YAML::BeginSeq;
-					
+				int constantIndex = 0;
+				out << YAML::Key << "Input Constants" << YAML::Value << YAML::BeginSeq; //Input Constants
+				for (Pin& pin : node->Inputs) {
+					if (!pin.HasDefaultValue || pin.IsConnected()) {
+						constantIndex++;
+						continue;
+					}
+
+					const Variant& constant = node->GetConstant(constantIndex);
 					out << YAML::BeginMap;
 					out << YAML::Key << "Type" << YAML::Value << Utils::GetVariantTypeName(constant);
+					out << YAML::Key << "Index" << YAML::Value << constantIndex;
 					out << YAML::Key << "Value" << YAML::Value;
-					
+
 					//Use C style casts
 					switch (constant.m_Type) {
 						case Variant::Type::BOOL:
@@ -297,11 +301,63 @@ namespace RealEngine {
 							RE_CORE_ASSERT(false, "Variant type unknown");
 							break;
 					}
-
 					out << YAML::EndMap;
-					
-					out << YAML::EndSeq;
+					constantIndex++;
 				}
+				out << YAML::EndSeq; //Input Constants
+
+				out << YAML::Key << "Output Constants" << YAML::Value << YAML::BeginSeq; //Output Constants
+				for (Pin& pin : node->Outputs) {
+					if (!pin.HasDefaultValue)
+						continue;
+
+
+					const Variant& constant = node->GetConstant(constantIndex);
+					out << YAML::BeginMap;
+					out << YAML::Key << "Type" << YAML::Value << Utils::GetVariantTypeName(constant);
+					out << YAML::Key << "Index" << YAML::Value << constantIndex;
+					out << YAML::Key << "Value" << YAML::Value;
+
+					//Use C style casts
+					switch (constant.m_Type) {
+						case Variant::Type::BOOL:
+							out << (bool)constant;
+							break;
+						case Variant::Type::INT:
+							out << (int)constant;
+							break;
+						case Variant::Type::FLOAT:
+							out << (float)constant;
+							break;
+						case Variant::Type::STRING:
+							out << (std::string)constant;
+							break;
+						case Variant::Type::VECTOR2:
+							out << (glm::vec2)constant;
+							break;
+						case Variant::Type::VECTOR2I:
+							out << (glm::ivec2)constant;
+							break;
+						case Variant::Type::VECTOR3:
+							out << (glm::vec3)constant;
+							break;
+						case Variant::Type::VECTOR3I:
+							out << (glm::ivec3)constant;
+							break;
+						case Variant::Type::VECTOR4:
+							out << (glm::vec4)constant;
+							break;
+						case Variant::Type::VECTOR4I:
+							out << (glm::ivec4)constant;
+							break;
+						default:
+							RE_CORE_ASSERT(false, "Variant type unknown");
+							break;
+					}
+					out << YAML::EndMap;
+					constantIndex++;
+				}
+				out << YAML::EndSeq; //Output Constants
 
 				if (node->ID.Get() > largestID)
 					largestID = node->ID.Get();
@@ -370,49 +426,86 @@ namespace RealEngine {
 					}
 				}
 
-				//Constant Node
-				ShaderNodeConstant* constantNode = dynamic_cast<ShaderNodeConstant*>(shaderNode.get());
-				if (constantNode) {
-					const auto& constant = node["Constant"][0];
+				for (auto& constant : node["Input Constants"]) {
 					Variant::Type type = Utils::GetVariantTypeFromString(constant["Type"].as<std::string>());
-					
+					int index = constant["Index"].as<int>();
+
+					switch (type) {
+					case Variant::Type::BOOL:
+						shaderNode->SetConstant(index, constant["Value"].as<bool>());
+						break;
+					case Variant::Type::INT:
+						shaderNode->SetConstant(index, constant["Value"].as<int>());
+						break;
+					case Variant::Type::FLOAT:
+						shaderNode->SetConstant(index, constant["Value"].as<float>());
+						break;
+					case Variant::Type::STRING:
+						shaderNode->SetConstant(index, constant["Value"].as<std::string>());
+						break;
+					case Variant::Type::VECTOR2:
+						shaderNode->SetConstant(index, constant["Value"].as<glm::vec2>());
+						break;
+					case Variant::Type::VECTOR2I:
+						shaderNode->SetConstant(index, constant["Value"].as<glm::ivec2>());
+						break;
+					case Variant::Type::VECTOR3:
+						shaderNode->SetConstant(index, constant["Value"].as<glm::vec3>());
+						break;
+					case Variant::Type::VECTOR3I:
+						shaderNode->SetConstant(index, constant["Value"].as<glm::ivec3>());
+						break;
+					case Variant::Type::VECTOR4:
+						shaderNode->SetConstant(index, constant["Value"].as<glm::vec4>());
+						break;
+					case Variant::Type::VECTOR4I:
+						shaderNode->SetConstant(index, constant["Value"].as<glm::ivec4>());
+						break;
+					default:
+						RE_CORE_ASSERT(false, "Variant type unknown");
+						break;
+					}
+				}
+
+				for (auto& constant : node["Output Constants"]) {
+					Variant::Type type = Utils::GetVariantTypeFromString(constant["Type"].as<std::string>());
+					int index = constant["Index"].as<int>();
+
 					switch (type) {
 						case Variant::Type::BOOL:
-							constantNode->SetConstant(constant["Value"].as<bool>());
+							shaderNode->SetConstant(index, constant["Value"].as<bool>());
 							break;
 						case Variant::Type::INT:
-							constantNode->SetConstant(constant["Value"].as<int>());
+							shaderNode->SetConstant(index, constant["Value"].as<int>());
 							break;
 						case Variant::Type::FLOAT:
-							constantNode->SetConstant(constant["Value"].as<float>());
+							shaderNode->SetConstant(index, constant["Value"].as<float>());
 							break;
 						case Variant::Type::STRING:
-							constantNode->SetConstant(constant["Value"].as<std::string>());
+							shaderNode->SetConstant(index, constant["Value"].as<std::string>());
 							break;
 						case Variant::Type::VECTOR2:
-							constantNode->SetConstant(constant["Value"].as<glm::vec2>());
+							shaderNode->SetConstant(index, constant["Value"].as<glm::vec2>());
 							break;
 						case Variant::Type::VECTOR2I:
-							constantNode->SetConstant(constant["Value"].as<glm::ivec2>());
+							shaderNode->SetConstant(index, constant["Value"].as<glm::ivec2>());
 							break;
 						case Variant::Type::VECTOR3:
-							constantNode->SetConstant(constant["Value"].as<glm::vec3>());
+							shaderNode->SetConstant(index, constant["Value"].as<glm::vec3>());
 							break;
 						case Variant::Type::VECTOR3I:
-							constantNode->SetConstant(constant["Value"].as<glm::ivec3>());
+							shaderNode->SetConstant(index, constant["Value"].as<glm::ivec3>());
 							break;
 						case Variant::Type::VECTOR4:
-							constantNode->SetConstant(constant["Value"].as<glm::vec4>());
+							shaderNode->SetConstant(index, constant["Value"].as<glm::vec4>());
 							break;
 						case Variant::Type::VECTOR4I:
-							constantNode->SetConstant(constant["Value"].as<glm::ivec4>());
+							shaderNode->SetConstant(index, constant["Value"].as<glm::ivec4>());
 							break;
 						default:
 							RE_CORE_ASSERT(false, "Variant type unknown");
 							break;
 					}
-
-
 				}
 			}
 			shaderPanels[i]->BuildNodes();

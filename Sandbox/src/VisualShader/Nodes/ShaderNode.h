@@ -26,8 +26,8 @@ namespace RealEngine {
 	};
 
 	struct Pin {
-		Pin(const char* name, PinType type)
-			: ID(UniqueId::GetNextId()), Name(name), Type(type), Kind(PinKind::Input) {}
+		Pin(const char* name, PinType type, bool hasDefaultValue = false)
+			: ID(UniqueId::GetNextId()), Name(name), Type(type), Kind(PinKind::Input), HasDefaultValue(hasDefaultValue) {}
 
 		~Pin() {
 			Dissconnect();
@@ -51,6 +51,7 @@ namespace RealEngine {
 		ShaderNode* Node = nullptr;
 		PinType Type;
 		PinKind Kind;
+		bool HasDefaultValue;
 
 		//This isn't a vector because outputs only need to know if they are connected
 		//and not with who they are connected with
@@ -79,6 +80,7 @@ namespace RealEngine {
 		virtual const char* GetName() const = 0;
 		virtual const char* GetOptionPath() const = 0;
 
+		//Used for ComboBoxes etc..
 		virtual const std::vector<const char*>& GetVariantOptions(int index) const {
 			RE_CORE_ASSERT(false); 
 			return std::vector<const char*>();
@@ -87,9 +89,16 @@ namespace RealEngine {
 			RE_CORE_ASSERT(false);
 			return std::vector<int>();
 		};
-
-		//Returns true if the node needs to be rebuilt
 		virtual void SetVariantOptionsIndex(int vectorIndex, int stringIndex) {
+			RE_CORE_ASSERT(false);
+		};
+
+		//Constant Nodes and defualt value pins
+		virtual Variant& GetConstant(int index) {
+			RE_CORE_ASSERT(false);
+			return Variant(false);
+		}
+		virtual void SetConstant(int index, Variant constant) {
 			RE_CORE_ASSERT(false);
 		};
 
@@ -105,14 +114,5 @@ namespace RealEngine {
 		std::vector<Pin> Inputs;
 		std::vector<Pin> Outputs;
 		std::vector<ContentType> Content;
-	};
-
-	class ShaderNodeConstant : public ShaderNode {
-	public:
-		ShaderNodeConstant()
-			: ShaderNode() {}
-
-		virtual Variant& GetConstant() = 0;
-		virtual void SetConstant(Variant constant) = 0;
 	};
 }

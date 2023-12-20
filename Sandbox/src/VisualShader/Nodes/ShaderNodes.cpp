@@ -94,8 +94,8 @@ namespace RealEngine {
 	}
 
 	ShaderConstantVec4Node::ShaderConstantVec4Node() 
-		: ShaderNodeConstant() {
-		Outputs.emplace_back("Vector4", PinType::Vector4);
+		: ShaderNode() {
+		Outputs.emplace_back("Vector4", PinType::Vector4, true);
 	}
 
 	std::string ShaderConstantVec4Node::GenerateCode(std::string* outputVars, std::string* inputVars) const {
@@ -103,8 +103,8 @@ namespace RealEngine {
 	}
 
 	ShaderConstantVec3Node::ShaderConstantVec3Node()
-		: ShaderNodeConstant() {
-		Outputs.emplace_back("Vector3", PinType::Vector3);
+		: ShaderNode() {
+		Outputs.emplace_back("Vector3", PinType::Vector3, true);
 	}
 
 	std::string ShaderConstantVec3Node::GenerateCode(std::string* outputVars, std::string* inputVars) const {
@@ -112,8 +112,8 @@ namespace RealEngine {
 	}
 
 	ShaderConstantVec2Node::ShaderConstantVec2Node()
-		: ShaderNodeConstant() {
-		Outputs.emplace_back("Vector2", PinType::Vector2);
+		: ShaderNode() {
+		Outputs.emplace_back("Vector2", PinType::Vector2, true);
 	}
 
 	std::string ShaderConstantVec2Node::GenerateCode(std::string* outputVars, std::string* inputVars) const {
@@ -121,8 +121,8 @@ namespace RealEngine {
 	}
 
 	ShaderConstantFloatNode::ShaderConstantFloatNode()
-		: ShaderNodeConstant() {
-		Outputs.emplace_back("Float", PinType::Float);
+		: ShaderNode() {
+		Outputs.emplace_back("Float", PinType::Float, true);
 	}
 
 	std::string ShaderConstantFloatNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
@@ -130,8 +130,8 @@ namespace RealEngine {
 	}
 
 	ShaderConstantIntNode::ShaderConstantIntNode()
-		: ShaderNodeConstant() {
-		Outputs.emplace_back("Int", PinType::Int);
+		: ShaderNode() {
+		Outputs.emplace_back("Int", PinType::Int, true);
 	}
 
 	std::string ShaderConstantIntNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
@@ -139,8 +139,8 @@ namespace RealEngine {
 	}
 
 	ShaderConstantBoolNode::ShaderConstantBoolNode()
-		: ShaderNodeConstant() {
-		Outputs.emplace_back("Bool", PinType::Bool);
+		: ShaderNode() {
+		Outputs.emplace_back("Bool", PinType::Bool, true);
 	}
 
 	std::string ShaderConstantBoolNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
@@ -239,10 +239,10 @@ namespace RealEngine {
 		Content.emplace_back(ContentType::ComboBox);
 		m_VectorTypesIndex[0] = 2;
 
-		Inputs.emplace_back("X", PinType::Float);
-		Inputs.emplace_back("Y", PinType::Float);
-		Inputs.emplace_back("Z", PinType::Float);
-		Inputs.emplace_back("W", PinType::Float);
+		Inputs.emplace_back("X", PinType::Float, true);
+		Inputs.emplace_back("Y", PinType::Float, true);
+		Inputs.emplace_back("Z", PinType::Float, true);
+		Inputs.emplace_back("W", PinType::Float, true);
 
 		Outputs.emplace_back("Results", PinType::Vector4);
 	}
@@ -257,12 +257,23 @@ namespace RealEngine {
 	std::string ShaderVectorComposeNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
 		std::string code;
 
-		if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector2")
-			code += "\t" + outputVars[0] + " = vec2(" + inputVars[0] + ", " + inputVars[1] + ");\n";
-		else if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector3")
-			code += "\t" + outputVars[0] + " = vec3(" + inputVars[0] + ", " + inputVars[1] + ", " + inputVars[3] + ");\n";
-		else if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector4")
-			code += "\t" + outputVars[0] + " = vec4(" + inputVars[0] + ", " + inputVars[1] + ", " + inputVars[2] + ", " + inputVars[3] + ");\n";
+		std::string vars[4];
+		for (int i = 0; i < 4; i++) {
+			if (inputVars[i].empty())
+				vars[i] = m_Constant[i];
+			else
+				vars[i] = inputVars[i];
+		}
+
+		if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector2") {
+			code += "\t" + outputVars[0] + " = vec2(" + vars[0] + ", " + vars[1] + ");\n";
+		}
+		else if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector3") {
+			code += "\t" + outputVars[0] + " = vec3(" + vars[0] + ", " + vars[1] + ", " + vars[2] + ");\n";
+		}
+		else if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector4") {
+			code += "\t" + outputVars[0] + " = vec4(" + vars[0] + ", " + vars[1] + ", " + vars[2] + ", " + vars[3] + ");\n";
+		}
 
 		return code;
 	}
@@ -272,23 +283,23 @@ namespace RealEngine {
 
 		Inputs.clear();
 		if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector2") {
-			Inputs.emplace_back("X", PinType::Float);
-			Inputs.emplace_back("Y", PinType::Float);
+			Inputs.emplace_back("X", PinType::Float, true);
+			Inputs.emplace_back("Y", PinType::Float, true);
 
 			Outputs[0].Type = PinType::Vector2;
 		}
 		else if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector3") {
-			Inputs.emplace_back("X", PinType::Float);
-			Inputs.emplace_back("Y", PinType::Float);
-			Inputs.emplace_back("Z", PinType::Float);
+			Inputs.emplace_back("X", PinType::Float, true);
+			Inputs.emplace_back("Y", PinType::Float, true);
+			Inputs.emplace_back("Z", PinType::Float, true);
 
 			Outputs[0].Type = PinType::Vector3;
 		}
 		else if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector4") {
-			Inputs.emplace_back("X", PinType::Float);
-			Inputs.emplace_back("Y", PinType::Float);
-			Inputs.emplace_back("Z", PinType::Float);
-			Inputs.emplace_back("W", PinType::Float);
+			Inputs.emplace_back("X", PinType::Float, true);
+			Inputs.emplace_back("Y", PinType::Float, true);
+			Inputs.emplace_back("Z", PinType::Float, true);
+			Inputs.emplace_back("W", PinType::Float, true);
 
 			Outputs[0].Type = PinType::Vector4;
 		}
@@ -364,6 +375,61 @@ namespace RealEngine {
 		}
 
 		BuildNode();
+	}
+
+	ShaderGenericOpsNode::ShaderGenericOpsNode() {
+		//Type
+		Content.emplace_back(ContentType::ComboBox);
+		//Operation
+		Content.emplace_back(ContentType::ComboBox);
+
+		Inputs.emplace_back("A", PinType::Float);
+		Inputs.emplace_back("B", PinType::Float);
+		Outputs.emplace_back("Result", PinType::Float);
+	}
+	
+	void ShaderGenericOpsNode::SetVariantOptionsIndex(int vectorIndex, int stringIndex) {
+		if (m_OperationsIndex[vectorIndex] != stringIndex) {
+			m_OperationsIndex[vectorIndex] = stringIndex;
+			if (vectorIndex == 0)
+				ChangePinTypes();
+		}
+	}
+
+	std::string ShaderGenericOpsNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
+		std::string code;
+
+		if (m_Operations[1][m_OperationsIndex[1]] == "Add")
+			code += "\t" + outputVars[0] + " = " + inputVars[0] + " + " + inputVars[1] + ";\n";
+		else if (m_Operations[1][m_OperationsIndex[1]] == "Subtract")
+			code += "\t" + outputVars[0] + " = " + inputVars[0] + " - " + inputVars[1] + ";\n";
+		else if (m_Operations[1][m_OperationsIndex[1]] == "Multiply")
+			code += "\t" + outputVars[0] + " = " + inputVars[0] + " * " + inputVars[1] + ";\n";
+		else if (m_Operations[1][m_OperationsIndex[1]] == "Divide")
+			code += "\t" + outputVars[0] + " = " + inputVars[0] + " / " + inputVars[1] + ";\n";
+
+		return code;
+	}
+
+	void ShaderGenericOpsNode::ChangePinTypes() {
+		if (m_Operations[0][m_OperationsIndex[0]] == "Float") {
+			Inputs[0].Type = PinType::Float;
+			Inputs[1].Type = PinType::Float;
+
+			Outputs[0].Type = PinType::Float;
+		}
+		else if (m_Operations[0][m_OperationsIndex[0]] == "Int") {
+			Inputs[0].Type = PinType::Int;
+			Inputs[1].Type = PinType::Int;
+
+			Outputs[0].Type = PinType::Int;
+		}
+		else if (m_Operations[0][m_OperationsIndex[0]] == "Bool") {
+			Inputs[0].Type = PinType::Bool;
+			Inputs[1].Type = PinType::Bool;
+
+			Outputs[0].Type = PinType::Bool;
+		}
 	}
 }
 

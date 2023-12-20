@@ -5,6 +5,10 @@ Nodes:
     ID: 1
     Links:
       []
+    Input Constants:
+      []
+    Output Constants:
+      []
 ---
 Shader Type: Fragment
 Nodes:
@@ -12,65 +16,31 @@ Nodes:
     Option Path: /Fragment Output
     ID: 4
     Links:
-      - Input ID: 5
-        Output ID: 25
-  - Name: Vector Decompose
-    Option Path: Vectors/Composition/Vector Decompose
-    ID: 14
-    Links:
-      - Input ID: 19
-        Output ID: 31
-    Content: [0]
-  - Name: Vector Compose
-    Option Path: Vectors/Composition/Vector Compose
-    ID: 20
-    Links:
-      - Input ID: 21
-        Output ID: 15
-      - Input ID: 22
-        Output ID: 16
-      - Input ID: 23
-        Output ID: 49
-      - Input ID: 24
-        Output ID: 50
-    Content: [2]
+      []
+    Input Constants:
+      []
+    Output Constants:
+      []
   - Name: Input
     Option Path: Inputs/Input
-    ID: 30
+    ID: 14
     Links:
       []
     Content: [1]
-  - Name: Constanct Vector2
-    Option Path: Vectors/Constants/Constanct Vector2
-    ID: 40
-    Links:
+    Input Constants:
       []
-    Constant:
-      - Type: Vector2
-        Value: [0, 1]
-  - Name: Constanct Vector2
-    Option Path: Vectors/Constants/Constanct Vector2
-    ID: 42
-    Links:
+    Output Constants:
       []
-    Constant:
-      - Type: Vector2
-        Value: [0, 0]
-  - Name: Vector Operations
-    Option Path: Vectors/Operations/Vector Operations
-    ID: 44
-    Links:
-      - Input ID: 45
-        Output ID: 43
-      - Input ID: 46
-        Output ID: 41
-    Content: [0, 0]
   - Name: Vector Decompose
     Option Path: Vectors/Composition/Vector Decompose
-    ID: 48
+    ID: 16
     Links:
-      - Input ID: 53
-        Output ID: 47
+      - Input ID: 21
+        Output ID: 15
     Content: [0]
+    Input Constants:
+      []
+    Output Constants:
+      []
 ---
-Largest ID: 48
+Largest ID: 16
