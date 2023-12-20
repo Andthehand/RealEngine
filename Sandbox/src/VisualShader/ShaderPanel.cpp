@@ -404,9 +404,16 @@ namespace RealEngine {
 					//This is so scuffed
 					//It is now less scuffed
 					//and finally now it's way less scuffed
-					link.InputPin->Dissconnect();
+					//Hopefully this is the last time I have to touch this
+					Pin* outputPin = link.OutputPin;
+					link.InputPin->ConnectedPin = nullptr;
 
 					m_Links.erase(&link);
+
+					//This is in case the output pin is connected to another input pin
+					Link* otherLink = FindPinLink(outputPin->ID);
+					if(otherLink)
+						outputPin->ConnectedPin = outputPin;
 				}
 			}
 
