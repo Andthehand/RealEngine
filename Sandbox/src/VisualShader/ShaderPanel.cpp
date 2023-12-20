@@ -624,14 +624,15 @@ namespace RealEngine {
 		RegisterNodeType<ShaderVectorComposeNode>();
 		RegisterNodeType<ShaderVectorDecomposeNode>();
 
-		RegisterNodeType<ShaderDotProductNode>();
 		RegisterNodeType<ShaderVectorOpsNode>();
+		RegisterNodeType<ShaderVectorFuncNode>();
 
 		RegisterNodeType<ShaderConstantVec4Node>();
 		RegisterNodeType<ShaderConstantVec3Node>();
 		RegisterNodeType<ShaderConstantVec2Node>();
 
 		RegisterNodeType<ShaderGenericOpsNode>();
+		RegisterNodeType<ShaderGenericFuncNode>();
 
 		RegisterNodeType<ShaderConstantFloatNode>();
 		RegisterNodeType<ShaderConstantIntNode>();

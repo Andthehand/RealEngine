@@ -3,7 +3,7 @@
 namespace RealEngine {
 	VertexShaderOutputNode::VertexShaderOutputNode() {
 		Inputs.emplace_back("UV", PinType::Vector2);
-		Inputs.emplace_back("Vertex", PinType::Vector3);
+		Inputs.emplace_back("Vertex", PinType::Vector4);
 	}
 
 	//TODO: Implement this
@@ -146,16 +146,6 @@ namespace RealEngine {
 	std::string ShaderConstantBoolNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
 		return "\t" + outputVars[0] + " = " + (std::string)m_Constant + "; \n";
 	}
-	
-	ShaderDotProductNode::ShaderDotProductNode() {
-		Inputs.emplace_back("A", PinType::Vector3);
-		Inputs.emplace_back("B", PinType::Vector3);
-		Outputs.emplace_back("Dot", PinType::Float);
-	}
-
-	std::string ShaderDotProductNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
-		return "\t" + outputVars[0] + " = dot(" + inputVars[0] + ", " + inputVars[1] + ");\n";
-	}
 
 	ShaderVectorOpsNode::ShaderVectorOpsNode() {
 		//Type
@@ -215,7 +205,15 @@ namespace RealEngine {
 	ShaderInputNode::ShaderInputNode() {
 		Content.emplace_back(ContentType::ComboBox);
 
-		Outputs.emplace_back("Result", PinType::Vector2);
+		Outputs.emplace_back("Result", PinType::Vector3);
+	}
+
+	void ShaderInputNode::SetVariantOptionsIndex(int vectorIndex, int stringIndex) {
+		if (m_InputTypesIndex[vectorIndex] != stringIndex) {
+			m_InputTypesIndex[vectorIndex] = stringIndex;
+			if (vectorIndex == 0)
+				ChangePinTypes();
+		}
 	}
 
 	std::string ShaderInputNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
@@ -233,6 +231,15 @@ namespace RealEngine {
 			defines->emplace_back("IMPLEMENTUV");
 
 		return std::string();
+	}
+
+	void ShaderInputNode::ChangePinTypes() {
+		if (m_InputTypes[0][m_InputTypesIndex[0]] == "Position") {
+			Outputs[0].Type = PinType::Vector3;
+		}
+		else if (m_InputTypes[0][m_InputTypesIndex[0]] == "UV") {
+			Outputs[0].Type = PinType::Vector2;
+		}
 	}
 
 	ShaderVectorComposeNode::ShaderVectorComposeNode() {
@@ -257,8 +264,9 @@ namespace RealEngine {
 	std::string ShaderVectorComposeNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
 		std::string code;
 
-		std::string vars[4];
-		for (int i = 0; i < 4; i++) {
+		std::vector<std::string> vars;
+		vars.resize(Inputs.size());
+		for (int i = 0; i < vars.size(); i++) {
 			if (inputVars[i].empty())
 				vars[i] = m_Constant[i];
 			else
@@ -330,19 +338,28 @@ namespace RealEngine {
 		std::string code;
 
 		if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector2") {
-			code += "\t" + outputVars[0] + " = " + inputVars[0] + ".x;\n";
-			code += "\t" + outputVars[1] + " = " + inputVars[0] + ".y;\n";
+			if(!outputVars[0].empty())
+				code += "\t" + outputVars[0] + " = " + inputVars[0] + ".x;\n";
+			if(!outputVars[1].empty())
+				code += "\t" + outputVars[1] + " = " + inputVars[0] + ".y;\n";
 		}
 		else if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector3") {
-			code += "\t" + outputVars[0] + " = " + inputVars[0] + ".x;\n";
-			code += "\t" + outputVars[1] + " = " + inputVars[0] + ".y;\n";
-			code += "\t" + outputVars[2] + " = " + inputVars[0] + ".z;\n";
+			if(!outputVars[0].empty())
+				code += "\t" + outputVars[0] + " = " + inputVars[0] + ".x;\n";
+			if(!outputVars[1].empty())
+				code += "\t" + outputVars[1] + " = " + inputVars[0] + ".y;\n";
+			if(!outputVars[2].empty())
+				code += "\t" + outputVars[2] + " = " + inputVars[0] + ".z;\n";
 		}
 		else if (m_VectorTypes[0][m_VectorTypesIndex[0]] == "Vector4") {
-			code += "\t" + outputVars[0] + " = " + inputVars[0] + ".x;\n";
-			code += "\t" + outputVars[1] + " = " + inputVars[0] + ".y;\n";
-			code += "\t" + outputVars[2] + " = " + inputVars[0] + ".z;\n";
-			code += "\t" + outputVars[3] + " = " + inputVars[0] + ".w;\n";
+			if(!outputVars[0].empty())
+				code += "\t" + outputVars[0] + " = " + inputVars[0] + ".x;\n";
+			if(!outputVars[1].empty())
+				code += "\t" + outputVars[1] + " = " + inputVars[0] + ".y;\n";
+			if(!outputVars[2].empty())
+				code += "\t" + outputVars[2] + " = " + inputVars[0] + ".z;\n";
+			if(!outputVars[3].empty())
+				code += "\t" + outputVars[3] + " = " + inputVars[0] + ".w;\n";
 		}
 
 		return code;
@@ -425,6 +442,117 @@ namespace RealEngine {
 			Outputs[0].Type = PinType::Int;
 		}
 		else if (m_Operations[0][m_OperationsIndex[0]] == "Bool") {
+			Inputs[0].Type = PinType::Bool;
+			Inputs[1].Type = PinType::Bool;
+
+			Outputs[0].Type = PinType::Bool;
+		}
+	}
+
+	ShaderVectorFuncNode::ShaderVectorFuncNode() {
+		//Type
+		Content.emplace_back(ContentType::ComboBox);
+		//Operation
+		Content.emplace_back(ContentType::ComboBox);
+
+		Inputs.emplace_back("A", PinType::Vector3);
+		Outputs.emplace_back("Result", PinType::Vector3);
+	}
+
+	void ShaderVectorFuncNode::SetVariantOptionsIndex(int vectorIndex, int stringIndex) {
+		if (m_FunctionsIndex[vectorIndex] != stringIndex) {
+			m_FunctionsIndex[vectorIndex] = stringIndex;
+			if (vectorIndex == 0)
+				ChangePinTypes();
+		}
+	}
+
+	std::string ShaderVectorFuncNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
+		std::string code;
+
+		if(m_Functions[1][m_FunctionsIndex[1]] == "Normalize")
+			code += "\t" + outputVars[0] + " = normalize(" + inputVars[0] + ");\n";
+		else if (m_Functions[1][m_FunctionsIndex[1]] == "Length")
+			code += "\t" + outputVars[0] + " = length(" + inputVars[0] + ");\n";
+		else if (m_Functions[1][m_FunctionsIndex[1]] == "Sine")
+			code += "\t" + outputVars[0] + " = sin(" + inputVars[0] + ");\n";
+		else if (m_Functions[1][m_FunctionsIndex[1]] == "Cosine")
+			code += "\t" + outputVars[0] + " = cos(" + inputVars[0] + ");\n";
+		else if (m_Functions[1][m_FunctionsIndex[1]] == "Tangent")
+			code += "\t" + outputVars[0] + " = tan(" + inputVars[0] + ");\n";
+
+		return code;
+	}
+
+	void ShaderVectorFuncNode::ChangePinTypes() {
+		if (m_Functions[0][m_FunctionsIndex[0]] == "Vector2") {
+			Inputs[0].Type = PinType::Vector2;
+			Inputs[1].Type = PinType::Vector2;
+
+			Outputs[0].Type = PinType::Vector2;
+		}
+		else if (m_Functions[0][m_FunctionsIndex[0]] == "Vector3") {
+			Inputs[0].Type = PinType::Vector3;
+			Inputs[1].Type = PinType::Vector3;
+
+			Outputs[0].Type = PinType::Vector3;
+		}
+		else if (m_Functions[0][m_FunctionsIndex[0]] == "Vector4") {
+			Inputs[0].Type = PinType::Vector4;
+			Inputs[1].Type = PinType::Vector4;
+
+			Outputs[0].Type = PinType::Vector4;
+		}
+	}
+
+	ShaderGenericFuncNode::ShaderGenericFuncNode() {\
+		//Type
+		Content.emplace_back(ContentType::ComboBox);
+		//Operation
+		Content.emplace_back(ContentType::ComboBox);
+
+		Inputs.emplace_back("A", PinType::Float);
+		Outputs.emplace_back("Result", PinType::Float);
+	}
+
+	void ShaderGenericFuncNode::SetVariantOptionsIndex(int vectorIndex, int stringIndex) {
+		if (m_FunctionsIndex[vectorIndex] != stringIndex) {
+			m_FunctionsIndex[vectorIndex] = stringIndex;
+			if (vectorIndex == 0)
+				ChangePinTypes();
+		}
+	}
+	std::string ShaderGenericFuncNode::GenerateCode(std::string* outputVars, std::string* inputVars) const {
+		std::string code;
+
+		if (m_Functions[1][m_FunctionsIndex[1]] == "Normalize")
+			code += "\t" + outputVars[0] + " = normalize(" + inputVars[0] + ");\n";
+		else if (m_Functions[1][m_FunctionsIndex[1]] == "Length")
+			code += "\t" + outputVars[0] + " = length(" + inputVars[0] + ");\n";
+		else if (m_Functions[1][m_FunctionsIndex[1]] == "Sine")
+			code += "\t" + outputVars[0] + " = sin(" + inputVars[0] + ");\n";
+		else if (m_Functions[1][m_FunctionsIndex[1]] == "Cosine")
+			code += "\t" + outputVars[0] + " = cos(" + inputVars[0] + ");\n";
+		else if (m_Functions[1][m_FunctionsIndex[1]] == "Tangent")
+			code += "\t" + outputVars[0] + " = tan(" + inputVars[0] + ");\n";
+
+		return code;
+	}
+
+	void ShaderGenericFuncNode::ChangePinTypes() {
+		if (m_Functions[0][m_FunctionsIndex[0]] == "Float") {
+			Inputs[0].Type = PinType::Float;
+			Inputs[1].Type = PinType::Float;
+
+			Outputs[0].Type = PinType::Float;
+		}
+		else if (m_Functions[0][m_FunctionsIndex[0]] == "Int") {
+			Inputs[0].Type = PinType::Int;
+			Inputs[1].Type = PinType::Int;
+
+			Outputs[0].Type = PinType::Int;
+		}
+		else if (m_Functions[0][m_FunctionsIndex[0]] == "Bool") {
 			Inputs[0].Type = PinType::Bool;
 			Inputs[1].Type = PinType::Bool;
 

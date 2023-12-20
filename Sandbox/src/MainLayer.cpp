@@ -13,11 +13,11 @@ namespace RealEngine {
 		m_Framebuffer = Framebuffer::Create(fbSpec);
 
 		float vertices[] = {
-			//Positions			//UVs
-			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
-			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
+			//Positions				//UVs
+			 0.5f,  0.5f, 0.0f,		1.0f, 1.0f,
+			 0.5f, -0.5f, 0.0f,		1.0f, 0.0f,
+			-0.5f, -0.5f, 0.0f,		0.0f, 0.0f,
+			-0.5f,  0.5f, 0.0f,		0.0f, 1.0f
 		}; 
 
 		unsigned int indices[] = {
@@ -25,7 +25,7 @@ namespace RealEngine {
 			1, 2, 3  // second triangle
 		};
 
-		Ref<VertexBuffer> vertexBuffer = VertexBuffer::Create(vertices, sizeof(vertices) * 12);
+		Ref<VertexBuffer> vertexBuffer = VertexBuffer::Create(vertices, sizeof(vertices));
 
 		vertexBuffer->SetLayout({
 			{ ShaderDataType::Float3, "a_Position" },

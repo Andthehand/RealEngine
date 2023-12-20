@@ -1,7 +1,7 @@
 Shader Type: Vertex
 Nodes:
-  - Name: Fragment Output
-    Option Path: /Fragment Output
+  - Name: Vertex Output
+    Option Path: /Vertex Output
     ID: 1
     Links:
       []
@@ -16,7 +16,8 @@ Nodes:
     Option Path: /Fragment Output
     ID: 4
     Links:
-      []
+      - Input ID: 5
+        Output ID: 43
     Input Constants:
       []
     Output Constants:
@@ -42,5 +43,166 @@ Nodes:
       []
     Output Constants:
       []
+  - Name: Constanct Float
+    Option Path: Generic/Constants/Constanct Float
+    ID: 22
+    Links:
+      []
+    Input Constants:
+      []
+    Output Constants:
+      - Type: Float
+        Index: 0
+        Value: 50
+  - Name: Generic Operations
+    Option Path: Generic/Operations/Generic Operations
+    ID: 30
+    Links:
+      - Input ID: 31
+        Output ID: 18
+      - Input ID: 32
+        Output ID: 23
+    Content: [0, 2]
+    Input Constants:
+      []
+    Output Constants:
+      []
+  - Name: Generic Operations
+    Option Path: Generic/Operations/Generic Operations
+    ID: 34
+    Links:
+      - Input ID: 35
+        Output ID: 33
+      - Input ID: 36
+        Output ID: 17
+    Content: [0, 2]
+    Input Constants:
+      []
+    Output Constants:
+      []
+  - Name: Vector Compose
+    Option Path: Vectors/Composition/Vector Compose
+    ID: 38
+    Links:
+      - Input ID: 39
+        Output ID: 69
+      - Input ID: 40
+        Output ID: 72
+      - Input ID: 41
+        Output ID: 92
+    Content: [2]
+    Input Constants:
+      - Type: Float
+        Index: 3
+        Value: 1
+    Output Constants:
+      []
+  - Name: Constanct Float
+    Option Path: Generic/Constants/Constanct Float
+    ID: 50
+    Links:
+      []
+    Input Constants:
+      []
+    Output Constants:
+      - Type: Float
+        Index: 0
+        Value: 10
+  - Name: Generic Operations
+    Option Path: Generic/Operations/Generic Operations
+    ID: 52
+    Links:
+      - Input ID: 53
+        Output ID: 17
+      - Input ID: 54
+        Output ID: 51
+    Content: [0, 2]
+    Input Constants:
+      []
+    Output Constants:
+      []
+  - Name: Generic Operations
+    Option Path: Generic/Operations/Generic Operations
+    ID: 56
+    Links:
+      - Input ID: 57
+        Output ID: 18
+      - Input ID: 58
+        Output ID: 51
+    Content: [0, 2]
+    Input Constants:
+      []
+    Output Constants:
+      []
+  - Name: Generic Functions
+    Option Path: Generic/Operations/Generic Functions
+    ID: 64
+    Links:
+      - Input ID: 65
+        Output ID: 37
+    Content: [0, 0]
+    Input Constants:
+      []
+    Output Constants:
+      []
+  - Name: Generic Functions
+    Option Path: Generic/Operations/Generic Functions
+    ID: 67
+    Links:
+      - Input ID: 68
+        Output ID: 55
+    Content: [0, 0]
+    Input Constants:
+      []
+    Output Constants:
+      []
+  - Name: Generic Functions
+    Option Path: Generic/Operations/Generic Functions
+    ID: 70
+    Links:
+      - Input ID: 71
+        Output ID: 59
+    Content: [0, 1]
+    Input Constants:
+      []
+    Output Constants:
+      []
+  - Name: Constanct Float
+    Option Path: Generic/Constants/Constanct Float
+    ID: 80
+    Links:
+      []
+    Input Constants:
+      []
+    Output Constants:
+      - Type: Float
+        Index: 0
+        Value: 0.5
+  - Name: Generic Operations
+    Option Path: Generic/Operations/Generic Operations
+    ID: 85
+    Links:
+      - Input ID: 86
+        Output ID: 66
+      - Input ID: 87
+        Output ID: 81
+    Content: [0, 2]
+    Input Constants:
+      []
+    Output Constants:
+      []
+  - Name: Generic Operations
+    Option Path: Generic/Operations/Generic Operations
+    ID: 89
+    Links:
+      - Input ID: 90
+        Output ID: 88
+      - Input ID: 91
+        Output ID: 81
+    Content: [0, 0]
+    Input Constants:
+      []
+    Output Constants:
+      []
 ---
-Largest ID: 16
+Largest ID: 89

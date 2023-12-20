@@ -14,7 +14,7 @@ namespace RealEngine {
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 
 	public:
-		inline static const char* s_Name = "Fragment Output";
+		inline static const char* s_Name = "Vertex Output";
 	};
 
 	class FragmentShaderOutputNode : public ShaderNode {
@@ -61,14 +61,15 @@ namespace RealEngine {
 
 		const std::vector<const char*>& GetVariantOptions(int index) const override { return m_InputTypes[index]; };
 		const std::vector<int>& GetVariantOptionsIndex() const override { return m_InputTypesIndex; };
-		void SetVariantOptionsIndex(int vectorIndex, int stringIndex) override { m_InputTypesIndex[vectorIndex] = stringIndex; };
+		void SetVariantOptionsIndex(int vectorIndex, int stringIndex) override;
 
 		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
 		std::string GenerateGlobalCode(std::string* inputVars, std::vector<std::string>* defines) const override;
 	public:
 		inline static const char* s_Name = "Input";
 		inline static const char* s_OptionPath = "Inputs";
-
+	private:
+		void ChangePinTypes();
 	private:
 		std::vector<int> m_InputTypesIndex = { 0 };
 
@@ -140,19 +141,6 @@ namespace RealEngine {
 				{"Vector2", "Vector3", "Vector4"}
 			}
 		};
-	};;
-
-	class ShaderDotProductNode : public ShaderNode {
-	public:
-		ShaderDotProductNode();
-
-		const char* GetName() const override { return s_Name; }
-		const char* GetOptionPath() const override { return s_OptionPath; }
-
-		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
-	public:
-		inline static const char* s_Name = "Dot Product";
-		inline static const char* s_OptionPath = "Vectors/Operations";
 	};
 
 	class ShaderVectorOpsNode : public ShaderNode {
@@ -179,6 +167,34 @@ namespace RealEngine {
 			{
 				{"Vector2", "Vector3", "Vector4"},
 				{"Add", "Subtract", "Multiply", "Divide"}
+			}
+		};
+	};
+
+	class ShaderVectorFuncNode : public ShaderNode {
+	public:
+		ShaderVectorFuncNode();
+
+		const char* GetName() const override { return s_Name; }
+		const char* GetOptionPath() const override { return s_OptionPath; }
+		
+		const std::vector<const char*>& GetVariantOptions(int index) const override { return m_Functions[index]; };
+		const std::vector<int>& GetVariantOptionsIndex() const override { return m_FunctionsIndex; };
+		void SetVariantOptionsIndex(int vectorIndex, int stringIndex) override;
+
+		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
+	public:
+		inline static const char* s_Name = "Vector Functions";
+		inline static const char* s_OptionPath = "Vectors/Operations";
+	private:
+		void ChangePinTypes();
+	private:
+		std::vector<int> m_FunctionsIndex = { 0, 0 };
+
+		static inline std::array<std::vector<const char*>, 2> m_Functions = {
+			{
+				{"Vector2", "Vector3", "Vector4"},
+				{"Normalize", "Length", "Sine", "Cosine", "Tangent"}
 			}
 		};
 	};
@@ -271,6 +287,34 @@ namespace RealEngine {
 			}
 		};
 	};
+
+	class ShaderGenericFuncNode : public ShaderNode {
+	public:
+		ShaderGenericFuncNode();
+
+		const char* GetName() const override { return s_Name; }
+		const char* GetOptionPath() const override { return s_OptionPath; }
+		
+		const std::vector<const char*>& GetVariantOptions(int index) const override { return m_Functions[index]; };
+		const std::vector<int>& GetVariantOptionsIndex() const override { return m_FunctionsIndex; };
+		void SetVariantOptionsIndex(int vectorIndex, int stringIndex) override;
+
+		std::string GenerateCode(std::string* outputVars, std::string* inputVars) const override;
+	public:
+		inline static const char* s_Name = "Generic Functions";
+		inline static const char* s_OptionPath = "Generic/Operations";
+	private:
+		void ChangePinTypes();
+	private:
+		std::vector<int> m_FunctionsIndex = { 0, 0 };
+
+		static inline std::array<std::vector<const char*>, 2> m_Functions = {
+			{
+				{"Float", "Int", "Bool"},
+				{"Sine", "Cosine", "Tangent"}
+			}
+		};
+	};;
 
 	class ShaderConstantFloatNode : public ShaderNode {
 	public:

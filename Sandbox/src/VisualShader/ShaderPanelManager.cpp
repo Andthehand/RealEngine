@@ -156,7 +156,7 @@ namespace RealEngine {
 
 		m_PreviewShader = Shader::Create("Preview Shader", shaders[0], shaders[1], defines, &m_Reflect);
 
-		//for (auto& shaderCode : m_Reflect.ShaderCode)
-		//	RE_CORE_WARN("ShaderCode:\n{0}", shaderCode);
+		for (auto& shaderCode : m_Reflect.ShaderCode)
+			RE_CORE_WARN("ShaderCode:\n{0}", shaderCode);
 	}
 }
