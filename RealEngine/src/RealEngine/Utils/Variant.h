@@ -22,19 +22,19 @@ namespace RealEngine {
 
 		Variant& operator=(const Variant& p_other);
 
-		operator bool() const;
-		operator int() const;
-		operator float() const;
-		operator float*();
-		operator std::string() const;
-		operator std::string*();
+		explicit operator bool() const;
+		explicit operator int() const;
+		explicit operator float() const;
+		explicit operator float*();
+		explicit operator std::string() const;
+		explicit operator std::string*();
 
-		operator glm::vec2() const;
-		operator glm::ivec2() const;
-		operator glm::vec3() const;
-		operator glm::ivec3() const;
-		operator glm::vec4() const;
-		operator glm::ivec4() const;
+		explicit operator glm::vec2() const;
+		explicit operator glm::ivec2() const;
+		explicit operator glm::vec3() const;
+		explicit operator glm::ivec3() const;
+		explicit operator glm::vec4() const;
+		explicit operator glm::ivec4() const;
 	public:
 		enum Type {
 			NIL,

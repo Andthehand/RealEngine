@@ -2,7 +2,6 @@
 #include "RealEngine.h"
 #include "Panels/SceneHierarchyPanel.h"
 #include "Panels/ContentBrowserPanel.h"
-#include "VisualShader/ShaderCreatePanel.h"
 
 #include "RealEngine/Renderer/EditorCamera.h"
 #include "RealEngine/Core/CircularBuffer.h"
@@ -76,7 +75,6 @@ namespace RealEngine {
 
 		//Panels
 		SceneHierarchyPanel m_SceneHierarchyPanel;
-		ShaderCreatePanel m_ShaderCreatePanel;
 		Scope<ContentBrowserPanel> m_ContentBrowserPanel;
 
 		// Editor resources

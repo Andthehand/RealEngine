@@ -3,6 +3,8 @@
 
 #include "RealEngine/Renderer/Texture.h"
 
+#include "VisualShader/ShaderPanelManager.h"
+
 namespace RealEngine {
 	class ContentBrowserPanel {
 	public:
@@ -17,5 +19,7 @@ namespace RealEngine {
 		Ref<Texture2D> m_FileIcon;
 
 		std::unordered_map<std::string, Ref<Texture2D>> m_ImageIcons;
+
+		Scope<ShaderPanelManager> m_ShaderPanelManager;
 	};
 }

@@ -23,6 +23,8 @@
 
 #include "RealEngine/Project/Project.h"
 
+#include "RealEngine/Utils/YAML.h"
+
 #include "RealEngine/Utils/Threads/JobQueue.h"
 #include "RealEngine/Utils/Variant.h"
 #include "RealEngine/Utils/StringBuilder.h"

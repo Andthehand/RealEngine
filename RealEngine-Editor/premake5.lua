@@ -10,9 +10,9 @@ project "RealEngine-Editor"
 	files {
 		"src/**.h",
 		"src/**.cpp",
-		"vendor/ImNode/*.h",
-		"vendor/ImNode/*.cpp",
-		"vendor/ImNode/*.inl"
+		"%{IncludeDir.ImNode}/*.h",
+		"%{IncludeDir.ImNode}/*.cpp",
+		"%{IncludeDir.ImNode}/*.inl"
 	}
 
 	includedirs {
@@ -20,14 +20,15 @@ project "RealEngine-Editor"
 		"%{wks.location}/RealEngine/src",
 		"%{wks.location}/RealEngine/vendor",
 		"%{wks.location}/RealEngine/vendor/imgui",
+		"%{wks.location}/RealEngine-Editor/src",
 		"%{IncludeDir.filewatch}",
-		"%{IncludeDir.yaml_cpp}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
+		"%{IncludeDir.yaml_cpp}",
 		"%{IncludeDir.ImGuizmo}",
+		"%{IncludeDir.ImPlot}",
 		"%{IncludeDir.ImNode}",
-		"%{IncludeDir.optick}",
-		"%{IncludeDir.ImPlot}"
+		"%{IncludeDir.optick}"
 	}
 
 	defines {

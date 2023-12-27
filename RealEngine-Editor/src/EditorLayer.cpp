@@ -213,7 +213,6 @@ namespace RealEngine {
 		}
 
 		m_SceneHierarchyPanel.OnImGuiRender();
-		m_ShaderCreatePanel.OnImGuiRender();
 		m_ContentBrowserPanel->OnImGuiRender();
 
 		ImGui::Begin("Stats");

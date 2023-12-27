@@ -17,7 +17,7 @@
 #include "RealEngine/Scene/SceneCamera.h"
 
 #include "RealEngine/Scripting/ScriptEngine.h"
-#include "RealEngine/UI/UI.h"
+#include "RealEngine/ImGui/UI.h"
 
 #include "RealEngine/Utils/PlatformUtils.h"
 #include "RealEngine/Utils/FileFormats.h"
