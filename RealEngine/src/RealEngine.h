@@ -29,6 +29,12 @@
 #include "RealEngine/Utils/Variant.h"
 #include "RealEngine/Utils/StringBuilder.h"
 
+// ---Resources-----------------------
+#include "RealEngine/Resources/Resource.h"
+#include "RealEngine/Resources/ShaderResource.h"
+// -----------------------------------
+
+
 // ---Renderer------------------------
 #include "RealEngine/Renderer/Renderer.h"
 #include "RealEngine/Renderer/Renderer2D.h"
