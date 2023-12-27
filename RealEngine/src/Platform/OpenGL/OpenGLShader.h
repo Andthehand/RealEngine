@@ -4,9 +4,9 @@
 #include <glad/glad.h>
 
 namespace RealEngine {
-	class OpenGLShader : public Shader {
+	class OpenGLShader : public Shader, public Resource<OpenGLShader> {
 	public:
-		OpenGLShader(const std::filesystem::path& filepath, std::vector<std::string>& defines);
+		OpenGLShader(const std::filesystem::path& path, std::vector<std::string>& defines);
 		OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, std::vector<std::string>& defines, ShaderReflect* reflect);
 		virtual ~OpenGLShader();
 
@@ -35,7 +35,6 @@ namespace RealEngine {
 
 	private:
 		uint32_t m_RendererID;
-		std::filesystem::path m_FilePath;
 		//TODO: Remove this and get the name from the filepath
 		std::string m_Name;
 

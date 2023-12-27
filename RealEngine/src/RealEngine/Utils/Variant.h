@@ -26,7 +26,7 @@ namespace RealEngine {
 		explicit operator int() const;
 		explicit operator float() const;
 		explicit operator float*();
-		explicit operator std::string() const;
+		operator std::string() const;
 		explicit operator std::string*();
 
 		explicit operator glm::vec2() const;

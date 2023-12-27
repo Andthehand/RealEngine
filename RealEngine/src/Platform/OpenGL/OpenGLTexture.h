@@ -3,12 +3,13 @@
 #include <glad/glad.h>
 
 #include "RealEngine/Renderer/Texture.h"
+#include "RealEngine/Resources/Resource.h"
 
 namespace RealEngine {
 	//------------------------------------
 	// Texture2D -------------------------
 	//------------------------------------
-	class OpenGLTexture2D : public Texture2D{
+	class OpenGLTexture2D : public Texture2D, public Resource<OpenGLTexture2D> {
 	public:
 		OpenGLTexture2D(const uint32_t width, const uint32_t height);
 		OpenGLTexture2D(const std::filesystem::path& path);
@@ -18,7 +19,7 @@ namespace RealEngine {
 		virtual uint32_t GetHeight() const override { return m_Height; }
 		virtual uint32_t GetRendererID() const override { return m_RendererID; }
 
-		virtual const std::filesystem::path& GetPath() const override { return m_Path; }
+		virtual const std::filesystem::path& GetPath() const override { return Resource::GetPath(); }
 
 		virtual void SetData(void* data, uint32_t size) override;
 
@@ -28,7 +29,6 @@ namespace RealEngine {
 			return m_RendererID == other.GetRendererID();;
 		}
 	private:
-		std::filesystem::path m_Path;
 		uint32_t m_Width, m_Height;
 
 		uint32_t m_RendererID;

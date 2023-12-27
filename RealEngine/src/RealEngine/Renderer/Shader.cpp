@@ -8,7 +8,7 @@ namespace RealEngine {
 	Ref<Shader> Shader::Create(const std::string& filepath, std::vector<std::string>& defines) {
 		switch (Renderer::GetAPI()) {
 			case RendererAPI::API::None:    RE_CORE_ASSERT(false, "RenderAPI::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:  return std::make_shared<OpenGLShader>(filepath, defines);
+			case RendererAPI::API::OpenGL:  return OpenGLShader::GetInstance(filepath, defines);
 		}
 
 		RE_CORE_ASSERT(false, "Unkown RendererAPI!");

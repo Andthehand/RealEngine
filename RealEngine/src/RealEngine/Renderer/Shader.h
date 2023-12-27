@@ -1,7 +1,8 @@
 #pragma once
-
 #include <string>
 #include <glm/glm.hpp>
+
+#include "RealEngine/Resources/Resource.h"
 
 namespace RealEngine {
 	struct ReflectType {

@@ -11,9 +11,6 @@ namespace RealEngine {
 
 		virtual void OnUpdate(Timestep ts) override;
 	private:
-		Ref<ShaderResource> m_ShaderResource;
-		Ref<ShaderResource> m_ShaderResource1;
-
 		Ref<Framebuffer> m_Framebuffer;
 
 		Ref<VertexArray> m_VertexArray;

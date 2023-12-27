@@ -6,14 +6,6 @@ namespace RealEngine {
 	MainLayer::MainLayer() : RealEngine::Layer("MainLayer") { }
 
 	void MainLayer::OnAttach() {
-		m_ShaderResource = ShaderResource::GetInstance("Shader");
-		RE_CORE_CRITICAL("Count: {0}", m_ShaderResource.use_count());
-		m_ShaderResource1 = ShaderResource::GetInstance("Shader");
-		RE_CORE_CRITICAL("Count: {0}", m_ShaderResource1.use_count());
-
-		m_ShaderResource.reset();
-		m_ShaderResource1.reset();
-
 		FramebufferSpecification fbSpec;
 		fbSpec.Attachments = { FramebufferTextureFormat::RGBA8 };
 		fbSpec.Width = 1280;

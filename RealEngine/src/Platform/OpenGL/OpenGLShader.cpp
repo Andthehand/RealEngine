@@ -122,14 +122,14 @@ namespace RealEngine {
 		}
 	}
 
-	OpenGLShader::OpenGLShader(const std::filesystem::path& filepath, std::vector<std::string>& defines)
-		: m_FilePath(filepath) {
+	OpenGLShader::OpenGLShader(const std::filesystem::path& path, std::vector<std::string>& defines)
+		: Resource(path) {
 		RE_PROFILE_FUNCTION();
 
-		m_Name = filepath.stem().string();
+		m_Name = Resource::GetPath().stem().string();
 		Utils::CreateCacheDirectoryIfNeeded();
 
-		std::string source = ReadFile(filepath);
+		std::string source = ReadFile(Resource::GetPath());
 		if (source.empty()) {
 			RE_CORE_WARN("Failed to create shader: {0}", m_Name);
 			return;
@@ -141,13 +141,13 @@ namespace RealEngine {
 			Timer timer;
 			CompileOrGetOpenGLBinaries(shaderSources, defines);
 			CreateProgram();
-			RE_CORE_WARN("Shader {0} took {1} ms to create", filepath.stem().string(), timer.ElapsedMillis());
+			RE_CORE_WARN("Shader {0} took {1} ms to create", Resource::GetPath().stem().string(), timer.ElapsedMillis());
 		}
 
 	}
 
 	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, std::vector<std::string>& defines, ShaderReflect* reflect)
-		: m_Name(name), m_FilePath(name) {
+		: Resource(name), m_Name(name) {
 		RE_PROFILE_FUNCTION();
 
 		std::unordered_map<GLenum, std::string> sources;
@@ -248,7 +248,7 @@ namespace RealEngine {
 		auto& shaderData = m_OpenGLSPIRV;
 		shaderData.clear();
 		for (auto&& [stage, source] : shaderSources) {
-			std::filesystem::path shaderFilePath = m_FilePath;
+			std::filesystem::path shaderFilePath = Resource::GetPath();
 			std::filesystem::path stringHashPath = cacheDirectory / (shaderFilePath.stem() += Utils::GLShaderStageCachedStringHashFileExtension(stage));
 			std::filesystem::path cachedPath = cacheDirectory / (shaderFilePath.stem() += Utils::GLShaderStageCachedOpenGLFileExtension(stage));
 
@@ -313,7 +313,7 @@ namespace RealEngine {
 
 			std::vector<GLchar> infoLog(maxLength);
 			glGetProgramInfoLog(program, maxLength, &maxLength, infoLog.data());
-			RE_CORE_ERROR("Shader linking failed ({0}):\n{1}", m_FilePath, infoLog.data());
+			RE_CORE_ERROR("Shader linking failed ({0}):\n{1}", Resource::GetPath(), infoLog.data());
 
 			glDeleteProgram(program);
 
@@ -389,7 +389,7 @@ namespace RealEngine {
 		spirv_cross::Compiler compiler(shaderData);
 		spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 
-		RE_CORE_TRACE("OpenGLShader::Reflect - {0} {1}", Utils::GLShaderStageToString(stage), m_FilePath);
+		RE_CORE_TRACE("OpenGLShader::Reflect - {0} {1}", Utils::GLShaderStageToString(stage), Resource::GetPath());
 		RE_CORE_TRACE("    {0} uniform buffers", resources.uniform_buffers.size());
 		RE_CORE_TRACE("    {0} resources", resources.sampled_images.size());
 
