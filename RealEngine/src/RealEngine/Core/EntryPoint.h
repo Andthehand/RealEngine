@@ -7,6 +7,11 @@
 //Looks for the decleration of this function in sandbox
 extern RealEngine::Application* RealEngine::CreateApplication(ApplicationCommandLineArgs args);
 
+extern "C" {
+	__declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;
+	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
+
 int main(int argc, char** argv) {
 	RealEngine::Log::Init();
 	
