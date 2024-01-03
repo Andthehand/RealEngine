@@ -122,7 +122,7 @@ namespace RealEngine {
 		}
 	}
 
-	OpenGLShader::OpenGLShader(const std::filesystem::path& path, std::vector<std::string>& defines)
+	OpenGLShader::OpenGLShader(const std::filesystem::path& path)
 		: Resource(path) {
 		RE_PROFILE_FUNCTION();
 
@@ -139,14 +139,14 @@ namespace RealEngine {
 
 		{
 			Timer timer;
-			CompileOrGetOpenGLBinaries(shaderSources, defines);
+			CompileOrGetOpenGLBinaries(shaderSources);
 			CreateProgram();
 			RE_CORE_WARN("Shader {0} took {1} ms to create", Resource::GetPath().stem().string(), timer.ElapsedMillis());
 		}
 
 	}
 
-	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, std::vector<std::string>& defines, ShaderReflect* reflect)
+	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, ShaderReflect* reflect)
 		: Resource(name), m_Name(name) {
 		RE_PROFILE_FUNCTION();
 
@@ -157,7 +157,7 @@ namespace RealEngine {
 
 		{
 			Timer timer;
-			CompileOrGetOpenGLBinaries(sources, defines);
+			CompileOrGetOpenGLBinaries(sources);
 			if (reflect != nullptr) {
 				reflect->clear();
 				GenerateReflectData(reflect);
@@ -223,7 +223,7 @@ namespace RealEngine {
 		return shaderSources;
 	}
 
-	void OpenGLShader::CompileOrGetOpenGLBinaries(const std::unordered_map<GLenum, std::string>& shaderSources, std::vector<std::string>& defines) {
+	void OpenGLShader::CompileOrGetOpenGLBinaries(const std::unordered_map<GLenum, std::string>& shaderSources) {
 		RE_PROFILE_FUNCTION();
 		
 		GLuint program = glCreateProgram();
@@ -239,9 +239,6 @@ namespace RealEngine {
 		options.SetAutoBindUniforms(true);
 
 		options.SetGenerateDebugInfo();
-
-		for(auto& define : defines)
-			options.AddMacroDefinition(define);
 
 		std::filesystem::path cacheDirectory = Utils::GetCacheDirectory();
 

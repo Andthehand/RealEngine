@@ -3,6 +3,7 @@
 
 #include "RealEngine/Renderer/Shader.h"
 #include "RealEngine/Renderer/Texture.h"
+#include "RealEngine/Resources/Resource.h"
 
 #include <filesystem>
 
@@ -12,27 +13,20 @@ namespace RealEngine {
 		Fragment	= 1,
 	};
 
-	class ShaderPanelManager {
+	class ShaderPanelManager : public Resource<ShaderPanelManager> {
 	public:
 		ShaderPanelManager(const std::filesystem::path& path);
 		~ShaderPanelManager();
 
 		void OnImGuiRender();
-		void OnUpdate();
 
 		std::string ShaderPanelManager::ReadFile(const std::filesystem::path& filepath);
-		void PreProcess(std::filesystem::path& ubershader, std::string shaders[2], CompileData shaderData[2]);
-		void Compile();
-		
-		Ref<Shader> GetShader() { return m_PreviewShader; }
+		std::string PreProcess(std::filesystem::path& ubershader, CompileData shaderData[2]);
+		void SaveAndCompile();
 	private:
 		ShaderType m_CurrentShaderType = ShaderType::Vertex;
 
 		Ref<Texture2D> m_HeaderBackground;
 		Ref<ShaderPanel> m_ShaderPanels[2];
-
-		bool m_QueuedCompile = true;
-		Ref<Shader> m_PreviewShader;
-		ShaderReflect m_Reflect;
 	};
 }

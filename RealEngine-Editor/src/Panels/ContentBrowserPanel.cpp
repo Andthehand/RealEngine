@@ -101,7 +101,7 @@ namespace RealEngine {
 					m_ImageIcons.clear();
 				}
 				else if (FileExtenstion::DoesExtensionExist(FileExtenstion::REALENGINE_SHADER_PANEL_EXTENTIONS, path.extension().string())) {
-					m_ShaderPanelManager = CreateScope<ShaderPanelManager>(path);
+					m_ShaderPanelManager = ShaderPanelManager::GetInstance(path);
 				}
 				//TODO: Implement more stuff to be used when double clicked like a scene
 			}

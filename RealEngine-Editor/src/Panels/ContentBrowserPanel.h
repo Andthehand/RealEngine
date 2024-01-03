@@ -20,6 +20,6 @@ namespace RealEngine {
 
 		std::unordered_map<std::string, Ref<Texture2D>> m_ImageIcons;
 
-		Scope<ShaderPanelManager> m_ShaderPanelManager;
+		Ref<ShaderPanelManager> m_ShaderPanelManager;
 	};
 }

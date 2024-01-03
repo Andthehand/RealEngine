@@ -29,6 +29,11 @@ namespace RealEngine {
 			".realProj"
 		};
 
+		static const std::unordered_set<std::string> REALENGINE_SHADER_EXTENTIONS{
+			".glsl",
+			".shaderpanel"
+		};
+
 		static const std::unordered_set<std::string> REALENGINE_SHADER_PANEL_EXTENTIONS{
 			".shaderpanel"
 		};

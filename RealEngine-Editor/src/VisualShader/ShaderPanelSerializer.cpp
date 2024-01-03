@@ -43,7 +43,7 @@ namespace RealEngine {
 		}
 	}
 
-	void ShaderPanelSerializer::Serialize(Ref<ShaderPanel> shaderPanel[2], const std::filesystem::path& filepath) {
+	void ShaderPanelSerializer::Serialize(Ref<ShaderPanel> shaderPanel[2], const std::filesystem::path& filepath, const std::string& shaderCode) {
 		RE_PROFILE_FUNCTION();
 
 		YAML::Emitter out;
@@ -202,6 +202,8 @@ namespace RealEngine {
 
 		std::ofstream fout(filepath);
 		fout << out.c_str();
+		fout << "\n\n";
+		fout << shaderCode;
 	}
 
 	bool ShaderPanelSerializer::Deserialize(const std::filesystem::path& filepath, Ref<ShaderPanel>* shaderPanels) {

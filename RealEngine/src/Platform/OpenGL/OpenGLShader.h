@@ -6,8 +6,8 @@
 namespace RealEngine {
 	class OpenGLShader : public Shader, public Resource<OpenGLShader> {
 	public:
-		OpenGLShader(const std::filesystem::path& path, std::vector<std::string>& defines);
-		OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, std::vector<std::string>& defines, ShaderReflect* reflect);
+		OpenGLShader(const std::filesystem::path& path);
+		OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, ShaderReflect* reflect);
 		virtual ~OpenGLShader();
 
 		virtual void Bind() const override;
@@ -27,7 +27,7 @@ namespace RealEngine {
 		std::string ReadFile(const std::filesystem::path& filepath);
 		std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);
 
-		void CompileOrGetOpenGLBinaries(const std::unordered_map<GLenum, std::string>& shaderSources, std::vector<std::string>& defines);
+		void CompileOrGetOpenGLBinaries(const std::unordered_map<GLenum, std::string>& shaderSources);
 		void CreateProgram();
 
 		void GenerateReflectData(ShaderReflect* reflect);

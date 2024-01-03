@@ -44,8 +44,8 @@ namespace RealEngine {
 
 		virtual const std::string& GetName() const = 0;
 	
-		static Ref<Shader> Create(const std::string& filepath, std::vector<std::string>& defines = std::vector<std::string>());
-		static Ref<Shader> Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, std::vector<std::string>& defines = std::vector<std::string>(), ShaderReflect* reflect = nullptr);
+		static Ref<Shader> Create(const std::filesystem::path& filepath);
+		static Ref<Shader> Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, ShaderReflect* reflect = nullptr);
 	};
 
 	class ShaderLibrary {

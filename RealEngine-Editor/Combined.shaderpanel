@@ -206,3 +206,65 @@ Nodes:
       []
 ---
 Largest ID: 89
+
+#type vertex
+#version 450 core
+
+#define IMPLEMENTUV
+
+
+in vec3 a_Position;
+in vec2 a_UV;
+
+#ifdef IMPLEMENTUV
+out vec2 v_UV;
+#endif
+
+//Custom Globals
+
+
+void main() {
+	#ifndef IMPLEMENTUV
+	v_UV = a_UV;
+	#endif
+
+	v_UV = a_UV;
+	gl_Position = vec4(a_Position, 1.0);
+
+}
+
+#type fragment
+#version 450 core
+
+#define IMPLEMENTUV
+
+
+#ifdef IMPLEMENTUV
+in vec2 v_UV;
+#endif
+out vec4 o_Color;
+out vec3 o_Normal;
+
+//Custom Globals
+
+
+void main() {
+	vec2 out_14_Input_Result = v_UV;
+	float out_16_VectorDecompose_X = out_14_Input_Result.x;
+	float out_16_VectorDecompose_Y = out_14_Input_Result.y;
+	float out_50_ConstanctFloat_Float = 10.000000; 
+	float out_52_GenericOperations_Result = out_16_VectorDecompose_X * out_50_ConstanctFloat_Float;
+	float out_67_GenericFunctions_Result = sin(out_52_GenericOperations_Result);
+	float out_56_GenericOperations_Result = out_16_VectorDecompose_Y * out_50_ConstanctFloat_Float;
+	float out_70_GenericFunctions_Result = cos(out_56_GenericOperations_Result);
+	float out_22_ConstanctFloat_Float = 50.000000; 
+	float out_30_GenericOperations_Result = out_16_VectorDecompose_Y * out_22_ConstanctFloat_Float;
+	float out_34_GenericOperations_Result = out_30_GenericOperations_Result * out_16_VectorDecompose_X;
+	float out_64_GenericFunctions_Result = sin(out_34_GenericOperations_Result);
+	float out_80_ConstanctFloat_Float = 0.500000; 
+	float out_85_GenericOperations_Result = out_64_GenericFunctions_Result * out_80_ConstanctFloat_Float;
+	float out_89_GenericOperations_Result = out_85_GenericOperations_Result + out_80_ConstanctFloat_Float;
+	vec4 out_38_VectorCompose_Results = vec4(out_67_GenericFunctions_Result, out_70_GenericFunctions_Result, out_89_GenericOperations_Result, 1.000000);
+	o_Color = out_38_VectorCompose_Results;
+
+}
