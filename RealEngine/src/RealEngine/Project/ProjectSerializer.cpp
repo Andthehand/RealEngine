@@ -2,9 +2,9 @@
 #include "ProjectSerializer.h"
 
 #include "RealEngine/Core/Application.h"
+#include "RealEngine/Utils/YAML.h"
 
 #include <fstream>
-#include <yaml-cpp/yaml.h>
 
 namespace RealEngine {
 	ProjectSerializer::ProjectSerializer(Ref<Project> project)

@@ -9,7 +9,10 @@ project "Sandbox"
 
 	files {
 		"src/**.h",
-		"src/**.cpp"
+		"src/**.cpp",
+		"%{IncludeDir.ImNode}/*.h",
+		"%{IncludeDir.ImNode}/*.cpp",
+		"%{IncludeDir.ImNode}/*.inl"
 	}
 
 	includedirs {
@@ -19,9 +22,15 @@ project "Sandbox"
 		"%{wks.location}/RealEngine/vendor/imgui",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
+		"%{IncludeDir.yaml_cpp}",
 		"%{IncludeDir.ImGuizmo}",
-		"%{IncludeDir.optick}",
-		"%{IncludeDir.ImPlot}"
+		"%{IncludeDir.ImPlot}",
+		"%{IncludeDir.ImNode}",
+		"%{IncludeDir.optick}"
+	}
+
+	defines {
+		"IMGUI_DEFINE_MATH_OPERATORS"
 	}
 
 	links {

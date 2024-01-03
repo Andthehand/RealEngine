@@ -14,5 +14,4 @@ namespace RealEngine {
 		RE_CORE_ASSERT(false, "Unkown RendererAPI!");
 		return nullptr;
 	}
-
 }

@@ -1,14 +1,14 @@
 #type vertex
 #version 450 core
 
-layout(location = 0) in vec3 a_WorldPosition;
-layout(location = 1) in vec3 a_LocalPosition;
-layout(location = 2) in vec4 a_Color;
-layout(location = 3) in float a_Thickness;
-layout(location = 4) in float a_Fade;
-layout(location = 5) in int a_EntityID;
+in vec3 a_WorldPosition;
+in vec3 a_LocalPosition;
+in vec4 a_Color;
+in float a_Thickness;
+in float a_Fade;
+in int a_EntityID;
 
-layout(std140, binding = 0) uniform Camera {
+uniform Camera {
 	mat4 u_ViewProjection;
 };
 
@@ -19,8 +19,8 @@ struct VertexOutput {
 	float Fade;
 };
 
-layout (location = 0) out VertexOutput Output;
-layout (location = 4) out flat int v_EntityID;
+out VertexOutput Output;
+out flat int v_EntityID;
 
 void main() {
 	Output.LocalPosition = a_LocalPosition;
@@ -36,8 +36,8 @@ void main() {
 #type fragment
 #version 450 core
 
-layout(location = 0) out vec4 o_Color;
-layout(location = 1) out int o_EntityID;
+out vec4 o_Color;
+out int o_EntityID;
 
 struct VertexOutput {
 	vec3 LocalPosition;
@@ -46,8 +46,8 @@ struct VertexOutput {
 	float Fade;
 };
 
-layout (location = 0) in VertexOutput Input;
-layout (location = 4) in flat int v_EntityID;
+in VertexOutput Input;
+in flat int v_EntityID;
 
 void main() {
     // Calculate distance and fill circle with white

@@ -17,11 +17,12 @@
 #include "RealEngine/Scene/SceneCamera.h"
 
 #include "RealEngine/Scripting/ScriptEngine.h"
-#include "RealEngine/UI/UI.h"
+#include "RealEngine/ImGui/UI.h"
 
 #include "RealEngine/Utils/PlatformUtils.h"
 #include "RealEngine/Utils/FileFormats.h"
 
+#include "RealEngine/Renderer/Shader.h"
 
 namespace RealEngine {
 	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& context) {
@@ -52,7 +53,7 @@ namespace RealEngine {
 				m_SelectionContext = {};
 
 			// Right-click on blank space
-			if (ImGui::BeginPopupContextWindow(0, 1, false)) {
+			if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems)) {
 				if (ImGui::MenuItem("Create Empty Entity"))
 					m_SelectionContext = m_Context->CreateEntity("Empty Entity");
 				if (ImGui::MenuItem("Create Sprite")) {
@@ -792,6 +793,16 @@ namespace RealEngine {
 						component.Texture = Texture2D::Create(texturePath);
 					else
 						RE_CORE_WARN("{0} is not a proper image extention", texturePath.extension().string());
+				}
+			}
+
+			if (ImGui::Button("Shader", ImVec2(100.0f, 0.0f))) {
+				std::filesystem::path shaderPath = FileDialogs::OpenFile("Image Files");
+				if (!shaderPath.empty()) {
+					if (FileExtenstion::DoesExtensionExist(FileExtenstion::REALENGINE_SHADER_EXTENTIONS, shaderPath.extension().string()))
+						component.Shader = Shader::Create(shaderPath);
+					else
+						RE_CORE_WARN("{0} is not a shader extention", shaderPath.extension().string());
 				}
 			}
 			

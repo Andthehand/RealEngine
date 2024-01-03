@@ -1,7 +1,7 @@
 #pragma once
 #include <optick.h>
 
-#define RE_PROFILE 1
+#define RE_PROFILE 0
 #if RE_PROFILE
     #define RE_PROFILE_BEGIN_SESSION(...) ::Optick::StartCapture(__VA_ARGS__);
 	#define RE_PROFILE_END_SESSION(...) ::Optick::StopCapture(__VA_ARGS__);
@@ -27,13 +27,15 @@
 
 	#define RE_PROFILE_SHUTDOWN() ::Optick::Shutdown();
 #else
-    #define RE_PROFILE_BEGIN_SESSION(...) OPTICK_THREAD()
-    #define RE_PROFILE_END_SESSION(...)
-	#define RE_PROFILE_SAVE_SESSION(name)
+#define RE_PROFILE_BEGIN_SESSION(...)
+#define RE_PROFILE_END_SESSION(...)
+#define RE_PROFILE_SAVE_SESSION(name)
 
-	#define RE_PROFILE_FRAME(FRAME_NAME, ...)
+#define RE_PROFILE_FRAME(FRAME_NAME, ...)
+#define RE_PROFILE_FUNCTION(...)
 
-    #define RE_PROFILE_FUNCTION(...)
+#define RE_PROFILE_NEW_THREAD(THREAD_NAME)
 
-	#define RE_PROFILE_NEW_THREAD(THREAD_NAME)
+#define RE_PROFILE_TAG(NAME, ...)
+#define RE_PROFILE_SHUTDOWN()
 #endif

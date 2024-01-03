@@ -9,9 +9,6 @@
 	path = RealEngine/vendor/spdlog
 	url = https://github.com/gabime/spdlog.git
 	branch = v1.x
-[submodule "RealEngine/vendor/yaml-cpp"]
-	path = RealEngine/vendor/yaml-cpp
-	url = https://github.com/Andthehand/yaml-cpp.git
 [submodule "RealEngine/vendor/ImGuizmo"]
 	path = RealEngine/vendor/ImGuizmo
 	url = https://github.com/TheCherno/ImGuizmo.git
@@ -21,12 +18,18 @@
 [submodule "RealEngine/vendor/Box2D"]
 	path = RealEngine/vendor/Box2D
 	url = https://github.com/Andthehand/box2d.git
-[submodule "RealEngine/vendor/imgui"]
-	path = RealEngine/vendor/imgui
-	url = https://github.com/TheCherno/imgui.git
 [submodule "RealEngine/vendor/optick"]
 	path = RealEngine/vendor/optick
 	url = https://github.com/Andthehand/optick.git
 [submodule "RealEngine/vendor/GLFW"]
 	path = RealEngine/vendor/GLFW
 	url = https://github.com/TheCherno/glfw.git
+[submodule "RealEngine/vendor/imgui"]
+	path = RealEngine/vendor/imgui
+	url = https://github.com/Andthehand/imgui.git
+[submodule "RealEngine/vendor/yaml-cpp"]
+	path = RealEngine/vendor/yaml-cpp
+	url = https://github.com/Andthehand/yaml-cpp.git
+[submodule "RealEngine-Editor/vendor/ImNode"]
+	path = RealEngine-Editor/vendor/ImNode
+	url = https://github.com/Andthehand/imgui-node-editor.git

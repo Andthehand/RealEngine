@@ -26,3 +26,7 @@ VoxelSandbox/assets/cache
 Sandbox/assets/cache
 MachineLearningSandbox/assets/cache
 scripts/__pycache__
+
+# ImNode Files
+/Sandbox/Fragment.json
+/Sandbox/Vertex.json

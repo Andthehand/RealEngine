@@ -20,12 +20,14 @@ project "RealEngine"
 		"vendor/ImGuizmo/ImGuizmo.h",
 		"vendor/ImGuizmo/ImGuizmo.cpp",
 		"vendor/ImPlot/**.cpp",
-		"vendor/ImPlot/**.h"
+		"vendor/ImPlot/**.h",
 	}
 
 	defines {
 		"_CRT_SECURE_NO_WARNINGS",
-		"GLFW_INCLUDE_NONE"
+		"GLFW_INCLUDE_NONE",
+		"IMGUI_DEFINE_MATH_OPERATORS",
+		"_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING"
 	}
 
 	includedirs {
@@ -67,9 +69,6 @@ project "RealEngine"
 
 	filter "system:windows"
 		systemversion "latest"
-
-		defines {
-		}
 
 		links {
 			"%{Library.WinSock}",

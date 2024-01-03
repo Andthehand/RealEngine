@@ -7,7 +7,8 @@ namespace RealEngine {
 	//------------------------------------
 	// Texture2D -------------------------
 	//------------------------------------
-	OpenGLTexture2D::OpenGLTexture2D(const uint32_t width, const uint32_t height) : m_Width(width), m_Height(height) {
+	OpenGLTexture2D::OpenGLTexture2D(const uint32_t width, const uint32_t height) 
+		: Resource(""), m_Width(width), m_Height(height) {
 		RE_PROFILE_FUNCTION();
 
 		m_InternalFormat = GL_RGBA8;
@@ -23,7 +24,8 @@ namespace RealEngine {
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	}
 
-	OpenGLTexture2D::OpenGLTexture2D(const std::filesystem::path& path) : m_Path(path) {
+	OpenGLTexture2D::OpenGLTexture2D(const std::filesystem::path& path) 
+		: Resource(path) {
 		RE_PROFILE_FUNCTION();
 
 		int width, height, channels;
@@ -31,7 +33,7 @@ namespace RealEngine {
 		stbi_set_flip_vertically_on_load(1);
 		{
 			RE_PROFILE_FUNCTION("stbi_load - OpenGLTexture2D::OpenGLTexture2D(const std::string&)");
-			data = stbi_load(path.string().c_str(), &width, &height, &channels, 0);
+			data = stbi_load(Resource::GetPath().string().c_str(), &width, &height, &channels, 0);
 		}
 		RE_CORE_ASSERT(data, "Failed to load image!");
 		m_Width = width;

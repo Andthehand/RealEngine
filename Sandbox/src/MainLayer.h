@@ -1,31 +1,20 @@
 #pragma once
 #include <RealEngine.h>
 
-#include "Cartridge.h"
-#include "Bus.h"
+namespace RealEngine {
+	class MainLayer : public Layer {
+	public:
+		MainLayer();
+		
+		virtual void OnAttach() override;
+		virtual void OnImGuiRender() override;
 
-class MainLayer : public RealEngine::Layer {
-public:
-	MainLayer();
-	virtual void OnAttach() override;
-	virtual void OnUpdate(RealEngine::Timestep ts) override;
-	virtual void OnImGuiRender() override;
-	virtual void OnEvent(RealEngine::Event& event) override;
+		virtual void OnUpdate(Timestep ts) override;
+	private:
+		Ref<Framebuffer> m_Framebuffer;
 
-private:
-	bool OnKeyPressed(RealEngine::KeyPressedEvent& e);
+		Ref<VertexArray> m_VertexArray;
 
-	void DrawCpu(int x, int y);
-	void DrawCode(int x, int y, int nLines);
-	void DrawStatus(const char* text, bool enabled);
-	void DrawRam(int x, int y, uint16_t nAddr, int nRows, int nColumns);
-
-private:
-	Bus m_NES;
-	std::map<uint16_t, std::string> m_MapAsm;
-
-	RealEngine::Ref<Cartridge> m_Cartridge;
-
-	bool m_EmulationRun = false;
-	float m_ResidualTime = 0.0f;
-};
+		Ref<Texture2D> m_Texture;
+	};
+}

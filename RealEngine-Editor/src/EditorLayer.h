@@ -46,7 +46,7 @@ namespace RealEngine {
 		// UI Panels
 		void UI_Toolbar();
 	private:
-		Ref<RealEngine::Framebuffer> m_Framebuffer;
+		Ref<Framebuffer> m_Framebuffer;
 
 		Ref<Scene> m_ActiveScene;
 		Ref<Scene> m_EditorScene;

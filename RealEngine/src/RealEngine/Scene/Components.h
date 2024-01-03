@@ -2,7 +2,9 @@
 
 #include "SceneCamera.h"
 #include "RealEngine/Core/UUID.h"
+
 #include "RealEngine/Renderer/Texture.h"
+#include "RealEngine/Renderer/Shader.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -57,6 +59,7 @@ namespace RealEngine {
 	struct SpriteRendererComponent {
 		glm::vec4 Color{ 1.0f };
 		Ref<Texture2D> Texture;
+		Ref<Shader> Shader;
 		float TilingFactor = 1.0f;
 
 		SpriteRendererComponent() = default;

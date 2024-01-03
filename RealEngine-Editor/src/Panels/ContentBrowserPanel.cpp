@@ -100,6 +100,9 @@ namespace RealEngine {
 					m_CurrentDirectory /= path.filename();
 					m_ImageIcons.clear();
 				}
+				else if (FileExtenstion::DoesExtensionExist(FileExtenstion::REALENGINE_SHADER_PANEL_EXTENTIONS, path.extension().string())) {
+					m_ShaderPanelManager = ShaderPanelManager::GetInstance(path);
+				}
 				//TODO: Implement more stuff to be used when double clicked like a scene
 			}
 			ImGui::TextWrapped(filenameString.c_str());
@@ -117,5 +120,8 @@ namespace RealEngine {
 
 		// TODO: status bar
 		ImGui::End();
+
+		if (m_ShaderPanelManager)
+			m_ShaderPanelManager->OnImGuiRender();
 	}
 }

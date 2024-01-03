@@ -9,7 +9,10 @@ project "RealEngine-Editor"
 
 	files {
 		"src/**.h",
-		"src/**.cpp"
+		"src/**.cpp",
+		"%{IncludeDir.ImNode}/*.h",
+		"%{IncludeDir.ImNode}/*.cpp",
+		"%{IncludeDir.ImNode}/*.inl"
 	}
 
 	includedirs {
@@ -17,12 +20,19 @@ project "RealEngine-Editor"
 		"%{wks.location}/RealEngine/src",
 		"%{wks.location}/RealEngine/vendor",
 		"%{wks.location}/RealEngine/vendor/imgui",
+		"%{wks.location}/RealEngine-Editor/src",
 		"%{IncludeDir.filewatch}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
+		"%{IncludeDir.yaml_cpp}",
 		"%{IncludeDir.ImGuizmo}",
-		"%{IncludeDir.optick}",
-		"%{IncludeDir.ImPlot}"
+		"%{IncludeDir.ImPlot}",
+		"%{IncludeDir.ImNode}",
+		"%{IncludeDir.optick}"
+	}
+
+	defines {
+		"IMGUI_DEFINE_MATH_OPERATORS"
 	}
 
 	links {

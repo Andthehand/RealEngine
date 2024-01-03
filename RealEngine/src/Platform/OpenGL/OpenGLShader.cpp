@@ -62,7 +62,7 @@ namespace RealEngine {
 		}
 
 		//Returns false if the file doesn't exist or if the hash is different
-		static const bool CompareFileHashes(const std::filesystem::path& filepath, uint32_t stage, const std::string& source) {
+		static const bool CompareFileHashes(const std::filesystem::path& filepath, const std::string& source) {
 			RE_PROFILE_FUNCTION();
 			
 			size_t hashCompare = std::hash<std::string>{}(source);
@@ -110,17 +110,6 @@ namespace RealEngine {
 			return "";
 		}
 
-		static const std::filesystem::path GLShaderStageCachedVulkanFileExtension(uint32_t stage) {
-			switch (stage) {
-				case GL_VERTEX_SHADER:    return ".cached_vulkan.vert";
-				case GL_FRAGMENT_SHADER:  return ".cached_vulkan.frag";
-				case GL_GEOMETRY_SHADER:  return ".cached_vulkan.geo";
-				case GL_COMPUTE_SHADER:   return ".cached_vulkan.comp";
-			}
-			RE_CORE_ASSERT(false);
-			return "";
-		}
-
 		static const std::filesystem::path GLShaderStageCachedStringHashFileExtension(uint32_t stage) {
 			switch (stage) {
 				case GL_VERTEX_SHADER:    return ".string_hash.vert";
@@ -133,37 +122,50 @@ namespace RealEngine {
 		}
 	}
 
-	OpenGLShader::OpenGLShader(const std::filesystem::path& filepath)
-		: m_FilePath(filepath) {
+	OpenGLShader::OpenGLShader(const std::filesystem::path& path)
+		: Resource(path) {
 		RE_PROFILE_FUNCTION();
 
+		m_Name = Resource::GetPath().stem().string();
 		Utils::CreateCacheDirectoryIfNeeded();
 
-		std::string source = ReadFile(filepath);
+		std::string source = ReadFile(Resource::GetPath());
+		if (source.empty()) {
+			RE_CORE_WARN("Failed to create shader: {0}", m_Name);
+			return;
+		}
+
 		auto shaderSources = PreProcess(source);
 
 		{
 			Timer timer;
-			CompileOrGetVulkanBinaries(shaderSources);
-			CompileOrGetOpenGLBinaries();
+			CompileOrGetOpenGLBinaries(shaderSources);
 			CreateProgram();
-			RE_CORE_WARN("Shader {0} took {1} ms to create", filepath.stem().string(), timer.ElapsedMillis());
+			RE_CORE_WARN("Shader {0} took {1} ms to create", Resource::GetPath().stem().string(), timer.ElapsedMillis());
 		}
 
-		m_Name = filepath.stem().string();
 	}
 
-	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
-		: m_Name(name) {
+	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, ShaderReflect* reflect)
+		: Resource(name), m_Name(name) {
 		RE_PROFILE_FUNCTION();
 
 		std::unordered_map<GLenum, std::string> sources;
 		sources[GL_VERTEX_SHADER] = vertexSrc;
 		sources[GL_FRAGMENT_SHADER] = fragmentSrc;
+		
 
-		CompileOrGetVulkanBinaries(sources);
-		CompileOrGetOpenGLBinaries();
-		CreateProgram();
+		{
+			Timer timer;
+			CompileOrGetOpenGLBinaries(sources);
+			if (reflect != nullptr) {
+				reflect->clear();
+				GenerateReflectData(reflect);
+			}
+			CreateProgram();
+
+			RE_CORE_WARN("Shader {0} took {1} ms to create", name, timer.ElapsedMillis());
+		}
 	}
 
 	OpenGLShader::~OpenGLShader() {
@@ -221,29 +223,34 @@ namespace RealEngine {
 		return shaderSources;
 	}
 
-	void OpenGLShader::CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources) {
+	void OpenGLShader::CompileOrGetOpenGLBinaries(const std::unordered_map<GLenum, std::string>& shaderSources) {
 		RE_PROFILE_FUNCTION();
 		
 		GLuint program = glCreateProgram();
 
 		shaderc::Compiler compiler;
 		shaderc::CompileOptions options;
-		options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_2);
+		options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
 		const bool optimize = true;
 		if (optimize)
 			options.SetOptimizationLevel(shaderc_optimization_level_performance);
 
+		options.SetAutoMapLocations(true);
+		options.SetAutoBindUniforms(true);
+
+		options.SetGenerateDebugInfo();
+
 		std::filesystem::path cacheDirectory = Utils::GetCacheDirectory();
 
-		auto& shaderData = m_VulkanSPIRV;
+		auto& shaderData = m_OpenGLSPIRV;
 		shaderData.clear();
 		for (auto&& [stage, source] : shaderSources) {
-			std::filesystem::path shaderFilePath = m_FilePath;
+			std::filesystem::path shaderFilePath = Resource::GetPath();
 			std::filesystem::path stringHashPath = cacheDirectory / (shaderFilePath.stem() += Utils::GLShaderStageCachedStringHashFileExtension(stage));
-			std::filesystem::path cachedPath = cacheDirectory / (shaderFilePath.stem() += Utils::GLShaderStageCachedVulkanFileExtension(stage));
+			std::filesystem::path cachedPath = cacheDirectory / (shaderFilePath.stem() += Utils::GLShaderStageCachedOpenGLFileExtension(stage));
 
 			//Check if the bianary already exists or if the file changed
-			m_DontRecompile[stage] = Utils::CompareFileHashes(stringHashPath, stage, source);
+			m_DontRecompile[stage] = Utils::CompareFileHashes(stringHashPath, source);
 			std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
 			if (m_DontRecompile[stage] && in.is_open()) {
 				in.seekg(0, std::ios::end);
@@ -255,7 +262,7 @@ namespace RealEngine {
 				in.read((char*)data.data(), size);
 			}
 			else {
-				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), m_FilePath.string().c_str(), options);
+				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), m_Name.c_str(), options);
 				if (module.GetCompilationStatus() != shaderc_compilation_status_success) {
 					RE_CORE_ERROR(module.GetErrorMessage());
 					RE_CORE_ASSERT(false);
@@ -274,61 +281,7 @@ namespace RealEngine {
 		}
 
 		//for (auto&& [stage, data] : shaderData)
-		//	Reflect(stage, data);
-	}
-
-	void OpenGLShader::CompileOrGetOpenGLBinaries() {
-		RE_PROFILE_FUNCTION();
-		
-		auto& shaderData = m_OpenGLSPIRV;
-
-		shaderc::Compiler compiler;
-		shaderc::CompileOptions options;
-		options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
-		const bool optimize = false;
-		if (optimize)
-			options.SetOptimizationLevel(shaderc_optimization_level_performance);
-
-		std::filesystem::path cacheDirectory = Utils::GetCacheDirectory();
-
-		shaderData.clear();
-		m_OpenGLSourceCode.clear();
-		for (auto&& [stage, spirv] : m_VulkanSPIRV) {
-			std::filesystem::path shaderFilePath = m_FilePath;
-			std::filesystem::path cachedPath = cacheDirectory / shaderFilePath.stem() += Utils::GLShaderStageCachedOpenGLFileExtension(stage);
-
-			std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
-			if (m_DontRecompile[stage] && in.is_open()) {
-				in.seekg(0, std::ios::end);
-				auto size = in.tellg();
-				in.seekg(0, std::ios::beg);
-
-				auto& data = shaderData[stage];
-				data.resize(size / sizeof(uint32_t));
-				in.read((char*)data.data(), size);
-			}
-			else {
-				spirv_cross::CompilerGLSL glslCompiler(spirv);
-				m_OpenGLSourceCode[stage] = glslCompiler.compile();
-				auto& source = m_OpenGLSourceCode[stage];
-
-				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), m_FilePath.string().c_str());
-				if (module.GetCompilationStatus() != shaderc_compilation_status_success) {
-					RE_CORE_ERROR(module.GetErrorMessage());
-					RE_CORE_ASSERT(false);
-				}
-
-				shaderData[stage] = std::vector<uint32_t>(module.cbegin(), module.cend());
-
-				std::ofstream out(cachedPath, std::ios::out | std::ios::binary| std::ios::trunc);
-				if (out.is_open()) {
-					auto& data = shaderData[stage];
-					out.write((char*)data.data(), data.size() * sizeof(uint32_t));
-					out.flush();
-					out.close();
-				}
-			}
-		}
+		//	DebugReflect(stage, data);
 	}
 
 	void OpenGLShader::CreateProgram() {
@@ -357,7 +310,7 @@ namespace RealEngine {
 
 			std::vector<GLchar> infoLog(maxLength);
 			glGetProgramInfoLog(program, maxLength, &maxLength, infoLog.data());
-			RE_CORE_ERROR("Shader linking failed ({0}):\n{1}", m_FilePath, infoLog.data());
+			RE_CORE_ERROR("Shader linking failed ({0}):\n{1}", Resource::GetPath(), infoLog.data());
 
 			glDeleteProgram(program);
 
@@ -374,18 +327,66 @@ namespace RealEngine {
 
 		//Cleanup
 		m_DontRecompile.clear();
-		m_VulkanSPIRV.clear();
 		m_OpenGLSPIRV.clear();
-		m_OpenGLSourceCode.clear();
 	}
 
-	void OpenGLShader::Reflect(GLenum stage, const std::vector<uint32_t>& shaderData) {
+	void OpenGLShader::GenerateReflectData(ShaderReflect* reflect) {
+		//Vertex shader
+		{
+			spirv_cross::CompilerGLSL glslCompiler(m_OpenGLSPIRV[GL_VERTEX_SHADER]);
+			spirv_cross::Compiler compiler(m_OpenGLSPIRV[GL_VERTEX_SHADER]);
+			spirv_cross::ShaderResources resources = compiler.get_shader_resources();
+
+			reflect->ShaderCode.push_back(glslCompiler.compile());
+
+			for (const auto& resource : resources.push_constant_buffers) {
+				uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
+
+				reflect->PushConstants.push_back({ resource.name, binding });
+			}
+
+			for (const auto& resource : resources.sampled_images) {
+				uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
+
+				reflect->Sampler2D.push_back({ resource.name, binding });
+			}
+
+			for (const auto& resource : resources.stage_inputs) {
+				uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
+
+				reflect->VertexInputs.push_back({ resource.name, binding });
+			}
+		}
+	
+		//Fragment shader
+		{
+			spirv_cross::CompilerGLSL glslCompiler(m_OpenGLSPIRV[GL_FRAGMENT_SHADER]);
+			spirv_cross::Compiler compiler(m_OpenGLSPIRV[GL_FRAGMENT_SHADER]);
+			spirv_cross::ShaderResources resources = compiler.get_shader_resources();
+			
+			reflect->ShaderCode.push_back(glslCompiler.compile());
+
+			for (const auto& resource : resources.sampled_images) {
+				uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
+
+				reflect->Sampler2D.push_back({ resource.name, binding });
+			}
+			
+			for (const auto& resource : resources.push_constant_buffers) {
+				uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
+
+				reflect->PushConstants.push_back({ resource.name, binding });
+			}
+		}
+	}
+
+	void OpenGLShader::DebugReflect(GLenum stage, const std::vector<uint32_t>& shaderData) {
 		RE_PROFILE_FUNCTION();
-		
+
 		spirv_cross::Compiler compiler(shaderData);
 		spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 
-		RE_CORE_TRACE("OpenGLShader::Reflect - {0} {1}", Utils::GLShaderStageToString(stage), m_FilePath);
+		RE_CORE_TRACE("OpenGLShader::Reflect - {0} {1}", Utils::GLShaderStageToString(stage), Resource::GetPath());
 		RE_CORE_TRACE("    {0} uniform buffers", resources.uniform_buffers.size());
 		RE_CORE_TRACE("    {0} resources", resources.sampled_images.size());
 
@@ -409,5 +410,54 @@ namespace RealEngine {
 
 	void OpenGLShader::Unbind() const {
 		glUseProgram(0);
+	}
+
+	void OpenGLShader::SetInt(const std::string& name, int value) {
+		RE_PROFILE_FUNCTION();
+
+		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		glUniform1i(location, value);
+	}
+
+	void OpenGLShader::SetIntArray(const std::string& name, int* values, uint32_t count) {
+		RE_PROFILE_FUNCTION();
+
+		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		glUniform1iv(location, count, values);
+	}
+
+	void OpenGLShader::SetFloat(const std::string& name, float value) {
+		RE_PROFILE_FUNCTION();
+
+		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		glUniform1f(location, value);
+	}
+
+	void OpenGLShader::SetFloat2(const std::string& name, const glm::vec2& value) {
+		RE_PROFILE_FUNCTION();
+
+		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		glUniform2f(location, value.x, value.y);
+	}
+
+	void OpenGLShader::SetFloat3(const std::string& name, const glm::vec3& value) {
+		RE_PROFILE_FUNCTION();
+
+		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		glUniform3f(location, value.x, value.y, value.z);
+	}
+
+	void OpenGLShader::SetFloat4(const std::string& name, const glm::vec4& value) {
+		RE_PROFILE_FUNCTION();
+
+		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		glUniform4f(location, value.x, value.y, value.z, value.w);
+	}
+
+	void OpenGLShader::SetMat4(const std::string& name, const glm::mat4& matrix) {
+		RE_PROFILE_FUNCTION();
+
+		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 }

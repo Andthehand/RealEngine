@@ -5,20 +5,20 @@
 #include "Platform/OpenGL/OpenGLShader.h"
 
 namespace RealEngine {
-	Ref<Shader> Shader::Create(const std::string& filepath) {
+	Ref<Shader> Shader::Create(const std::filesystem::path& filepath) {
 		switch (Renderer::GetAPI()) {
 			case RendererAPI::API::None:    RE_CORE_ASSERT(false, "RenderAPI::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:  return std::make_shared<OpenGLShader>(filepath);
+			case RendererAPI::API::OpenGL:  return OpenGLShader::GetInstance(filepath);
 		}
 
 		RE_CORE_ASSERT(false, "Unkown RendererAPI!");
 		return nullptr;
 	}
 
-	Ref<Shader> Shader::Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc) {
+	Ref<Shader> Shader::Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, ShaderReflect* reflect) {
 		switch (Renderer::GetAPI()) {
 			case RendererAPI::API::None:    RE_CORE_ASSERT(false, "RenderAPI::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:  return std::make_shared<OpenGLShader>(name, vertexSrc, fragmentSrc);
+			case RendererAPI::API::OpenGL:  return std::make_shared<OpenGLShader>(name, vertexSrc, fragmentSrc, reflect);
 		}
 
 		RE_CORE_ASSERT(false, "Unkown RendererAPI!");
